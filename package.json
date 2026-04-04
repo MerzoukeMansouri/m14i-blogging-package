@@ -1,0 +1,43 @@
+{
+  "name": "m14i-blogging",
+  "version": "0.1.0",
+  "description": "Drag & drop blog builder with customizable layouts and content blocks",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+  },
+  "keywords": [
+    "blog",
+    "builder",
+    "cms",
+    "drag-and-drop",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.25.0",
+  "peerDependencies": {
+    "@hello-pangea/dnd": "^16.0.0",
+    "lucide-react": "^0.0.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "lucide-react": "^1.7.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

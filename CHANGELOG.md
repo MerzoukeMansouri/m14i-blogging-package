@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.0...v0.16.1) (2026-04-05)
+
+### 📚 Documentation
+
+* add recommended Claude Haiku 4.5 model to README ([4803de3](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4803de342f02ff25985b4983aef2665fc05e2b94))
+
 ## [0.16.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.15.1...v0.16.0) (2026-04-05)
 
 ### ✨ Features

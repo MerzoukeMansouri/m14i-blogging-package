@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.6.1...v0.7.0) (2026-04-05)
+
+### ✨ Features
+
+* replace hardcoded colors with theme system in AI generation dialog ([f6f1995](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/f6f1995cdb0adbcee28d83a68b4999e2e664c406)), closes [#0A192F](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues/0A192F) [#F2F5F7](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues/F2F5F7) [#B87333](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues/B87333)
+
 ## [0.6.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.6.0...v0.6.1) (2026-04-05)
 
 ### ⚡ Performance Improvements

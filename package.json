@@ -44,7 +44,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package"
+    "url": "git+https://github.com/MerzoukeMansouri/m14i-blogging-package.git"
   },
   "bugs": {
     "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package/issues"

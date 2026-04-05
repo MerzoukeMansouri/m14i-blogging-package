@@ -11,6 +11,9 @@ importers:
       '@toon-format/toon':
         specifier: ^2.1.0
         version: 2.1.0
+      m14i-blogging:
+        specifier: 0.16.2
+        version: 0.16.2(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1)
     devDependencies:
       '@anthropic-ai/sdk':
         specifier: ^0.82.0
@@ -2371,6 +2374,26 @@ packages:
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
+
+  m14i-blogging@0.16.2:
+    resolution: {integrity: sha512-7z/y62hv/aVnMa9H5XhN8LoXfPshVjSz1imygsW2S6Rbj6wqmxO9ERVQip60qeqfRLX2FylDPAi3wHlHooCiVw==}
+    peerDependencies:
+      '@hello-pangea/dnd': ^16.0.0
+      '@supabase/ssr': '*'
+      '@supabase/supabase-js': '*'
+      lucide-react: ^0.0.0
+      next: '*'
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+      react-markdown: ^9.0.0
+      remark-gfm: ^4.0.0
+    peerDependenciesMeta:
+      '@supabase/ssr':
+        optional: true
+      '@supabase/supabase-js':
+        optional: true
+      next:
+        optional: true
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -5758,6 +5781,20 @@ snapshots:
       react: 19.2.4
 
   lz-string@1.5.0: {}
+
+  m14i-blogging@0.16.2(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1):
+    dependencies:
+      '@hello-pangea/dnd': 18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@toon-format/toon': 2.1.0
+      lucide-react: 1.7.0(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      react-markdown: 10.1.0(@types/react@19.2.14)(react@19.2.4)
+      remark-gfm: 4.0.1
+    optionalDependencies:
+      '@supabase/ssr': 0.6.1(@supabase/supabase-js@2.101.1)
+      '@supabase/supabase-js': 2.101.1
+      next: 15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
 
   magic-string@0.30.21:
     dependencies:

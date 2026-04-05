@@ -29,8 +29,8 @@ import {
 } from "./ai-prompts-compact";
 
 /**
- * Helper: Strip markdown code blocks from JSON response
- * Handles various formats that Claude might use
+ * Helper: Strip markdown code blocks and extract valid JSON from response
+ * Handles various formats that Claude might use and extracts only the JSON object
  */
 function stripMarkdownCodeBlocks(text: string): string {
   let cleaned = text.trim();
@@ -42,6 +42,15 @@ function stripMarkdownCodeBlocks(text: string): string {
   // Remove any remaining backticks at start/end
   cleaned = cleaned.replace(/^`+\s*/, '');
   cleaned = cleaned.replace(/\s*`+$/, '');
+
+  // Extract only the JSON object: find first { and last }
+  // This handles cases where the model adds text after the JSON
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+  }
 
   return cleaned.trim();
 }

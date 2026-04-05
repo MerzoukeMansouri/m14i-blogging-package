@@ -54,11 +54,13 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: pnpm audit signatures
 
+      - name: Update npm to latest version
+        run: npm install -g npm@latest
+
       - name: Release
         id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
   deploy-storybook:

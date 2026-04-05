@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.2...v0.5.3) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* strip markdown code blocks from AI JSON responses ([5d67f9e](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/5d67f9e305e7cca94d09ae56d42ad61a0d3bfecb))
+
 ## [0.5.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.1...v0.5.2) (2026-04-05)
 
 ### 🐛 Bug Fixes

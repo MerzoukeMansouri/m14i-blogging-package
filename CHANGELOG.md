@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.0...v0.5.1) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* add Next.js server imports as external to prevent __dirname errors ([199d4b9](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/199d4b9de692b8f18cb6fade902100bb3d508a29))
+
 ## [0.5.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.2...v0.5.0) (2026-04-05)
 
 ### ✨ Features

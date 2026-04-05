@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.1...v0.4.2) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* ensure schema fix is published ([59e2dc9](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/59e2dc9a8eca0d892c46df94638fd950b1e2ff68))
+
 ## [0.4.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.0...v0.4.1) (2026-04-05)
 
 ### 🐛 Bug Fixes

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.2...v0.5.0) (2026-04-05)
+
+### ✨ Features
+
+* add .env.example and update README with simplified setup ([fdc119c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/fdc119c8676558741cc8672b2ae97087b3c724fe))
+* add status label and update list view filters ([a44376d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/a44376de58ca253750307f51896a56f7a51aef27))
+
+### 🐛 Bug Fixes
+
+* add optional chaining and type safety for components ([ca5a62d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/ca5a62db13fba187b0853b2c3cba03f451b0ab72))
+
+### 📚 Documentation
+
+* add comprehensive guide for Blog component integration ([01dce05](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/01dce0502e95c5db8179d7383bca1d14992f12bf))
+* add storybook restart and blog admin guide documentation ([fc176da](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/fc176da196155ca9ce20480f1e38f3c21f10435a))
+
 ## [0.4.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.1...v0.4.2) (2026-04-05)
 
 ### 🐛 Bug Fixes

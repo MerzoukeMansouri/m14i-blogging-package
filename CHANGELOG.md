@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.1...v0.5.2) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* use apiClient from context instead of creating new instance ([b035bd3](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/b035bd37aed7350de30901ac212bc851a3fb3b4b))
+
 ## [0.5.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.0...v0.5.1) (2026-04-05)
 
 ### 🐛 Bug Fixes

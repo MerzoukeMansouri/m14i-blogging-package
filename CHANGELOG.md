@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.4...v0.2.5) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* trusted publisher ([53ff22e](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/53ff22eacdb0db66066c213fbfeeb2bc9ca71794))
+* trusted publisher ([4b55c5d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4b55c5de22e8d3667b1da06f0178964adc0f9321))
+
 ## [0.2.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.3...v0.2.4) (2026-04-05)
 
 ### 🐛 Bug Fixes

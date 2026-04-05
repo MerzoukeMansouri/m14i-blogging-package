@@ -22,6 +22,11 @@
       "import": "./dist/server/index.mjs",
       "require": "./dist/server/index.cjs"
     },
+    "./admin": {
+      "types": "./dist/admin/index.d.ts",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.cjs"
+    },
     "./styles": "./dist/index.css",
     "./package.json": "./package.json"
   },

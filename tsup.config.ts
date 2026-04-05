@@ -1,5 +1,25 @@
 import { defineConfig } from 'tsup';
 
+// Common external dependencies shared across bundles
+const commonExternals = [
+  'react',
+  'react-dom',
+  'react/jsx-runtime',
+  '@hello-pangea/dnd',
+  'lucide-react',
+  'react-markdown',
+  'remark-gfm',
+  '@supabase/supabase-js',
+  '@supabase/ssr',
+];
+
+// Common output extension configuration
+function getOutputExtension({ format }: { format: string }) {
+  return {
+    js: format === 'esm' ? '.mjs' : '.cjs',
+  };
+}
+
 export default defineConfig([
   // Main components bundle
   {
@@ -13,22 +33,8 @@ export default defineConfig([
     treeshake: true,
     splitting: false,
     minify: false,
-    outExtension({ format }) {
-      return {
-        js: format === 'esm' ? '.mjs' : '.cjs',
-      };
-    },
-    external: [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-      '@hello-pangea/dnd',
-      'lucide-react',
-      'react-markdown',
-      'remark-gfm',
-      '@supabase/supabase-js',
-      '@supabase/ssr',
-    ],
+    outExtension: getOutputExtension,
+    external: commonExternals,
     injectStyle: false, // Don't inject CSS, we'll provide it separately
   },
   // Client data access layer bundle
@@ -39,11 +45,7 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     dts: true,
     sourcemap: true,
-    outExtension({ format }) {
-      return {
-        js: format === 'esm' ? '.mjs' : '.cjs',
-      };
-    },
+    outExtension: getOutputExtension,
     external: [
       '@supabase/supabase-js',
       '@supabase/ssr',
@@ -57,17 +59,24 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     dts: true,
     sourcemap: true,
-    outExtension({ format }) {
-      return {
-        js: format === 'esm' ? '.mjs' : '.cjs',
-      };
-    },
+    outExtension: getOutputExtension,
     external: [
       'react',
       'react-dom',
       '@supabase/supabase-js',
       '@supabase/ssr',
     ],
+  },
+  // Admin interface bundle
+  {
+    entry: {
+      'admin/index': 'src/admin/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    outExtension: getOutputExtension,
+    external: commonExternals,
   },
   // CSS bundle - copy as index.css for the styles export
   {

@@ -540,7 +540,7 @@ export function createBlogClient(
        */
       async list(): Promise<import("../types/database").CategoryRow[]> {
         const { data, error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .select("*")
           .order("display_order", { ascending: true });
 
@@ -570,7 +570,7 @@ export function createBlogClient(
        */
       async getById(id: string): Promise<import("../types/database").CategoryRow | null> {
         const { data, error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .select("*")
           .eq("id", id)
           .single();
@@ -588,7 +588,7 @@ export function createBlogClient(
        */
       async getBySlug(slug: string): Promise<import("../types/database").CategoryRow | null> {
         const { data, error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .select("*")
           .eq("slug", slug)
           .single();
@@ -606,7 +606,7 @@ export function createBlogClient(
        */
       async create(category: import("../types/database").CategoryInsert): Promise<import("../types/database").CategoryRow> {
         const { data, error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .insert(category)
           .select()
           .single();
@@ -623,7 +623,7 @@ export function createBlogClient(
        */
       async update(id: string, updates: import("../types/database").CategoryUpdate): Promise<import("../types/database").CategoryRow> {
         const { data, error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .update(updates)
           .eq("id", id)
           .select()
@@ -641,7 +641,7 @@ export function createBlogClient(
        */
       async delete(id: string): Promise<void> {
         const { error } = await supabase
-          .from("blog.categories")
+          .from("blog_categories")
           .delete()
           .eq("id", id);
 
@@ -660,7 +660,7 @@ export function createBlogClient(
        */
       async list(): Promise<import("../types/database").TagRow[]> {
         const { data, error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .select("*")
           .order("name", { ascending: true });
 
@@ -690,7 +690,7 @@ export function createBlogClient(
        */
       async getById(id: string): Promise<import("../types/database").TagRow | null> {
         const { data, error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .select("*")
           .eq("id", id)
           .single();
@@ -708,7 +708,7 @@ export function createBlogClient(
        */
       async getBySlug(slug: string): Promise<import("../types/database").TagRow | null> {
         const { data, error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .select("*")
           .eq("slug", slug)
           .single();
@@ -726,7 +726,7 @@ export function createBlogClient(
        */
       async create(tag: import("../types/database").TagInsert): Promise<import("../types/database").TagRow> {
         const { data, error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .insert(tag)
           .select()
           .single();
@@ -743,7 +743,7 @@ export function createBlogClient(
        */
       async update(id: string, updates: import("../types/database").TagUpdate): Promise<import("../types/database").TagRow> {
         const { data, error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .update(updates)
           .eq("id", id)
           .select()
@@ -761,7 +761,7 @@ export function createBlogClient(
        */
       async delete(id: string): Promise<void> {
         const { error } = await supabase
-          .from("blog.tags")
+          .from("blog_tags")
           .delete()
           .eq("id", id);
 

@@ -50,6 +50,10 @@
     "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package/issues"
   },
   "homepage": "https://github.com/MerzoukeMansouri/m14i-blogging-package#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "packageManager": "pnpm@10.25.0",
   "peerDependencies": {
     "@hello-pangea/dnd": "^16.0.0",

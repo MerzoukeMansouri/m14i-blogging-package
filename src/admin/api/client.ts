@@ -22,6 +22,8 @@ import type {
 import type {
   GenerateCompleteBlogRequest,
   GenerateCompleteBlogResponse,
+  GenerateLayoutRequest,
+  GenerateLayoutResponse,
   GenerateSectionRequest,
   GenerateSectionResponse,
   GenerateSEORequest,
@@ -329,7 +331,17 @@ export class BlogAdminAPIClient {
   // ============================================================================
 
   /**
+   * Generate blog post layout structure only (Step 1 of two-step generation)
+   */
+  async generateLayout(
+    request: GenerateLayoutRequest
+  ): Promise<GenerateLayoutResponse> {
+    return this.makeAIGenerationRequest<GenerateLayoutResponse>("layout", request);
+  }
+
+  /**
    * Generate a complete blog post from a prompt using AI
+   * @deprecated Use generateLayout() + generateSection() for better control
    */
   async generateBlogPost(
     request: GenerateCompleteBlogRequest

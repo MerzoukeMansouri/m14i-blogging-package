@@ -226,23 +226,42 @@ export function EditorView({ postId }: EditorViewProps) {
     setGenerationError(null);
 
     try {
-      const result = await apiClient.generateBlogPost({
+      // Step 1: Generate layout structure only
+      const layoutResult = await apiClient.generateLayout({
         prompt: generatePrompt,
         length: "medium",
         tone: "professional",
       });
 
-      // Update all fields with generated content
-      updateField("title", result.title);
-      updateField("slug", result.slug);
-      updateField("excerpt", result.excerpt);
-      updateField("sections", result.sections);
-      updateField("category", result.category || "");
-      updateField("tags", result.tags || []);
+      // Update basic fields immediately
+      updateField("title", layoutResult.title);
+      updateField("slug", layoutResult.slug);
+      updateField("excerpt", layoutResult.excerpt);
+      updateField("category", layoutResult.category || "");
+      updateField("tags", layoutResult.tags || []);
       updateField("seo_metadata", {
-        metaTitle: result.title,
-        metaDescription: result.seo_metadata?.description || result.excerpt || "",
+        metaTitle: layoutResult.title,
+        metaDescription: layoutResult.excerpt || "",
       });
+
+      // Step 2: Generate content for each section progressively
+      const sections = [];
+      for (const layoutSection of layoutResult.layout) {
+        try {
+          const sectionResult = await apiClient.generateSection({
+            prompt: layoutSection.description,
+            layoutType: layoutSection.type,
+            context: `${layoutResult.title} - ${layoutResult.excerpt}`,
+          });
+
+          sections.push(sectionResult.section);
+          // Update sections progressively so user sees them appear
+          updateField("sections", [...sections]);
+        } catch (sectionErr: any) {
+          console.error(`Error generating section ${layoutSection.id}:`, sectionErr);
+          // Continue with other sections even if one fails
+        }
+      }
 
       setShowGenerateDialog(false);
       setGeneratePrompt("");

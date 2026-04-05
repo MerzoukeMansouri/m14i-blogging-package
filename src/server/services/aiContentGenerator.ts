@@ -20,12 +20,20 @@ import type {
 
 /**
  * Helper: Strip markdown code blocks from JSON response
+ * Handles various formats that Claude might use
  */
 function stripMarkdownCodeBlocks(text: string): string {
-  // Remove ```json ... ``` or ``` ... ``` wrapping
-  const codeBlockPattern = /^```(?:json)?\s*\n?([\s\S]*?)\n?```$/;
-  const match = text.trim().match(codeBlockPattern);
-  return match ? match[1].trim() : text.trim();
+  let cleaned = text.trim();
+
+  // Remove ```json ... ``` or ``` ... ``` wrapping (multiline)
+  cleaned = cleaned.replace(/^```(?:json)?\s*\n?/m, '');
+  cleaned = cleaned.replace(/\n?```\s*$/m, '');
+
+  // Remove any remaining backticks at start/end
+  cleaned = cleaned.replace(/^`+\s*/, '');
+  cleaned = cleaned.replace(/\s*`+$/, '');
+
+  return cleaned.trim();
 }
 
 /**

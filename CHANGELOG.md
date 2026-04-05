@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.4.0...v0.4.1) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* use public schema for categories/tags tables (blog_categories, blog_tags) ([fef582c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/fef582c32cd0182a524815e5cc35ee367026bfed))
+
 ## [0.4.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.3.0...v0.4.0) (2026-04-05)
 
 ### ✨ Features

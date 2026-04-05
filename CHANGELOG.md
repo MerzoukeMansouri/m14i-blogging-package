@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.7.2...v0.7.3) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* add comprehensive JSON validation and ultra-strict prompt formatting ([daebfb7](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/daebfb79a16892ef6332264952a1051fbe2c6953))
+
 ## [0.7.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.7.1...v0.7.2) (2026-04-05)
 
 ### 🐛 Bug Fixes

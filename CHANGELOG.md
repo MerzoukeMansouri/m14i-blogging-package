@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.15.1...v0.16.0) (2026-04-05)
+
+### ✨ Features
+
+* add all available layout types to generation prompt ([58dd352](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/58dd3524e4f96fbb311ae9ffdd2a38e5b9c0d232))
+* add compact prompt format as alternative to TOON ([a6d345f](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/a6d345f9455ffe4039f2cefb9a6ce7ece27867b9))
+* add detailed usage descriptions for each layout type ([81bbb59](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/81bbb59f2c3f2412d2343d77cd58a6040ad17ae2))
+
+### 🐛 Bug Fixes
+
+* remove corrupted TOON file and use compact prompts ([37d4b2b](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/37d4b2b8e0de4406c245104fa91888d9ce7a9a4e))
+
 ## [0.15.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.15.0...v0.15.1) (2026-04-05)
 
 ### 🐛 Bug Fixes

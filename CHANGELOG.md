@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.2...v0.2.3) (2026-04-05)
+
+### 📚 Documentation
+
+* add Claude skills documentation and setup guide ([9181d0e](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9181d0ec693045b5deaf852d4fed5a00b2283b5e))
+* update README with AI-assisted setup instructions ([9cd26f1](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9cd26f10e80e89f21eccd423f754fbf238975360))
+
 ## [0.2.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.1...v0.2.2) (2026-04-05)
 
 ### 📚 Documentation

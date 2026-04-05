@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    'server/index': 'src/server/index.ts',
     styles: 'src/styles.css',
   },
   format: ['cjs', 'esm'],
@@ -20,6 +21,8 @@ export default defineConfig({
     'lucide-react',
     'react-markdown',
     'remark-gfm',
+    '@supabase/supabase-js',
+    '@supabase/ssr',
   ],
   // Inject CSS imports into the bundle for automatic inclusion
   injectStyle: true,

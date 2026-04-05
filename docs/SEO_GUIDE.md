@@ -8,9 +8,10 @@ This guide provides comprehensive documentation for the SEO features built into 
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Quick Start](#quick-start)
-3. [SEO Configuration](#seo-configuration)
+1. [Search Engine Visibility](#search-engine-visibility) ⭐ **NEW**
+2. [Overview](#overview)
+3. [Quick Start](#quick-start)
+4. [SEO Configuration](#seo-configuration)
 4. [BlogPost SEO Fields](#blogpost-seo-fields)
 5. [Next.js Integration](#nextjs-integration)
 6. [Content Analysis](#content-analysis)
@@ -19,6 +20,99 @@ This guide provides comprehensive documentation for the SEO features built into 
 9. [Structured Data (JSON-LD)](#structured-data-json-ld)
 10. [Best Practices](#best-practices)
 11. [Advanced Usage](#advanced-usage)
+
+---
+
+## Search Engine Visibility
+
+### Sitemap, Robots.txt, and RSS Feeds
+
+Make your blog discoverable by search engines and feed readers with these **4 simple files**:
+
+#### 1. Sitemap (`app/sitemap.ts`)
+
+```typescript
+import { generateNextJsSitemap } from 'm14i-blogging/server';
+import { createServerSupabaseClient } from '@/lib/supabase-client';
+
+export default async function sitemap() {
+  const supabase = createServerSupabaseClient();
+
+  return generateNextJsSitemap(supabase, {
+    baseUrl: 'https://example.com',
+    additionalUrls: [
+      {
+        url: 'https://example.com',
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 1,
+      },
+      {
+        url: 'https://example.com/about',
+        changeFrequency: 'monthly',
+        priority: 0.8,
+      },
+    ],
+  });
+}
+```
+
+**Result:** `/sitemap.xml` - Auto-generated from your blog posts
+
+#### 2. Robots.txt (`app/robots.ts`)
+
+```typescript
+import { generateNextJsRobots } from 'm14i-blogging/server';
+
+export default function robots() {
+  return generateNextJsRobots({
+    baseUrl: 'https://example.com',
+    disallow: ['/admin', '/api', '/_next'],
+  });
+}
+```
+
+**Result:** `/robots.txt` - Tells search engines what to crawl
+
+#### 3. RSS Feed (`app/rss.xml/route.ts`)
+
+```typescript
+import { generateRSSFeed } from 'm14i-blogging/server';
+import { createServerSupabaseClient } from '@/lib/supabase-client';
+
+export async function GET() {
+  const supabase = createServerSupabaseClient();
+
+  const rss = await generateRSSFeed(supabase, {
+    baseUrl: 'https://example.com',
+    title: 'My Blog',
+    description: 'Latest posts from my blog',
+    language: 'en',
+  });
+
+  return new Response(rss, {
+    headers: { 'Content-Type': 'application/xml' },
+  });
+}
+```
+
+**Result:** `/rss.xml` - RSS feed for subscribers
+
+#### 4. Submit to Search Engines
+
+After deploying, submit your sitemap:
+
+**Google Search Console:**
+1. Go to [search.google.com/search-console](https://search.google.com/search-console)
+2. Add your property
+3. Submit: `https://your-site.com/sitemap.xml`
+
+**Bing Webmaster:**
+1. Go to [bing.com/webmasters](https://www.bing.com/webmasters)
+2. Add your site
+3. Submit sitemap
+
+✅ **Done!** Your blog is now discoverable by search engines.
 
 ---
 

@@ -107,6 +107,15 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
       return;
     }
 
+    // Handle section reordering
+    if (source.droppableId === "editor-zone" && destination.droppableId === "editor-zone") {
+      const newSections = [...sections];
+      const [movedSection] = newSections.splice(source.index, 1);
+      newSections.splice(destination.index, 0, movedSection);
+      onChange(newSections);
+      return;
+    }
+
     // Handle existing block reorganization
     const [, sourceSectionIdx, sourceColumnIdx] = source.droppableId.split("-");
     const [, destSectionIdx, destColumnIdx] = destination.droppableId.split("-");
@@ -225,126 +234,151 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                 ) : (
             <div className="space-y-4 max-w-6xl mx-auto pb-20">
               {sections.map((section, sectionIndex) => (
-                <Card key={section.id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        {getLayoutLabel(section.type)}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteSection(sectionIndex)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className={`grid gap-4 ${getLayoutClasses(section.type)}`}>
-                      {section.columns.map((column, columnIndex) => (
-                        <Droppable
-                          key={`column-${sectionIndex}-${columnIndex}`}
-                          droppableId={`column-${sectionIndex}-${columnIndex}`}
-                          type="BLOCK"
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                              className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 ${
-                                snapshot.isDraggingOver ? "border-primary bg-accent" : "border-muted"
-                              }`}
-                            >
-                              {column.length === 0 ? (
-                                <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
-                                  Glissez un bloc ici
-                                </div>
-                              ) : (
-                                <div className="space-y-3">
-                                  {column.map((block, blockIndex) => (
-                                    <Draggable
-                                      key={block.id}
-                                      draggableId={block.id}
-                                      index={blockIndex}
-                                    >
-                                      {(provided) => (
-                                        <div
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          className="group relative border rounded-lg bg-card hover:shadow-md transition-shadow"
-                                        >
-                                          <div className="flex items-start gap-2 p-3">
-                                            {/* Drag Handle */}
-                                            <div
-                                              {...provided.dragHandleProps}
-                                              className="cursor-grab active:cursor-grabbing opacity-50 hover:opacity-100 transition-opacity pt-1"
-                                            >
-                                              <svg
-                                                className="w-4 h-4"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                              >
-                                                <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
-                                              </svg>
-                                            </div>
-
-                                            {/* Content - Always editable */}
-                                            <div className="flex-1 min-w-0">
-                                              <ContentBlockInlineEditor
-                                                block={block}
-                                                onChange={(updatedBlock) =>
-                                                  updateBlock(
-                                                    sectionIndex,
-                                                    columnIndex,
-                                                    blockIndex,
-                                                    updatedBlock
-                                                  )
-                                                }
-                                                components={{
-                                                  Label: components.Label,
-                                                  Input: components.Input,
-                                                  Textarea: components.Textarea,
-                                                  Select: components.Select,
-                                                  SelectTrigger: components.SelectTrigger,
-                                                  SelectValue: components.SelectValue,
-                                                  SelectContent: components.SelectContent,
-                                                  SelectItem: components.SelectItem,
-                                                  Button: components.Button,
-                                                  PlusIcon: components.PlusIcon,
-                                                  XIcon: components.XIcon,
-                                                }}
-                                              />
-                                            </div>
-
-                                            {/* Delete Button */}
-                                            <div>
-                                              <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="h-8 w-8"
-                                                onClick={() =>
-                                                  deleteBlock(sectionIndex, columnIndex, blockIndex)
-                                                }
-                                              >
-                                                <Trash2 className="w-4 h-4" />
-                                              </Button>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  ))}
-                                </div>
-                              )}
-                              {provided.placeholder}
+                <Draggable key={section.id} draggableId={section.id} index={sectionIndex}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={snapshot.isDragging ? "opacity-50" : ""}
+                    >
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {/* Drag Handle for Section */}
+                              <div
+                                {...provided.dragHandleProps}
+                                className="cursor-grab active:cursor-grabbing opacity-50 hover:opacity-100 transition-opacity"
+                              >
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
+                                </svg>
+                              </div>
+                              <span className="text-sm text-muted-foreground">
+                                {getLayoutLabel(section.type)}
+                              </span>
                             </div>
-                          )}
-                        </Droppable>
-                      ))}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteSection(sectionIndex)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className={`grid gap-4 ${getLayoutClasses(section.type)}`}>
+                            {section.columns.map((column, columnIndex) => (
+                              <Droppable
+                                key={`column-${sectionIndex}-${columnIndex}`}
+                                droppableId={`column-${sectionIndex}-${columnIndex}`}
+                                type="BLOCK"
+                              >
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                    className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 ${
+                                      snapshot.isDraggingOver ? "border-primary bg-accent" : "border-muted"
+                                    }`}
+                                  >
+                                    {column.length === 0 ? (
+                                      <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
+                                        Glissez un bloc ici
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-3">
+                                        {column.map((block, blockIndex) => (
+                                          <Draggable
+                                            key={block.id}
+                                            draggableId={block.id}
+                                            index={blockIndex}
+                                          >
+                                            {(provided) => (
+                                              <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                className="group relative border rounded-lg bg-card hover:shadow-md transition-shadow"
+                                              >
+                                                <div className="flex items-start gap-2 p-3">
+                                                  {/* Drag Handle */}
+                                                  <div
+                                                    {...provided.dragHandleProps}
+                                                    className="cursor-grab active:cursor-grabbing opacity-50 hover:opacity-100 transition-opacity pt-1"
+                                                  >
+                                                    <svg
+                                                      className="w-4 h-4"
+                                                      fill="currentColor"
+                                                      viewBox="0 0 20 20"
+                                                    >
+                                                      <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
+                                                    </svg>
+                                                  </div>
+
+                                                  {/* Content - Always editable */}
+                                                  <div className="flex-1 min-w-0">
+                                                    <ContentBlockInlineEditor
+                                                      block={block}
+                                                      onChange={(updatedBlock) =>
+                                                        updateBlock(
+                                                          sectionIndex,
+                                                          columnIndex,
+                                                          blockIndex,
+                                                          updatedBlock
+                                                        )
+                                                      }
+                                                      components={{
+                                                        Label: components.Label,
+                                                        Input: components.Input,
+                                                        Textarea: components.Textarea,
+                                                        Select: components.Select,
+                                                        SelectTrigger: components.SelectTrigger,
+                                                        SelectValue: components.SelectValue,
+                                                        SelectContent: components.SelectContent,
+                                                        SelectItem: components.SelectItem,
+                                                        Button: components.Button,
+                                                        PlusIcon: components.PlusIcon,
+                                                        XIcon: components.XIcon,
+                                                      }}
+                                                    />
+                                                  </div>
+
+                                                  {/* Delete Button */}
+                                                  <div>
+                                                    <Button
+                                                      size="icon"
+                                                      variant="ghost"
+                                                      className="h-8 w-8"
+                                                      onClick={() =>
+                                                        deleteBlock(sectionIndex, columnIndex, blockIndex)
+                                                      }
+                                                    >
+                                                      <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )}
+                                          </Draggable>
+                                        ))}
+                                      </div>
+                                    )}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
                     </div>
-                  </CardContent>
-                </Card>
+                  )}
+                </Draggable>
               ))}
               {provided.placeholder}
             </div>

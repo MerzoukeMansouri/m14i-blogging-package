@@ -112,7 +112,7 @@ function InputField({
 }
 
 export function EditorView({ postId }: EditorViewProps) {
-  const { apiClient, components, labels, basePath, features, navigate, colors } = useBlogAdminContext();
+  const { apiClient, components, labels, basePath, features, navigate, colors, layout, classNames } = useBlogAdminContext();
   const { getPost, createPost, updatePost } = usePosts();
   const [initialPost, setInitialPost] = useState<BlogPostRow | undefined>();
   const [loadingPost, setLoadingPost] = useState(!!postId);
@@ -462,9 +462,9 @@ export function EditorView({ postId }: EditorViewProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={classNames?.editorLayout || "grid grid-cols-1 lg:grid-cols-3 gap-6"}>
         {/* Main Content - BlogBuilder */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className={classNames?.editorMain || "lg:col-span-2 space-y-6"}>
           {/* Title & Slug */}
           <CardWrapper Card={Card}>
             <div className="space-y-4 p-6">
@@ -581,11 +581,12 @@ export function EditorView({ postId }: EditorViewProps) {
         </div>
 
         {/* Sidebar - Metadata */}
-        <div className="space-y-6">
+        <div className={classNames?.editorSidebar || "space-y-6"}>
           {/* Taxonomy */}
-          <CardWrapper Card={Card}>
-            <div className="p-6">
-              <h3 className="font-semibold mb-4">{labels.taxonomy}</h3>
+          <div className={classNames?.sidebarSection || ""}>
+            <CardWrapper Card={Card}>
+              <div className="p-6">
+                <h3 className="font-semibold mb-4">{labels.taxonomy}</h3>
               <TaxonomySelector
                 selectedCategory={state.category}
                 selectedTags={state.tags}
@@ -594,12 +595,14 @@ export function EditorView({ postId }: EditorViewProps) {
                 onCreateCategory={() => setShowCategoryDialog(true)}
                 onCreateTag={() => setShowTagDialog(true)}
               />
-            </div>
-          </CardWrapper>
+              </div>
+            </CardWrapper>
+          </div>
 
           {/* Featured Image */}
           {features.featuredImage && (
-            <CardWrapper Card={Card}>
+            <div className={classNames?.sidebarSection || ""}>
+              <CardWrapper Card={Card}>
               <div className="p-6 space-y-4">
                 <h3 className="font-semibold">{labels.featuredImage}</h3>
                 <InputField
@@ -618,10 +621,12 @@ export function EditorView({ postId }: EditorViewProps) {
                 )}
               </div>
             </CardWrapper>
+            </div>
           )}
 
           {/* Excerpt */}
-          <CardWrapper Card={Card}>
+          <div className={classNames?.sidebarSection || ""}>
+            <CardWrapper Card={Card}>
             <div className="p-6 space-y-4">
               <h3 className="font-semibold">{labels.excerpt}</h3>
               <textarea
@@ -633,10 +638,12 @@ export function EditorView({ postId }: EditorViewProps) {
               />
             </div>
           </CardWrapper>
+          </div>
 
           {/* SEO */}
           {features.seo && (
-            <CardWrapper Card={Card}>
+            <div className={classNames?.sidebarSection || ""}>
+              <CardWrapper Card={Card}>
               <div className="p-6 space-y-4">
                 <h3 className="font-semibold">{labels.seo}</h3>
                 <div className="space-y-2">
@@ -661,6 +668,7 @@ export function EditorView({ postId }: EditorViewProps) {
                 </div>
               </div>
             </CardWrapper>
+            </div>
           )}
         </div>
       </div>

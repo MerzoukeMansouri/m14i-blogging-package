@@ -50,6 +50,8 @@ export function BlogAdmin(props: BlogAdminProps) {
     basePath = "/admin/blog",
     theme,
     colors,
+    layout,
+    classNames,
     features,
     components,
     onPostCreate,
@@ -96,6 +98,8 @@ export function BlogAdmin(props: BlogAdminProps) {
         basePath={basePath}
         theme={theme}
         colors={colors}
+        layout={layout}
+        classNames={classNames}
         features={features}
         components={components}
         onPostCreate={onPostCreate}
@@ -136,6 +140,8 @@ export function BlogAdmin(props: BlogAdminProps) {
       basePath={basePath}
       theme={theme}
       colors={colors}
+      layout={layout}
+      classNames={classNames}
       features={features}
       components={components}
       onPostCreate={onPostCreate}
@@ -144,7 +150,7 @@ export function BlogAdmin(props: BlogAdminProps) {
       onPublish={onPublish}
       labels={labels}
     >
-      <div className="min-h-screen bg-background">
+      <div className={classNames?.container || "min-h-screen bg-background"}>
         <div className="max-w-7xl mx-auto px-4 py-8">
           {renderView()}
         </div>

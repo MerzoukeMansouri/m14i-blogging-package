@@ -14,6 +14,8 @@ import type {
   BlogAdminFeatures,
   BlogAdminLabels,
   BlogAdminComponents,
+  BlogAdminLayout,
+  BlogAdminClassNames,
 } from "../types";
 
 // ============================================================================
@@ -31,6 +33,8 @@ export interface BlogAdminContextValue {
   basePath: string;
   theme?: BlogAdminTheme;
   colors?: BlogAdminColors;
+  layout?: BlogAdminLayout;
+  classNames?: BlogAdminClassNames;
   features: Required<BlogAdminFeatures>;
   labels: Required<BlogAdminLabels>;
   components?: BlogAdminComponents;
@@ -148,6 +152,8 @@ export interface BlogAdminProviderProps {
   basePath?: string;
   theme?: BlogAdminTheme;
   colors?: BlogAdminColors;
+  layout?: BlogAdminLayout;
+  classNames?: BlogAdminClassNames;
   features?: BlogAdminFeatures;
   labels?: Partial<BlogAdminLabels>;
   components?: BlogAdminComponents;
@@ -169,6 +175,8 @@ export function BlogAdminProvider({
   basePath = "/admin/blog",
   theme,
   colors,
+  layout,
+  classNames,
   features,
   labels,
   components,
@@ -185,6 +193,8 @@ export function BlogAdminProvider({
       basePath,
       theme,
       colors,
+      layout,
+      classNames,
       features: { ...DEFAULT_FEATURES, ...features },
       labels: { ...DEFAULT_LABELS, ...labels },
       components,
@@ -200,6 +210,8 @@ export function BlogAdminProvider({
       basePath,
       theme,
       colors,
+      layout,
+      classNames,
       features,
       labels,
       components,

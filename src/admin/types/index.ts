@@ -197,6 +197,53 @@ export interface BlogAdminComponents {
 }
 
 // ============================================================================
+// Layout Configuration
+// ============================================================================
+
+export interface BlogAdminLayout {
+  /**
+   * Position of the sidebar in editor view
+   * - "right": Sidebar on the right (default for horizontal layout)
+   * - "bottom": Sidebar at the bottom (default for vertical layout)
+   */
+  editorSidebarPosition?: "right" | "bottom";
+
+  /**
+   * Width of the main editor area
+   * - Can be a percentage string like "70%" or "80%"
+   * - Or "full" for full width
+   */
+  editorMainWidth?: string;
+}
+
+export interface BlogAdminClassNames {
+  // Container classes
+  container?: string;
+  header?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+
+  // Component classes
+  card?: string;
+  button?: string;
+  buttonOutline?: string;
+  input?: string;
+  badge?: string;
+  select?: string;
+  dialog?: string;
+  dialogOverlay?: string;
+  dialogContent?: string;
+  dialogTitle?: string;
+  dialogDescription?: string;
+
+  // Editor layout classes
+  editorLayout?: string;
+  editorMain?: string;
+  editorSidebar?: string;
+  sidebarSection?: string;
+}
+
+// ============================================================================
 // BlogAdmin Props
 // ============================================================================
 
@@ -244,6 +291,16 @@ export interface BlogAdminProps {
    * Custom colors (optional, defaults to Tailwind)
    */
   colors?: BlogAdminColors;
+
+  /**
+   * Layout configuration for editor view
+   */
+  layout?: BlogAdminLayout;
+
+  /**
+   * Custom CSS class names for components
+   */
+  classNames?: BlogAdminClassNames;
 
   /**
    * Feature toggles

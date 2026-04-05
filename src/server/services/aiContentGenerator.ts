@@ -88,7 +88,29 @@ export class AIContentGenerator {
 
     // Parse the JSON response (strip markdown code blocks first)
     const cleanedText = stripMarkdownCodeBlocks(responseText);
-    const result = JSON.parse(cleanedText) as GenerateCompleteBlogResponse;
+
+    // Try to parse JSON with detailed error reporting
+    let result: GenerateCompleteBlogResponse;
+    try {
+      result = JSON.parse(cleanedText) as GenerateCompleteBlogResponse;
+    } catch (error) {
+      // Log the problematic JSON for debugging
+      console.error("JSON Parse Error:", error);
+      console.error("Problematic JSON (first 500 chars):", cleanedText.substring(0, 500));
+      console.error("Problematic JSON (last 500 chars):", cleanedText.substring(Math.max(0, cleanedText.length - 500)));
+
+      // Try to provide more context about where the error occurred
+      if (error instanceof SyntaxError) {
+        const match = error.message.match(/position (\d+)/);
+        if (match) {
+          const position = parseInt(match[1]);
+          const context = cleanedText.substring(Math.max(0, position - 100), Math.min(cleanedText.length, position + 100));
+          console.error(`Context around error position ${position}:`, context);
+        }
+      }
+
+      throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}. This usually means the AI didn't follow the JSON format instructions. Please try again.`);
+    }
 
     return result;
   }
@@ -139,27 +161,35 @@ export class AIContentGenerator {
   private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest): string {
     return `You are an expert blog content writer specializing in creating elegant, visually engaging blog posts with sophisticated layouts.
 
-CRITICAL JSON FORMATTING RULES - MUST FOLLOW EXACTLY:
-1. Your ENTIRE response must be a single valid JSON object
-2. DO NOT wrap the JSON in markdown code blocks (no \`\`\`json or \`\`\`)
-3. DO NOT add any text before or after the JSON
-4. All string values MUST have properly escaped quotes: use \\" for quotes inside strings
-5. All strings MUST be on a single line (no literal newlines in string values)
-6. Use \\n for line breaks inside string content
-7. Ensure all brackets and braces are properly closed
-8. Test that your response is valid JSON before returning it
+⚠️ CRITICAL: YOUR RESPONSE MUST BE 100% VALID JSON ⚠️
 
-WRONG EXAMPLES:
-❌ \`\`\`json {...}\`\`\`  (no markdown)
-❌ Here is the JSON: {...}  (no extra text)
-❌ "content": "This is a "quote""  (escape quotes as \\\")
-❌ "content": "Line 1
-Line 2"  (use \\n instead)
+JSON FORMATTING RULES - ZERO TOLERANCE FOR ERRORS:
+1. Response starts with { and ends with } - NOTHING ELSE
+2. NO markdown code blocks (no \`\`\`json or \`\`\`)
+3. NO explanatory text before or after the JSON
+4. ALL quotes inside strings MUST be escaped: use \\" not "
+5. NO literal line breaks in strings - use \\n instead
+6. NO trailing commas after the last item in arrays or objects
+7. ALL object keys must be in "double quotes"
+8. Close EVERY bracket and brace you open
+9. Double-check your JSON is valid before responding
 
-CORRECT EXAMPLE:
-✅ {"title":"My Post","content":"This is a \\"quote\\" and\\nthis is a new line"}
+COMMON MISTAKES TO AVOID:
+❌ "content": "She said "hello""  → ✅ "content": "She said \\"hello\\""
+❌ "content": "First line
+Second line"  → ✅ "content": "First line\\nSecond line"
+❌ "tags": ["tag1", "tag2",]  → ✅ "tags": ["tag1", "tag2"]
+❌ {title: "Post"}  → ✅ {"title": "Post"}
+❌ \`\`\`json\\n{...}\\n\`\`\`  → ✅ {...}
 
-Your response must start with { and end with } with nothing else.
+If you're unsure about JSON syntax:
+- Every opening { needs a closing }
+- Every opening [ needs a closing ]
+- Every string needs exactly 2 unescaped quotes (start and end)
+- Commas separate items, but NO comma after the last item
+- Property names and string values both need "double quotes"
+
+BEFORE YOU RESPOND: Mentally validate your JSON structure is correct.
 
 # CONTENT PHILOSOPHY
 Create content that is:
@@ -416,7 +446,18 @@ CRITICAL REMINDERS:
 ${request.tone ? `Tone: ${request.tone}` : "Tone: Professional yet approachable, authoritative yet conversational"}
 ${request.length ? `Length: ${request.length}` : "Length: medium (5-7 sections, 800-1200 words)"}
 ${request.layoutPreference && request.layoutPreference.length > 0 ? `Preferred layouts: ${request.layoutPreference.join(", ")}. Use these layouts predominantly while maintaining visual variety.` : "Use varied layouts (2-col, 3-col, grids) for visual interest"}
-${request.additionalInstructions ? `\n\nADDITIONAL INSTRUCTIONS:\n${request.additionalInstructions}` : ""}`;
+${request.additionalInstructions ? `\n\nADDITIONAL INSTRUCTIONS:\n${request.additionalInstructions}` : ""}
+
+⚠️ FINAL CHECKLIST BEFORE RESPONDING:
+□ Does my response start with { and end with }?
+□ Did I escape ALL quotes inside strings with \\"?
+□ Did I replace ALL line breaks with \\n?
+□ Did I remove ALL trailing commas?
+□ Are ALL property names in "double quotes"?
+□ Did I avoid markdown code blocks?
+□ Is every bracket properly closed?
+
+RESPOND ONLY WITH VALID JSON NOW:`;
   }
 
   /**

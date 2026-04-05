@@ -65,6 +65,9 @@ export default defineConfig([
       'react-dom',
       '@supabase/supabase-js',
       '@supabase/ssr',
+      'next',
+      'next/server',
+      'next/navigation',
     ],
   },
   // Admin interface bundle

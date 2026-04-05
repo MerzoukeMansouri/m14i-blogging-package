@@ -34,11 +34,13 @@ export function generateLayoutPrompt(req: {
 
 CRITICAL: 100% VALID JSON { } NO \`\`\` escape " NO trailing commas
 
-Response: {title,slug,excerpt:"150-200c",layout:[{id,type:"hero|two-column|three-column|full-width|sidebar-left|sidebar-right",description}],category,tags:[]}
+Response: {title,slug,excerpt:"150-200c",layout:[{id,type,description}],category,tags:[]}
 
-Layouts: hero(intro+img), two-column(text|img alt), three-column(features), full-width(narrative), sidebar(context)
-Rules: NEVER repeat layout, alternate dense/spacious, two-col alternate sides
-Composition short(2-3):hero→two-col→full, medium(3-4):hero→two-col→three-col→two-col, long(4-5):hero→two-col→three-col→two-col→sidebar
+Available types: "1-column", "2-columns", "3-columns", "2-columns-wide-left", "2-columns-wide-right", "grid-2x2", "grid-3x3", "grid-2x3", "grid-4-even"
+
+Layouts usage: 1-column(intro/narrative), 2-columns(comparison/text+img), 3-columns(features/steps), 2-columns-wide-left(content+sidebar 66/33), 2-columns-wide-right(icon+detail 33/66), grid-2x2(4 items), grid-3x3(9 items), grid-2x3(6 items), grid-4-even(4 items)
+Rules: NEVER repeat layout, alternate dense/spacious, vary column widths
+Composition short(2-3):1-column→2-columns→3-columns, medium(3-4):1-column→2-columns→3-columns→2-columns-wide-left, long(4-5):1-column→2-columns→grid-2x2→3-columns→2-columns-wide-left
 Words: 1,500-2,500 total, short~1k, medium~1.5-2k, long~2-2.5k, MAX 2.5k
 
 ${req.length ? `Len:${req.length}` : ""}${req.layoutPreference?.length ? ` Pref:${req.layoutPreference}` : ""}${req.tone ? ` Tone:${req.tone}` : ""}${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}`;

@@ -54,9 +54,6 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: pnpm audit signatures
 
-      - name: Update npm to latest version
-        run: npm install -g npm@latest
-
       - name: Release
         id: semantic
         env:

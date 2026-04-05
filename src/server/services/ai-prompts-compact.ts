@@ -36,23 +36,31 @@ CRITICAL: 100% VALID JSON { } NO \`\`\` escape " NO trailing commas
 
 Response: {title,slug,excerpt:"150-200c",layout:[{id,type,description}],category,tags:[]}
 
-Layout types & usage:
-• "1-column": Hero intro, long narrative, conclusion, single focused message, full-width content
-• "2-columns": Text+image side-by-side, comparison tables, before/after, pros/cons, balanced content
-• "3-columns": Feature lists, step-by-step guides, benefits showcase, icon+text cards, equal importance items
-• "2-columns-wide-left": Main content (66%) + sidebar tip/note (33%), article+related, content+CTA
-• "2-columns-wide-right": Icon/visual (33%) + detailed explanation (66%), diagram+description
-• "grid-2x2": 4 equal items (case studies, team members, products, categories)
-• "grid-3x3": 9 items (portfolio, gallery, features matrix, comprehensive showcase)
-• "grid-2x3": 6 items (services, benefits, steps, moderate showcase)
-• "grid-4-even": 4 prominent items (key features, main offerings, core values)
+PROVEN PATTERNS (use these successful structures):
+${lang === "fr" ? "• Article tech: 1-col(hero+image)→2-col(contenu+quote/image)→grid-2x3(6 features emoji)→1-col(conclusion)" : "• Tech article: 1-col(hero+image)→2-col(content+quote/image)→grid-2x3(6 features emoji)→1-col(conclusion)"}
+${lang === "fr" ? "• Portfolio: 1-col(hero)→grid-2x2(4 projets)→2-col(détails+visuel)→1-col(CTA)" : "• Portfolio: 1-col(hero)→grid-2x2(4 projects)→2-col(details+visual)→1-col(CTA)"}
+${lang === "fr" ? "• Guide: 1-col(intro)→3-col(3 steps)→2-col-wide-left(détail+tip)→grid-2x3(6 tips)→1-col(next steps)" : "• Guide: 1-col(intro)→3-col(3 steps)→2-col-wide-left(detail+tip)→grid-2x3(6 tips)→1-col(next steps)"}
 
-Rules: NEVER repeat same type, alternate dense(grids/3-col) with spacious(1-col/2-col), vary widths for rhythm
-Composition examples:
-• short(2-3): 1-column→2-columns→3-columns
-• medium(3-4): 1-column→2-columns→3-columns→2-columns-wide-left
-• long(4-5): 1-column→2-columns→grid-2x2→3-columns→2-columns-wide-left
-Words: 1,500-2,500 total, short~1k, medium~1.5-2k, long~2-2.5k, MAX 2.5k
+Layout types:
+• 1-column: ALWAYS start hero (image+intro), conclusion, focused content
+• 2-columns: Text+quote/image (NOT text+text), comparisons, before/after
+• 3-columns: Exactly 3 equal steps/features/benefits
+• 2-columns-wide-left: Main(66%)+sidebar tip/quote(33%)
+• 2-columns-wide-right: Visual/icon(33%)+detail(66%)
+• grid-2x2: 4 equal showcase items
+• grid-2x3: 6 feature cards (use emoji)
+• grid-3x3: 9 gallery items
+• grid-4-even: 4 prominent features
+
+MANDATORY RULES:
+1. START with 1-column hero (description must mention image)
+2. Use grids for features/benefits (description: mention emoji/icons)
+3. 2-col = text + quote/image (description must specify)
+4. END with 1-column conclusion
+5. NEVER repeat same type consecutively
+6. Alternate dense(grid/3-col) with spacious(1-col/2-col)
+
+Words: short~3-4 sect 1k, medium~5-6 sect 1.5-2k, long~6-7 sect 2-2.5k
 
 ${req.length ? `Len:${req.length}` : ""}${req.layoutPreference?.length ? ` Pref:${req.layoutPreference}` : ""}${req.tone ? ` Tone:${req.tone}` : ""}${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}`;
 }

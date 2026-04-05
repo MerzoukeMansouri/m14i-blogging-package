@@ -112,7 +112,7 @@ function InputField({
 }
 
 export function EditorView({ postId }: EditorViewProps) {
-  const { components, labels, basePath, features, navigate } = useBlogAdminContext();
+  const { apiClient, components, labels, basePath, features, navigate } = useBlogAdminContext();
   const { getPost, createPost, updatePost } = usePosts();
   const [initialPost, setInitialPost] = useState<BlogPostRow | undefined>();
   const [loadingPost, setLoadingPost] = useState(!!postId);
@@ -216,8 +216,6 @@ export function EditorView({ postId }: EditorViewProps) {
   };
 
   // AI Generation handlers
-  const apiClient = new BlogAdminAPIClient(basePath);
-
   const handleGenerateComplete = async (): Promise<void> => {
     if (!generatePrompt.trim()) {
       setGenerationError("Please enter a topic or prompt");

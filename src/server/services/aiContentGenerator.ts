@@ -94,13 +94,68 @@ RESPONSE STRUCTURE:
   "tags": ["tag1", "tag2"]
 }
 
-AVAILABLE LAYOUT TYPES:
-- hero: Eye-catching introduction with large visual
-- two-column: Content split into two columns
-- three-column: Content split into three columns
-- full-width: Single column spanning full width
-- sidebar-left: Main content with sidebar on left
-- sidebar-right: Main content with sidebar on right
+🎨 AVAILABLE LAYOUT TYPES & BEST USE CASES:
+
+**hero** - Impact maximal, perfect for introduction
+→ Use for: Opening section with strong visual hook
+→ Visual: Large image/video + bold headline + short intro text
+→ Creates: Immediate engagement, sets the tone
+
+**two-column** - Équilibre texte/visuel, professional & scannable
+→ Use for: Main content sections, comparisons, before/after
+→ Visual: Text on one side, image/media on other (alternating sides for variety)
+→ Creates: Visual breathing room, easy scanning
+
+**three-column** - Présentation de features/bénéfices/étapes
+→ Use for: Lists of benefits, features, steps, tips
+→ Visual: Icon/image + title + description in each column
+→ Creates: Organized, structured information display
+
+**full-width** - Emphase narrative, storytelling
+→ Use for: Important messages, quotes, conclusions, transitions
+→ Visual: Centered text with full-bleed background or focused content
+→ Creates: Dramatic pauses, emphasis on key points
+
+**sidebar-left/right** - Contexte additionnel, ressources
+→ Use for: Sections needing supporting info, resources, callouts
+→ Visual: Main content + sidebar with related tips/links/stats
+→ Creates: Depth without cluttering main flow
+
+🎯 VISUAL DESIGN PRINCIPLES (MANDATORY):
+
+1. **VARIETY IS KEY**: NEVER use same layout twice in a row
+   ✅ Good: hero → two-column → three-column → two-column (different side)
+   ❌ Bad: two-column → two-column → two-column
+
+2. **VISUAL RHYTHM**: Alternate between dense & spacious layouts
+   - Start strong (hero)
+   - Alternate complexity (simple → complex → simple)
+   - End with impact (full-width conclusion or two-column with CTA)
+
+3. **ASYMMETRY**: For two-column, alternate image/text sides
+   Example: [text|image] → [image|text] → [text|image]
+
+4. **HIERARCHY**: Each section must have a clear visual purpose
+   - Opening: hero (impact)
+   - Body: mix of two-column (depth) + three-column (structure)
+   - Closing: full-width or sidebar (action/resources)
+
+5. **STORYTELLING FLOW**:
+   - Section 1: Hook (hero with compelling visual)
+   - Section 2-3: Educate (two-column for explanation)
+   - Section 4: Organize (three-column for key points)
+   - Section 5: Convert (full-width CTA or sidebar with resources)
+
+📐 LAYOUT COMPOSITION EXAMPLES:
+
+**Short Post (3 sections)**:
+hero → two-column → full-width
+
+**Medium Post (4 sections)**:
+hero → two-column (text|image) → three-column → two-column (image|text)
+
+**Long Post (5 sections)**:
+hero → two-column (text|image) → three-column → two-column (image|text) → sidebar-right
 
 📏 BLOG LENGTH BEST PRACTICES (2025):
 - Target total: 1,500-2,500 words for optimal SEO and engagement
@@ -109,7 +164,7 @@ AVAILABLE LAYOUT TYPES:
 - Long: ~2,000-2,500 words (4-5 sections)
 - NEVER exceed 2,500 words - quality over quantity
 
-${request.length === 'short' ? 'Generate 2-3 sections for ~1,000 words total.' : request.length === 'long' ? 'Generate 4-5 sections for ~2,000-2,500 words total.' : 'Generate 3-4 sections for ~1,500-2,000 words total.'}
+${request.length === 'short' ? 'Generate 2-3 sections for ~1,000 words total. Use varied layouts (hero + two-column + full-width).' : request.length === 'long' ? 'Generate 4-5 sections for ~2,000-2,500 words total. Create visual rhythm: hero → two-column → three-column → two-column (alternate side) → full-width.' : 'Generate 3-4 sections for ~1,500-2,000 words total. Mix layouts dynamically: hero → two-column → three-column → two-column (opposite side).'}
 ${request.layoutPreference ? `Prefer these layouts: ${request.layoutPreference.join(', ')}` : ''}
 ${request.tone ? `Tone: ${request.tone}` : ''}
 ${request.additionalInstructions ? `Additional: ${request.additionalInstructions}` : ''}`;

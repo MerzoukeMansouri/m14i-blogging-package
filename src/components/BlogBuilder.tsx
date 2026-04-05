@@ -45,9 +45,11 @@ export interface BlogBuilderProps {
     PlusIcon: React.ComponentType<{ className?: string }>;
     XIcon: React.ComponentType<{ className?: string }>;
   };
+  // Optional AI improvement callback
+  onImproveContent?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;
 }
 
-export function BlogBuilder({ sections, onChange, config: userConfig, components }: BlogBuilderProps) {
+export function BlogBuilder({ sections, onChange, config: userConfig, components, onImproveContent }: BlogBuilderProps) {
   const config = mergeConfig(userConfig);
   const { Button, Card, CardContent, CardHeader } = components;
 
@@ -345,6 +347,7 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                                                         PlusIcon: components.PlusIcon,
                                                         XIcon: components.XIcon,
                                                       }}
+                                                      onImprove={onImproveContent}
                                                     />
                                                   </div>
 

@@ -39,54 +39,88 @@ export async function isAdmin(request: NextRequest): Promise<boolean> {
 export function parseFilterParams(searchParams: URLSearchParams): BlogFilterParams {
   const params: BlogFilterParams = {};
 
-  // Numeric parameters
-  const page = searchParams.get("page");
-  if (page) {
-    params.page = Number(page);
-  }
+  // Helper to parse and validate enum values
+  const parseEnum = <T extends readonly string[]>(
+    key: string,
+    validValues: T
+  ): T[number] | undefined => {
+    const value = searchParams.get(key);
+    return value && validValues.includes(value) ? (value as T[number]) : undefined;
+  };
 
-  const pageSize = searchParams.get("pageSize");
-  if (pageSize) {
-    params.pageSize = Number(pageSize);
-  }
+  // Helper to parse numeric values
+  const parseNumber = (key: string): number | undefined => {
+    const value = searchParams.get(key);
+    return value ? Number(value) : undefined;
+  };
 
-  // Status validation
-  const status = searchParams.get("status");
-  const validStatuses = ["draft", "published", "archived"] as const;
-  if (status && validStatuses.includes(status as any)) {
-    params.status = status as "draft" | "published" | "archived";
-  }
+  // Helper to parse string values
+  const parseString = (key: string): string | undefined => {
+    return searchParams.get(key) || undefined;
+  };
 
-  // String parameters (no validation needed)
-  const category = searchParams.get("category");
-  if (category) {
-    params.category = category;
-  }
+  // Parse all parameters
+  Object.assign(params, {
+    page: parseNumber("page"),
+    pageSize: parseNumber("pageSize"),
+    status: parseEnum("status", ["draft", "published", "archived"] as const),
+    category: parseString("category"),
+    tag: parseString("tag"),
+    search: parseString("search"),
+    orderBy: parseEnum("orderBy", ["created_at", "updated_at", "published_at", "title"] as const),
+    orderDirection: parseEnum("orderDirection", ["asc", "desc"] as const),
+  });
 
-  const tag = searchParams.get("tag");
-  if (tag) {
-    params.tag = tag;
-  }
+  // Remove undefined values
+  return Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined)
+  ) as BlogFilterParams;
+}
 
-  const search = searchParams.get("search");
-  if (search) {
-    params.search = search;
-  }
+// ============================================================================
+// Helper Functions for Route Handlers
+// ============================================================================
 
-  // Sort parameters validation
-  const orderBy = searchParams.get("orderBy");
-  const validOrderBy = ["created_at", "updated_at", "published_at", "title"] as const;
-  if (orderBy && validOrderBy.includes(orderBy as any)) {
-    params.orderBy = orderBy as "created_at" | "updated_at" | "published_at" | "title";
-  }
+/**
+ * Create a standard error response
+ */
+function createErrorResponse(error: unknown, defaultMessage: string): NextResponse {
+  console.error(defaultMessage, error);
+  return NextResponse.json(
+    { error: defaultMessage },
+    { status: 500 }
+  );
+}
 
-  const orderDirection = searchParams.get("orderDirection");
-  const validDirections = ["asc", "desc"] as const;
-  if (orderDirection && validDirections.includes(orderDirection as any)) {
-    params.orderDirection = orderDirection as "asc" | "desc";
-  }
+/**
+ * Create an unauthorized response
+ */
+function createUnauthorizedResponse(): NextResponse {
+  return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
+}
 
-  return params;
+/**
+ * Create a not found response
+ */
+function createNotFoundResponse(entity: string): NextResponse {
+  return NextResponse.json(
+    { error: `${entity} not found` },
+    { status: 404 }
+  );
+}
+
+/**
+ * Check authorization and return early response if unauthorized
+ */
+async function requireAuthorization(
+  request: NextRequest,
+  checkAuth: (request: NextRequest) => Promise<boolean>
+): Promise<NextResponse | null> {
+  const isAuthorized = await checkAuth(request);
+  return isAuthorized ? null : createUnauthorizedResponse();
 }
 
 // ============================================================================
@@ -97,7 +131,9 @@ export function parseFilterParams(searchParams: URLSearchParams): BlogFilterPara
  * GET /api/blog/posts
  * List all blog posts with filtering and pagination
  */
-export function createListPostsHandler(getBlogClient: () => Promise<any>): (request: NextRequest) => Promise<NextResponse> {
+export function createListPostsHandler(
+  getBlogClient: () => Promise<any>
+): (request: NextRequest) => Promise<NextResponse> {
   return async function GET(request: NextRequest): Promise<NextResponse> {
     try {
       const params = parseFilterParams(request.nextUrl.searchParams);
@@ -105,11 +141,7 @@ export function createListPostsHandler(getBlogClient: () => Promise<any>): (requ
       const response = await blog.posts.list(params);
       return NextResponse.json(response);
     } catch (error) {
-      console.error("Error fetching blog posts:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch blog posts" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to fetch blog posts");
     }
   };
 }
@@ -124,24 +156,15 @@ export function createCreatePostHandler(
 ): (request: NextRequest) => Promise<NextResponse> {
   return async function POST(request: NextRequest): Promise<NextResponse> {
     try {
-      const isAuthorized = await checkAuth(request);
-      if (!isAuthorized) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
 
       const body = await request.json();
       const blog = await getBlogClient();
       const post = await blog.posts.create(body);
       return NextResponse.json(post, { status: 201 });
     } catch (error) {
-      console.error("Error creating blog post:", error);
-      return NextResponse.json(
-        { error: "Failed to create blog post" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to create blog post");
     }
   };
 }
@@ -150,7 +173,9 @@ export function createCreatePostHandler(
  * GET /api/blog/posts/[slug]
  * Get a single blog post by slug
  */
-export function createGetPostBySlugHandler(getBlogClient: () => Promise<any>): (
+export function createGetPostBySlugHandler(
+  getBlogClient: () => Promise<any>
+): (
   request: NextRequest,
   context: { params: Promise<{ slug: string }> }
 ) => Promise<NextResponse> {
@@ -164,19 +189,12 @@ export function createGetPostBySlugHandler(getBlogClient: () => Promise<any>): (
       const post = await blog.posts.getBySlug(slug);
 
       if (!post) {
-        return NextResponse.json(
-          { error: "Post not found" },
-          { status: 404 }
-        );
+        return createNotFoundResponse("Post");
       }
 
       return NextResponse.json(post);
     } catch (error) {
-      console.error("Error fetching blog post:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch blog post" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to fetch blog post");
     }
   };
 }
@@ -197,13 +215,8 @@ export function createUpdatePostHandler(
     { params }: { params: Promise<{ id: string }> }
   ): Promise<NextResponse> {
     try {
-      const isAuthorized = await checkAuth(request);
-      if (!isAuthorized) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
 
       const { id } = await params;
       const body = await request.json();
@@ -211,11 +224,7 @@ export function createUpdatePostHandler(
       const post = await blog.posts.update(id, body);
       return NextResponse.json(post);
     } catch (error) {
-      console.error("Error updating blog post:", error);
-      return NextResponse.json(
-        { error: "Failed to update blog post" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to update blog post");
     }
   };
 }
@@ -236,24 +245,15 @@ export function createDeletePostHandler(
     { params }: { params: Promise<{ id: string }> }
   ): Promise<NextResponse> {
     try {
-      const isAuthorized = await checkAuth(request);
-      if (!isAuthorized) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
 
       const { id } = await params;
       const blog = await getBlogClient();
       await blog.posts.delete(id);
       return NextResponse.json({ success: true });
     } catch (error) {
-      console.error("Error deleting blog post:", error);
-      return NextResponse.json(
-        { error: "Failed to delete blog post" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to delete blog post");
     }
   };
 }
@@ -274,24 +274,15 @@ export function createPublishPostHandler(
     { params }: { params: Promise<{ id: string }> }
   ): Promise<NextResponse> {
     try {
-      const isAuthorized = await checkAuth(request);
-      if (!isAuthorized) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
 
       const { id } = await params;
       const blog = await getBlogClient();
       const post = await blog.posts.publish(id);
       return NextResponse.json(post);
     } catch (error) {
-      console.error("Error publishing blog post:", error);
-      return NextResponse.json(
-        { error: "Failed to publish blog post" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to publish blog post");
     }
   };
 }
@@ -300,7 +291,9 @@ export function createPublishPostHandler(
  * GET /api/blog/search
  * Search blog posts
  */
-export function createSearchPostsHandler(getBlogClient: () => Promise<any>): (request: NextRequest) => Promise<NextResponse> {
+export function createSearchPostsHandler(
+  getBlogClient: () => Promise<any>
+): (request: NextRequest) => Promise<NextResponse> {
   return async function GET(request: NextRequest): Promise<NextResponse> {
     try {
       const query = request.nextUrl.searchParams.get("q");
@@ -318,11 +311,7 @@ export function createSearchPostsHandler(getBlogClient: () => Promise<any>): (re
       const posts = await blog.posts.search(query, limit);
       return NextResponse.json(posts);
     } catch (error) {
-      console.error("Error searching blog posts:", error);
-      return NextResponse.json(
-        { error: "Failed to search blog posts" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to search blog posts");
     }
   };
 }
@@ -332,10 +321,20 @@ export function createSearchPostsHandler(getBlogClient: () => Promise<any>): (re
  * List all media files
  * POST /api/blog/media
  * Upload new media file (admin only)
+ *
+ * IMPORTANT: The POST handler now supports both:
+ * 1. File upload via FormData (recommended for actual file uploads)
+ * 2. JSON body (for creating media records with external URLs)
  */
 export function createMediaHandlers(
   getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
+  checkAuth: (request: NextRequest) => Promise<boolean>,
+  options?: {
+    storageAdapter?: import("./media-upload").StorageAdapter;
+    maxSizeMB?: number;
+    allowedTypes?: string[];
+    getUserId?: (request: NextRequest) => Promise<string | undefined>;
+  }
 ): {
   GET: (request: NextRequest) => Promise<NextResponse>;
   POST: (request: NextRequest) => Promise<NextResponse>;
@@ -368,16 +367,53 @@ export function createMediaHandlers(
         );
       }
 
-      const body = await request.json();
+      const contentType = request.headers.get("content-type") || "";
       const blog = await getBlogClient();
+
+      // Handle file upload via FormData
+      if (contentType.includes("multipart/form-data")) {
+        if (!options?.storageAdapter) {
+          return NextResponse.json(
+            {
+              error:
+                "Storage adapter not configured. Please provide a storage adapter in createMediaHandlers options.",
+            },
+            { status: 500 }
+          );
+        }
+
+        // Import the upload handler
+        const { handleFileUpload } = await import("./media-upload");
+
+        // Get user ID if available
+        const userId = options.getUserId
+          ? await options.getUserId(request)
+          : undefined;
+
+        // Handle the upload
+        const result = await handleFileUpload(
+          request,
+          options.storageAdapter,
+          blog,
+          userId,
+          {
+            maxSizeMB: options.maxSizeMB,
+            allowedTypes: options.allowedTypes,
+          }
+        );
+
+        return NextResponse.json(result, { status: 201 });
+      }
+
+      // Handle JSON body (for external URLs)
+      const body = await request.json();
       const media = await blog.media.create(body);
       return NextResponse.json(media, { status: 201 });
     } catch (error) {
       console.error("Error creating media:", error);
-      return NextResponse.json(
-        { error: "Failed to create media" },
-        { status: 500 }
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create media";
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
   }
 
@@ -391,7 +427,9 @@ export function createMediaHandlers(
  * GET /api/blog/stats
  * Get blog statistics
  */
-export function createStatsHandler(getBlogClient: () => Promise<any>): () => Promise<NextResponse> {
+export function createStatsHandler(
+  getBlogClient: () => Promise<any>
+): () => Promise<NextResponse> {
   return async function GET(): Promise<NextResponse> {
     try {
       const blog = await getBlogClient();
@@ -401,17 +439,148 @@ export function createStatsHandler(getBlogClient: () => Promise<any>): () => Pro
         blog.stats.getTags(),
       ]);
 
-      return NextResponse.json({
-        stats,
-        categories,
-        tags,
-      });
+      return NextResponse.json({ stats, categories, tags });
     } catch (error) {
-      console.error("Error fetching blog stats:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch blog stats" },
-        { status: 500 }
-      );
+      return createErrorResponse(error, "Failed to fetch blog stats");
+    }
+  };
+}
+
+// ============================================================================
+// Generic CRUD Handler Factory
+// ============================================================================
+
+/**
+ * Create a generic list handler for any entity type
+ */
+function createGenericListHandler(
+  getBlogClient: () => Promise<any>,
+  entityType: string,
+  entityKey: string
+): () => Promise<NextResponse> {
+  return async function GET(): Promise<NextResponse> {
+    try {
+      const blog = await getBlogClient();
+      const entities = await blog[entityType].list();
+      return NextResponse.json({ [entityKey]: entities });
+    } catch (error) {
+      return createErrorResponse(error, `Failed to fetch ${entityType}`);
+    }
+  };
+}
+
+/**
+ * Create a generic get handler for any entity type
+ */
+function createGenericGetHandler(
+  getBlogClient: () => Promise<any>,
+  entityType: string,
+  entityKey: string
+): (
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) => Promise<NextResponse> {
+  return async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ): Promise<NextResponse> {
+    try {
+      const { id } = await params;
+      const blog = await getBlogClient();
+      const entity = await blog[entityType].getById(id);
+
+      if (!entity) {
+        return createNotFoundResponse(entityKey);
+      }
+
+      return NextResponse.json({ [entityKey]: entity });
+    } catch (error) {
+      return createErrorResponse(error, `Failed to fetch ${entityKey}`);
+    }
+  };
+}
+
+/**
+ * Create a generic create handler for any entity type
+ */
+function createGenericCreateHandler(
+  getBlogClient: () => Promise<any>,
+  checkAuth: (request: NextRequest) => Promise<boolean>,
+  entityType: string,
+  entityKey: string
+): (request: NextRequest) => Promise<NextResponse> {
+  return async function POST(request: NextRequest): Promise<NextResponse> {
+    try {
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
+
+      const body = await request.json();
+      const blog = await getBlogClient();
+      const entity = await blog[entityType].create(body);
+      return NextResponse.json({ [entityKey]: entity }, { status: 201 });
+    } catch (error) {
+      return createErrorResponse(error, `Failed to create ${entityKey}`);
+    }
+  };
+}
+
+/**
+ * Create a generic update handler for any entity type
+ */
+function createGenericUpdateHandler(
+  getBlogClient: () => Promise<any>,
+  checkAuth: (request: NextRequest) => Promise<boolean>,
+  entityType: string,
+  entityKey: string
+): (
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) => Promise<NextResponse> {
+  return async function PATCH(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ): Promise<NextResponse> {
+    try {
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
+
+      const { id } = await params;
+      const body = await request.json();
+      const blog = await getBlogClient();
+      const entity = await blog[entityType].update(id, body);
+      return NextResponse.json({ [entityKey]: entity });
+    } catch (error) {
+      return createErrorResponse(error, `Failed to update ${entityKey}`);
+    }
+  };
+}
+
+/**
+ * Create a generic delete handler for any entity type
+ */
+function createGenericDeleteHandler(
+  getBlogClient: () => Promise<any>,
+  checkAuth: (request: NextRequest) => Promise<boolean>,
+  entityType: string,
+  entityKey: string
+): (
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) => Promise<NextResponse> {
+  return async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ): Promise<NextResponse> {
+    try {
+      const authError = await requireAuthorization(request, checkAuth);
+      if (authError) return authError;
+
+      const { id } = await params;
+      const blog = await getBlogClient();
+      await blog[entityType].delete(id);
+      return NextResponse.json({ success: true });
+    } catch (error) {
+      return createErrorResponse(error, `Failed to delete ${entityKey}`);
     }
   };
 }
@@ -424,20 +593,8 @@ export function createStatsHandler(getBlogClient: () => Promise<any>): () => Pro
  * GET /api/blog/categories
  * List all categories
  */
-export function createListCategoriesHandler(getBlogClient: () => Promise<any>): () => Promise<NextResponse> {
-  return async function GET(): Promise<NextResponse> {
-    try {
-      const blog = await getBlogClient();
-      const categories = await blog.categories.list();
-      return NextResponse.json({ categories });
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch categories" },
-        { status: 500 }
-      );
-    }
-  };
+export function createListCategoriesHandler(getBlogClient: () => Promise<any>) {
+  return createGenericListHandler(getBlogClient, "categories", "categories");
 }
 
 /**
@@ -448,28 +605,7 @@ export function createCreateCategoryHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function POST(request: NextRequest) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const body = await request.json();
-      const blog = await getBlogClient();
-      const category = await blog.categories.create(body);
-      return NextResponse.json({ category }, { status: 201 });
-    } catch (error) {
-      console.error("Error creating category:", error);
-      return NextResponse.json(
-        { error: "Failed to create category" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericCreateHandler(getBlogClient, checkAuth, "categories", "category");
 }
 
 /**
@@ -477,31 +613,7 @@ export function createCreateCategoryHandler(
  * Get a single category by ID
  */
 export function createGetCategoryHandler(getBlogClient: () => Promise<any>) {
-  return async function GET(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      const { id } = await params;
-      const blog = await getBlogClient();
-      const category = await blog.categories.getById(id);
-
-      if (!category) {
-        return NextResponse.json(
-          { error: "Category not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json({ category });
-    } catch (error) {
-      console.error("Error fetching category:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch category" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericGetHandler(getBlogClient, "categories", "category");
 }
 
 /**
@@ -512,32 +624,7 @@ export function createUpdateCategoryHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function PATCH(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const { id } = await params;
-      const body = await request.json();
-      const blog = await getBlogClient();
-      const category = await blog.categories.update(id, body);
-      return NextResponse.json({ category });
-    } catch (error) {
-      console.error("Error updating category:", error);
-      return NextResponse.json(
-        { error: "Failed to update category" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericUpdateHandler(getBlogClient, checkAuth, "categories", "category");
 }
 
 /**
@@ -548,31 +635,7 @@ export function createDeleteCategoryHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function DELETE(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const { id } = await params;
-      const blog = await getBlogClient();
-      await blog.categories.delete(id);
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting category:", error);
-      return NextResponse.json(
-        { error: "Failed to delete category" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericDeleteHandler(getBlogClient, checkAuth, "categories", "category");
 }
 
 // ============================================================================
@@ -584,19 +647,7 @@ export function createDeleteCategoryHandler(
  * List all tags
  */
 export function createListTagsHandler(getBlogClient: () => Promise<any>) {
-  return async function GET() {
-    try {
-      const blog = await getBlogClient();
-      const tags = await blog.tags.list();
-      return NextResponse.json({ tags });
-    } catch (error) {
-      console.error("Error fetching tags:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch tags" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericListHandler(getBlogClient, "tags", "tags");
 }
 
 /**
@@ -607,28 +658,7 @@ export function createCreateTagHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function POST(request: NextRequest) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const body = await request.json();
-      const blog = await getBlogClient();
-      const tag = await blog.tags.create(body);
-      return NextResponse.json({ tag }, { status: 201 });
-    } catch (error) {
-      console.error("Error creating tag:", error);
-      return NextResponse.json(
-        { error: "Failed to create tag" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericCreateHandler(getBlogClient, checkAuth, "tags", "tag");
 }
 
 /**
@@ -636,31 +666,7 @@ export function createCreateTagHandler(
  * Get a single tag by ID
  */
 export function createGetTagHandler(getBlogClient: () => Promise<any>) {
-  return async function GET(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      const { id } = await params;
-      const blog = await getBlogClient();
-      const tag = await blog.tags.getById(id);
-
-      if (!tag) {
-        return NextResponse.json(
-          { error: "Tag not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json({ tag });
-    } catch (error) {
-      console.error("Error fetching tag:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch tag" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericGetHandler(getBlogClient, "tags", "tag");
 }
 
 /**
@@ -671,32 +677,7 @@ export function createUpdateTagHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function PATCH(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const { id } = await params;
-      const body = await request.json();
-      const blog = await getBlogClient();
-      const tag = await blog.tags.update(id, body);
-      return NextResponse.json({ tag });
-    } catch (error) {
-      console.error("Error updating tag:", error);
-      return NextResponse.json(
-        { error: "Failed to update tag" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericUpdateHandler(getBlogClient, checkAuth, "tags", "tag");
 }
 
 /**
@@ -707,29 +688,5 @@ export function createDeleteTagHandler(
   getBlogClient: () => Promise<any>,
   checkAuth: (request: NextRequest) => Promise<boolean>
 ) {
-  return async function DELETE(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) {
-    try {
-      // Check authentication
-      if (!(await checkAuth(request))) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-
-      const { id } = await params;
-      const blog = await getBlogClient();
-      await blog.tags.delete(id);
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting tag:", error);
-      return NextResponse.json(
-        { error: "Failed to delete tag" },
-        { status: 500 }
-      );
-    }
-  };
+  return createGenericDeleteHandler(getBlogClient, checkAuth, "tags", "tag");
 }

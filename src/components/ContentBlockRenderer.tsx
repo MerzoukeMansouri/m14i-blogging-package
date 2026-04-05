@@ -58,32 +58,53 @@ export function ContentBlockRenderer({
         <div className={classNames?.image || "my-4"}>
           {block.src ? (
             <>
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-muted group">
                 {ImageComponent ? (
                   <ImageComponent
                     src={block.src}
                     alt={block.alt}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <img
                     src={block.src}
                     alt={block.alt}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
                   />
                 )}
+                {/* Image overlay with view action */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
+                <button
+                  onClick={() => window.open(block.src, "_blank")}
+                  className="absolute top-2 right-2 bg-white/90 hover:bg-white text-black rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  aria-label="View full image"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
               </div>
               {block.caption && (
-                <p className={classNames?.imageCaption || "text-xs text-muted-foreground mt-1 italic"}>
+                <p className={classNames?.imageCaption || "text-xs text-muted-foreground mt-2 italic text-center"}>
                   {block.caption}
                 </p>
               )}
             </>
           ) : (
-            <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm">
-              Aucune image
-            </div>
+            <EmptyState message="Aucune image" />
           )}
         </div>
       );
@@ -94,25 +115,30 @@ export function ContentBlockRenderer({
           {block.url ? (
             <>
               <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
-                {block.url.includes("youtube.com") || block.url.includes("youtu.be") ? (
-                  <iframe
-                    src={getYouTubeEmbedUrl(block.url)}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : block.url.includes("vimeo.com") ? (
-                  <iframe
-                    src={getVimeoEmbedUrl(block.url)}
-                    className="w-full h-full"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-white">
-                    URL vidéo non supportée
-                  </div>
-                )}
+                {(() => {
+                  const embedUrl = getEmbedUrl(block.url);
+                  if (!embedUrl) {
+                    return (
+                      <div className="flex items-center justify-center h-full text-white">
+                        URL vidéo non supportée
+                      </div>
+                    );
+                  }
+
+                  const isYouTube = block.url.includes("youtube") || block.url.includes("youtu.be");
+                  const allow = isYouTube
+                    ? "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    : "autoplay; fullscreen; picture-in-picture";
+
+                  return (
+                    <iframe
+                      src={embedUrl}
+                      className="w-full h-full"
+                      allow={allow}
+                      allowFullScreen
+                    />
+                  );
+                })()}
               </div>
               {block.caption && (
                 <p className={classNames?.videoCaption || "text-xs text-muted-foreground mt-1 italic"}>
@@ -121,9 +147,7 @@ export function ContentBlockRenderer({
               )}
             </>
           ) : (
-            <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm">
-              Aucune vidéo
-            </div>
+            <EmptyState message="Aucune vidéo" />
           )}
         </div>
       );
@@ -156,41 +180,68 @@ export function ContentBlockRenderer({
             <>
               {/* Title and Description */}
               {(block.title || block.description) && (
-                <div className="mb-3">
-                  {block.title && (
-                    <h4 className={classNames?.pdfTitle || "text-lg font-semibold mb-1"}>
-                      {block.title}
-                    </h4>
-                  )}
-                  {block.description && (
-                    <p className={classNames?.pdfDescription || "text-sm text-muted-foreground"}>
-                      {block.description}
-                    </p>
-                  )}
+                <div className="mb-4 p-4 bg-muted/30 rounded-lg border border-border">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-red-600"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="12" y1="18" x2="12" y2="12" />
+                        <line x1="9" y1="15" x2="15" y2="15" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {block.title && (
+                        <h4 className={classNames?.pdfTitle || "text-lg font-semibold mb-1 text-foreground"}>
+                          {block.title}
+                        </h4>
+                      )}
+                      {block.description && (
+                        <p className={classNames?.pdfDescription || "text-sm text-muted-foreground"}>
+                          {block.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
               {/* PDF Embed */}
               {(displayMode === "embed" || displayMode === "both") && (
-                <div className={classNames?.pdfEmbed || "relative rounded-lg overflow-hidden border border-border bg-muted"}>
+                <div className={classNames?.pdfEmbed || "relative rounded-lg overflow-hidden border-2 border-border bg-muted shadow-lg group"}>
                   <iframe
-                    src={`${block.url}#view=FitH`}
+                    src={`${block.url}#view=FitH&toolbar=0&navpanes=0`}
                     className="w-full"
                     style={{ height: pdfHeight }}
                     title={block.title || "PDF Document"}
                   />
+                  {/* Fullscreen hint */}
+                  <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    Cliquez pour agrandir
+                  </div>
                 </div>
               )}
 
-              {/* Download Button */}
+              {/* Action Buttons */}
               {(displayMode === "download" || displayMode === "both") && (
-                <div className={displayMode === "both" ? "mt-3" : ""}>
+                <div className={displayMode === "both" ? "mt-4 flex gap-2 flex-wrap" : "flex gap-2 flex-wrap"}>
                   <a
                     href={block.url}
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={classNames?.pdfDownloadButton || "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"}
+                    className={classNames?.pdfDownloadButton || "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm"}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -207,14 +258,52 @@ export function ContentBlockRenderer({
                       <polyline points="7 10 12 15 17 10" />
                       <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
-                    {displayMode === "download" ? "Télécharger le PDF" : "Télécharger"}
+                    Télécharger le PDF
+                  </a>
+                  <a
+                    href={block.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors text-sm font-medium shadow-sm"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                    Ouvrir dans un nouvel onglet
                   </a>
                 </div>
               )}
             </>
           ) : (
-            <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm">
-              Aucun PDF
+            <div className="aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground text-sm gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-50"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              <span>Aucun PDF</span>
             </div>
           )}
         </div>
@@ -424,13 +513,26 @@ function CarouselRenderer({ block, ImageComponent, classNames }: CarouselRendere
   );
 }
 
-// Helper functions
-function getYouTubeEmbedUrl(url: string): string {
-  const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+// Helper functions for video embeds
+function getEmbedUrl(url: string): string | null {
+  const youtubeId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
+  if (youtubeId) {
+    return `https://www.youtube.com/embed/${youtubeId}`;
+  }
+
+  const vimeoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+  if (vimeoId) {
+    return `https://player.vimeo.com/video/${vimeoId}`;
+  }
+
+  return null;
 }
 
-function getVimeoEmbedUrl(url: string): string {
-  const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
-  return videoId ? `https://player.vimeo.com/video/${videoId}` : "";
+// Helper component for empty state
+function EmptyState({ message }: { message: string }): JSX.Element {
+  return (
+    <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm">
+      {message}
+    </div>
+  );
 }

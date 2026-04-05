@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import type {
   TextBlock,
   ImageBlock,
@@ -27,14 +28,87 @@ interface TextEditorProps {
   block: TextBlock;
   onChange: (block: TextBlock) => void;
   components: EditorComponents;
+  onImprove?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;
 }
 
-export function TextEditor({ block, onChange, components }: TextEditorProps): JSX.Element {
-  const { Label, Textarea } = components;
+export function TextEditor({ block, onChange, components, onImprove }: TextEditorProps): JSX.Element {
+  const { Label, Textarea, Button } = components;
+  const [isImproving, setIsImproving] = React.useState(false);
+  const [showImprovementMenu, setShowImprovementMenu] = React.useState(false);
+
+  const handleImprove = async (instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => {
+    if (!onImprove || !block.content) return;
+
+    setIsImproving(true);
+    setShowImprovementMenu(false);
+
+    try {
+      const improvedContent = await onImprove(block.content, instruction);
+      onChange({ ...block, content: improvedContent });
+    } catch (err) {
+      console.error("Error improving content:", err);
+    } finally {
+      setIsImproving(false);
+    }
+  };
 
   return (
     <div className="space-y-2">
-      <Label className="text-xs text-muted-foreground">Contenu (Markdown)</Label>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs text-muted-foreground">Contenu (Markdown)</Label>
+        {onImprove && block.content && (
+          <div className="relative">
+            <button
+              onClick={() => setShowImprovementMenu(!showImprovementMenu)}
+              disabled={isImproving}
+              className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded hover:bg-purple-100 disabled:opacity-50"
+            >
+              {isImproving ? "Improving..." : "✨ AI Improve"}
+            </button>
+
+            {showImprovementMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white border rounded-md shadow-lg z-10 min-w-[180px]">
+                <button
+                  onClick={() => handleImprove("expand")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  📝 Expand
+                </button>
+                <button
+                  onClick={() => handleImprove("shorten")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  ✂️ Shorten
+                </button>
+                <button
+                  onClick={() => handleImprove("rewrite")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  🔄 Rewrite
+                </button>
+                <button
+                  onClick={() => handleImprove("add-examples")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  💡 Add Examples
+                </button>
+                <button
+                  onClick={() => handleImprove("improve-clarity")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  🎯 Improve Clarity
+                </button>
+                <button
+                  onClick={() => handleImprove("make-engaging")}
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                >
+                  ⭐ Make Engaging
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <Textarea
         value={block.content}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -42,6 +116,7 @@ export function TextEditor({ block, onChange, components }: TextEditorProps): JS
         }
         className="min-h-[150px] font-mono text-sm resize-y"
         placeholder="**Gras**, *italique*, # Titre, etc."
+        disabled={isImproving}
       />
     </div>
   );

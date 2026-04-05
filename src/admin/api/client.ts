@@ -19,6 +19,17 @@ import type {
   TagUpdate,
 } from "../../types/database";
 
+import type {
+  GenerateCompleteBlogRequest,
+  GenerateCompleteBlogResponse,
+  GenerateSectionRequest,
+  GenerateSectionResponse,
+  GenerateSEORequest,
+  GenerateSEOResponse,
+  ImproveContentRequest,
+  ImproveContentResponse,
+} from "../../types/aiGeneration";
+
 export interface APIResponse<T = any> {
   data?: T;
   error?: string;
@@ -52,32 +63,25 @@ export class BlogAdminAPIClient {
       return query;
     }
 
-    // Add numeric parameters
-    if (params.page !== undefined) {
-      query.set("page", params.page.toString());
-    }
-    if (params.pageSize !== undefined) {
-      query.set("pageSize", params.pageSize.toString());
-    }
+    // Define parameter mappings for cleaner code
+    const paramMappings: Array<[keyof BlogFilterParams, string?]> = [
+      ["page", undefined],
+      ["pageSize", undefined],
+      ["status", undefined],
+      ["category", undefined],
+      ["tag", undefined],
+      ["search", undefined],
+      ["orderBy", undefined],
+      ["orderDirection", undefined],
+    ];
 
-    // Add string parameters
-    if (params.status) {
-      query.set("status", params.status);
-    }
-    if (params.category) {
-      query.set("category", params.category);
-    }
-    if (params.tag) {
-      query.set("tag", params.tag);
-    }
-    if (params.search) {
-      query.set("search", params.search);
-    }
-    if (params.orderBy) {
-      query.set("orderBy", params.orderBy);
-    }
-    if (params.orderDirection) {
-      query.set("orderDirection", params.orderDirection);
+    // Add each parameter if it exists
+    for (const [key, mappedKey] of paramMappings) {
+      const value = params[key];
+      if (value !== undefined) {
+        const paramName = mappedKey || key;
+        query.set(paramName, String(value));
+      }
     }
 
     return query;
@@ -88,8 +92,7 @@ export class BlogAdminAPIClient {
    */
   async getPost(id: string): Promise<BlogPostRow> {
     const res = await this.makeRequest(`${this.basePath}/${id}`);
-    const data = await res.json();
-    return data.post || data;
+    return this.extractDataFromResponse(await res.json(), "post");
   }
 
   /**
@@ -97,36 +100,45 @@ export class BlogAdminAPIClient {
    */
   async getPostBySlug(slug: string): Promise<BlogPostRow> {
     const res = await this.makeRequest(`${this.basePath}/slug/${slug}`);
-    const data = await res.json();
-    return data.post || data;
+    return this.extractDataFromResponse(await res.json(), "post");
+  }
+
+  /**
+   * Extract data from API response
+   */
+  private extractDataFromResponse<T>(data: any, key: string): T {
+    return data[key] || data;
   }
 
   /**
    * Create a new post
    */
   async createPost(post: BlogPostInsert): Promise<BlogPostRow> {
-    const res = await this.makeRequest(this.basePath, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
-    });
-
-    const data = await res.json();
-    return data.post || data;
+    const res = await this.makeJsonRequest(this.basePath, "POST", post);
+    return this.extractDataFromResponse(await res.json(), "post");
   }
 
   /**
    * Update an existing post
    */
   async updatePost(id: string, updates: BlogPostUpdate): Promise<BlogPostRow> {
-    const res = await this.makeRequest(`${this.basePath}/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
+    const res = await this.makeJsonRequest(`${this.basePath}/${id}`, "PATCH", updates);
+    return this.extractDataFromResponse(await res.json(), "post");
+  }
 
-    const data = await res.json();
-    return data.post || data;
+  /**
+   * Make a JSON request with proper headers
+   */
+  private async makeJsonRequest(
+    url: string,
+    method: string,
+    body?: any
+  ): Promise<Response> {
+    return this.makeRequest(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
   }
 
   /**
@@ -165,8 +177,7 @@ export class BlogAdminAPIClient {
     const res = await this.makeRequest(`${this.basePath}/${id}/publish`, {
       method: "POST",
     });
-    const data = await res.json();
-    return data.post || data;
+    return this.extractDataFromResponse(await res.json(), "post");
   }
 
   // ============================================================================
@@ -177,53 +188,35 @@ export class BlogAdminAPIClient {
    * List all categories
    */
   async listCategories(): Promise<CategoryRow[]> {
-    const res = await this.makeRequest(`${this.basePath}/categories`);
-    const data = await res.json();
-    return data.categories || data;
+    return this.listEntities<CategoryRow>("categories");
   }
 
   /**
    * Get a single category by ID
    */
   async getCategory(id: string): Promise<CategoryRow> {
-    const res = await this.makeRequest(`${this.basePath}/categories/${id}`);
-    const data = await res.json();
-    return data.category || data;
+    return this.getEntity<CategoryRow>("categories", id, "category");
   }
 
   /**
    * Create a new category
    */
   async createCategory(category: CategoryInsert): Promise<CategoryRow> {
-    const res = await this.makeRequest(`${this.basePath}/categories`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(category),
-    });
-    const data = await res.json();
-    return data.category || data;
+    return this.createEntity<CategoryRow>("categories", category, "category");
   }
 
   /**
    * Update an existing category
    */
   async updateCategory(id: string, updates: CategoryUpdate): Promise<CategoryRow> {
-    const res = await this.makeRequest(`${this.basePath}/categories/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
-    const data = await res.json();
-    return data.category || data;
+    return this.updateEntity<CategoryRow>("categories", id, updates, "category");
   }
 
   /**
    * Delete a category
    */
   async deleteCategory(id: string): Promise<void> {
-    await this.makeRequest(`${this.basePath}/categories/${id}`, {
-      method: "DELETE",
-    });
+    return this.deleteEntity("categories", id);
   }
 
   // ============================================================================
@@ -234,52 +227,155 @@ export class BlogAdminAPIClient {
    * List all tags
    */
   async listTags(): Promise<TagRow[]> {
-    const res = await this.makeRequest(`${this.basePath}/tags`);
-    const data = await res.json();
-    return data.tags || data;
+    return this.listEntities<TagRow>("tags");
   }
 
   /**
    * Get a single tag by ID
    */
   async getTag(id: string): Promise<TagRow> {
-    const res = await this.makeRequest(`${this.basePath}/tags/${id}`);
-    const data = await res.json();
-    return data.tag || data;
+    return this.getEntity<TagRow>("tags", id, "tag");
   }
 
   /**
    * Create a new tag
    */
   async createTag(tag: TagInsert): Promise<TagRow> {
-    const res = await this.makeRequest(`${this.basePath}/tags`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(tag),
-    });
-    const data = await res.json();
-    return data.tag || data;
+    return this.createEntity<TagRow>("tags", tag, "tag");
   }
 
   /**
    * Update an existing tag
    */
   async updateTag(id: string, updates: TagUpdate): Promise<TagRow> {
-    const res = await this.makeRequest(`${this.basePath}/tags/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
-    const data = await res.json();
-    return data.tag || data;
+    return this.updateEntity<TagRow>("tags", id, updates, "tag");
   }
 
   /**
    * Delete a tag
    */
   async deleteTag(id: string): Promise<void> {
-    await this.makeRequest(`${this.basePath}/tags/${id}`, {
+    return this.deleteEntity("tags", id);
+  }
+
+  // ============================================================================
+  // Generic CRUD Operations
+  // ============================================================================
+
+  /**
+   * List all entities of a given type
+   */
+  private async listEntities<T>(entityType: string): Promise<T[]> {
+    const res = await this.makeRequest(`${this.basePath}/${entityType}`);
+    return this.extractDataFromResponse(await res.json(), entityType);
+  }
+
+  /**
+   * Get a single entity by ID
+   */
+  private async getEntity<T>(
+    entityType: string,
+    id: string,
+    responseKey: string
+  ): Promise<T> {
+    const res = await this.makeRequest(`${this.basePath}/${entityType}/${id}`);
+    return this.extractDataFromResponse(await res.json(), responseKey);
+  }
+
+  /**
+   * Create a new entity
+   */
+  private async createEntity<T>(
+    entityType: string,
+    data: any,
+    responseKey: string
+  ): Promise<T> {
+    const res = await this.makeJsonRequest(
+      `${this.basePath}/${entityType}`,
+      "POST",
+      data
+    );
+    return this.extractDataFromResponse(await res.json(), responseKey);
+  }
+
+  /**
+   * Update an existing entity
+   */
+  private async updateEntity<T>(
+    entityType: string,
+    id: string,
+    updates: any,
+    responseKey: string
+  ): Promise<T> {
+    const res = await this.makeJsonRequest(
+      `${this.basePath}/${entityType}/${id}`,
+      "PATCH",
+      updates
+    );
+    return this.extractDataFromResponse(await res.json(), responseKey);
+  }
+
+  /**
+   * Delete an entity
+   */
+  private async deleteEntity(entityType: string, id: string): Promise<void> {
+    await this.makeRequest(`${this.basePath}/${entityType}/${id}`, {
       method: "DELETE",
     });
+  }
+
+  // ============================================================================
+  // AI Generation
+  // ============================================================================
+
+  /**
+   * Generate a complete blog post from a prompt using AI
+   */
+  async generateBlogPost(
+    request: GenerateCompleteBlogRequest
+  ): Promise<GenerateCompleteBlogResponse> {
+    return this.makeAIGenerationRequest<GenerateCompleteBlogResponse>("complete", request);
+  }
+
+  /**
+   * Generate a single section with specific layout using AI
+   */
+  async generateSection(
+    request: GenerateSectionRequest
+  ): Promise<GenerateSectionResponse> {
+    return this.makeAIGenerationRequest<GenerateSectionResponse>("section", request);
+  }
+
+  /**
+   * Generate SEO metadata for a blog post using AI
+   */
+  async generateSEO(
+    request: GenerateSEORequest
+  ): Promise<GenerateSEOResponse> {
+    return this.makeAIGenerationRequest<GenerateSEOResponse>("seo", request);
+  }
+
+  /**
+   * Improve existing content using AI
+   */
+  async improveContent(
+    request: ImproveContentRequest
+  ): Promise<ImproveContentResponse> {
+    return this.makeAIGenerationRequest<ImproveContentResponse>("improve", request);
+  }
+
+  /**
+   * Make an AI generation request
+   */
+  private async makeAIGenerationRequest<T>(
+    endpoint: string,
+    request: any
+  ): Promise<T> {
+    const res = await this.makeJsonRequest(
+      `${this.basePath}/generate/${endpoint}`,
+      "POST",
+      request
+    );
+    return res.json();
   }
 }

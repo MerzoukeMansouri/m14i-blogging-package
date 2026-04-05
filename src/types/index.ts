@@ -57,6 +57,20 @@ export type {
   TagWithCount,
 } from "./database";
 
+// Re-export AI generation types
+export type {
+  GenerateCompleteBlogRequest,
+  GenerateCompleteBlogResponse,
+  GenerateSectionRequest,
+  GenerateSectionResponse,
+  GenerateSEORequest,
+  GenerateSEOResponse,
+  ImproveContentRequest,
+  ImproveContentResponse,
+  AIGenerationError,
+  AIGenerationConfig,
+} from "./aiGeneration";
+
 export interface BlogPost {
   id?: string;
   title: string;

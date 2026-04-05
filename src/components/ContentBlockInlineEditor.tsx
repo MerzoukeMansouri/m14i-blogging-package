@@ -32,31 +32,40 @@ interface ContentBlockInlineEditorProps {
   block: ContentBlock;
   onChange: (block: ContentBlock) => void;
   components: EditorComponents;
+  onImprove?: (
+    content: string,
+    instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging"
+  ) => Promise<string>;
 }
 
-export function ContentBlockInlineEditor({ block, onChange, components }: ContentBlockInlineEditorProps) {
-  const editorProps = { onChange, components } as any;
+export function ContentBlockInlineEditor({
+  block,
+  onChange,
+  components,
+  onImprove,
+}: ContentBlockInlineEditorProps): JSX.Element | null {
+  // Map block types to their respective editor components
+  const editorComponentMap = {
+    text: TextEditor,
+    image: ImageEditor,
+    video: VideoEditor,
+    quote: QuoteEditor,
+    pdf: PDFEditor,
+    carousel: CarouselEditor,
+  } as const;
 
-  switch (block.type) {
-    case "text":
-      return <TextEditor block={block} {...editorProps} />;
+  const EditorComponent = editorComponentMap[block.type as keyof typeof editorComponentMap];
 
-    case "image":
-      return <ImageEditor block={block} {...editorProps} />;
-
-    case "video":
-      return <VideoEditor block={block} {...editorProps} />;
-
-    case "quote":
-      return <QuoteEditor block={block} {...editorProps} />;
-
-    case "pdf":
-      return <PDFEditor block={block} {...editorProps} />;
-
-    case "carousel":
-      return <CarouselEditor block={block} {...editorProps} />;
-
-    default:
-      return null;
+  if (!EditorComponent) {
+    return null;
   }
+
+  return (
+    <EditorComponent
+      block={block as any}
+      onChange={onChange}
+      components={components}
+      onImprove={onImprove}
+    />
+  );
 }

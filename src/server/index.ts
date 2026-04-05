@@ -46,6 +46,20 @@ export {
   publishScheduledPosts,
 } from './routes/scheduled';
 
+// Export AI generation route handlers
+export {
+  createGenerateCompleteRoute,
+  createGenerateSectionRoute,
+  createGenerateSEORoute,
+  createImproveContentRoute,
+} from './routes/generate';
+
+// Export AI services
+export { createAIContentGenerator, AIContentGenerator } from './services/aiContentGenerator';
+
+// Export middleware
+export { applyRateLimit, getRateLimiter, type RateLimitConfig } from './middleware/rateLimit';
+
 // Export ready-to-use API route handlers
 export {
   createListPostsHandler,
@@ -97,3 +111,22 @@ export {
   generateAtomFeed,
   type RSSOptions,
 } from './seo';
+
+// Export media upload utilities
+export {
+  validateFile,
+  validateFileSize,
+  validateFileType,
+  sanitizeFileName,
+  generateUniqueFileName,
+  getMediaType,
+  parseFileFromRequest,
+  handleFileUpload,
+  createSupabaseStorageAdapter,
+  extractImageMetadata,
+  extractPdfMetadata,
+  type UploadedFile,
+  type UploadResult,
+  type ValidationOptions,
+  type StorageAdapter,
+} from './media-upload';

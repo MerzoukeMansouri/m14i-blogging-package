@@ -102,7 +102,28 @@ That's it! Modern package managers will handle peer dependencies automatically.
 
 ## 🚀 Quick Start (New Way!)
 
-### The Easiest Way - Complete Blog in 3 Steps
+### The Easiest Way - AI-Assisted Setup
+
+**Using Claude Code (Recommended):**
+
+```bash
+# Install the package
+pnpm add m14i-blogging
+
+# Then ask Claude Code:
+"Setup m14i-blogging in my app"
+```
+
+The AI assistant will:
+- ✅ Check your environment (Next.js version, Supabase, etc.)
+- ✅ Guide you through each setup step
+- ✅ Create all necessary files for you
+- ✅ Test functionality as you go
+- ✅ Fix any issues automatically
+
+**Result:** Fully working blog in 30-60 minutes with zero manual configuration!
+
+### Manual Setup - Complete Blog in 3 Steps
 
 **Step 1:** Set up the data layer (one file)
 

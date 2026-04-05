@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.1.1...v0.1.2) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* **ci:** configure npm registry and fix repository URL ([e4f83a0](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/e4f83a072c6eafd2281f03ac1004418822abb7ca))
+
 ## [0.1.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.1.0...v0.1.1) (2026-04-05)
 
 ### 🐛 Bug Fixes

@@ -26,7 +26,7 @@ import {
   generateCompletePrompt,
   generateSEOPrompt,
   generateImprovePrompt,
-} from "./ai-prompts-toon";
+} from "./ai-prompts-compact";
 
 /**
  * Helper: Strip markdown code blocks from JSON response

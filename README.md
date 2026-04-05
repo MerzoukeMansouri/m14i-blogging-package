@@ -279,6 +279,39 @@ import { createListPostsHandler } from 'm14i-blogging/server';      // API handl
 import 'm14i-blogging/styles';                                      // Styles
 ```
 
+## AI Content Generation
+
+The package includes an AI-powered content generator using Anthropic's Claude API.
+
+### Recommended Model
+
+**Claude Haiku 4.5** (`claude-haiku-4-5`) - Best choice for blog generation:
+- ⚡ Fast JSON generation (2x faster than Haiku 3.5)
+- 💰 Cost-effective (3x cheaper than Sonnet 4)
+- 🎯 Excellent coding performance (similar to Sonnet 4)
+- 📊 Consistent structured output with temperature 0.3
+
+### Example Configuration
+
+```typescript
+import { createAIContentGenerator } from "m14i-blogging/server";
+
+const generator = createAIContentGenerator({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  model: "claude-haiku-4-5", // Recommended
+  maxTokens: 800,
+  temperature: 0.3, // Lower for consistent JSON
+});
+
+// Generate layout
+const layout = await generator.generateLayout({
+  prompt: "Article about web development",
+  language: "fr", // "en" | "fr"
+});
+```
+
+**Note:** Claude Haiku 3.5 (`claude-3-5-haiku-20241022`) was retired on February 19, 2026.
+
 ## Documentation
 
 📚 **Complete documentation:**

@@ -38,6 +38,19 @@ export interface BlogAdminColors {
   background?: string;
   border?: string;
   text?: string;
+  textMuted?: string;
+  accent?: string;
+  error?: string;
+  errorBg?: string;
+  dialogOverlay?: string;
+  dialogBg?: string;
+  dialogBorder?: string;
+  inputBg?: string;
+  inputBorder?: string;
+  buttonPrimary?: string;
+  buttonPrimaryText?: string;
+  buttonSecondary?: string;
+  buttonSecondaryText?: string;
 }
 
 export type BlogAdminTheme = "light" | "dark" | "system";

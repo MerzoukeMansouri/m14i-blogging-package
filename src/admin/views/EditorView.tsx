@@ -112,7 +112,7 @@ function InputField({
 }
 
 export function EditorView({ postId }: EditorViewProps) {
-  const { apiClient, components, labels, basePath, features, navigate } = useBlogAdminContext();
+  const { apiClient, components, labels, basePath, features, navigate, colors } = useBlogAdminContext();
   const { getPost, createPost, updatePost } = usePosts();
   const [initialPost, setInitialPost] = useState<BlogPostRow | undefined>();
   const [loadingPost, setLoadingPost] = useState(!!postId);
@@ -603,17 +603,37 @@ export function EditorView({ postId }: EditorViewProps) {
 
       {/* AI Generation Dialog */}
       {showGenerateDialog && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A192F] border border-[#B87333]/20 rounded-none shadow-2xl max-w-md w-full p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-[#B87333]/20 pb-4">
-              <h2 className="text-xl font-['Playfair_Display'] text-[#F2F5F7]">
+        <div
+          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          style={{ backgroundColor: colors?.dialogOverlay || 'rgba(0, 0, 0, 0.7)' }}
+        >
+          <div
+            className="border rounded-none shadow-2xl max-w-md w-full p-8 space-y-6"
+            style={{
+              backgroundColor: colors?.dialogBg || colors?.background || '#0A192F',
+              borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)'
+            }}
+          >
+            <div
+              className="flex items-center justify-between border-b pb-4"
+              style={{ borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)' }}
+            >
+              <h2
+                className="text-xl font-['Playfair_Display']"
+                style={{ color: colors?.text || '#F2F5F7' }}
+              >
                 {generateAction === "complete" && "Generate Full Blog Post"}
                 {generateAction === "section" && "Generate Section"}
                 {generateAction === "seo" && "Generate SEO Metadata"}
               </h2>
               <button
                 onClick={() => setShowGenerateDialog(false)}
-                className="text-[#F2F5F7]/50 hover:text-[#B87333] transition-colors"
+                className="transition-colors"
+                style={{
+                  color: colors?.textMuted || 'rgba(242, 245, 247, 0.5)',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = colors?.accent || colors?.primary || '#B87333'}
+                onMouseLeave={(e) => e.currentTarget.style.color = colors?.textMuted || 'rgba(242, 245, 247, 0.5)'}
                 disabled={isGenerating}
               >
                 ✕
@@ -621,7 +641,10 @@ export function EditorView({ postId }: EditorViewProps) {
             </div>
 
             <div className="space-y-5">
-              <p className="text-sm text-[#F2F5F7]/70 leading-relaxed">
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: colors?.textMuted || 'rgba(242, 245, 247, 0.7)' }}
+              >
                 {generateAction === "complete" &&
                   "Describe the topic or theme for your blog post. The AI will generate a complete post with title, sections, and SEO metadata."}
                 {generateAction === "section" &&
@@ -632,7 +655,10 @@ export function EditorView({ postId }: EditorViewProps) {
 
               {generateAction !== "seo" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#F2F5F7] font-['Inter']">
+                  <label
+                    className="text-sm font-medium font-['Inter']"
+                    style={{ color: colors?.text || '#F2F5F7' }}
+                  >
                     {generateAction === "complete" ? "Topic or Prompt" : "Section Topic"}
                   </label>
                   <textarea
@@ -644,7 +670,16 @@ export function EditorView({ postId }: EditorViewProps) {
                         : "e.g., Benefits of server-side rendering"
                     }
                     rows={3}
-                    className="w-full px-4 py-3 bg-[#0A192F] border border-[#B87333]/30 text-[#F2F5F7] placeholder:text-[#F2F5F7]/30 resize-none focus:outline-none focus:border-[#B87333] transition-colors font-['Inter']"
+                    className="w-full px-4 py-3 resize-none focus:outline-none transition-colors font-['Inter']"
+                    style={{
+                      backgroundColor: colors?.inputBg || colors?.background || '#0A192F',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)',
+                      color: colors?.text || '#F2F5F7',
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = colors?.accent || colors?.primary || '#B87333'}
+                    onBlur={(e) => e.currentTarget.style.borderColor = colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'}
                     disabled={isGenerating}
                   />
                 </div>
@@ -652,11 +687,25 @@ export function EditorView({ postId }: EditorViewProps) {
 
               {generateAction === "section" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#F2F5F7] font-['Inter']">Layout Type</label>
+                  <label
+                    className="text-sm font-medium font-['Inter']"
+                    style={{ color: colors?.text || '#F2F5F7' }}
+                  >
+                    Layout Type
+                  </label>
                   <select
                     value={selectedLayoutType}
                     onChange={(e) => setSelectedLayoutType(e.target.value as LayoutType)}
-                    className="w-full px-4 py-3 bg-[#0A192F] border border-[#B87333]/30 text-[#F2F5F7] focus:outline-none focus:border-[#B87333] transition-colors font-['Inter']"
+                    className="w-full px-4 py-3 focus:outline-none transition-colors font-['Inter']"
+                    style={{
+                      backgroundColor: colors?.inputBg || colors?.background || '#0A192F',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)',
+                      color: colors?.text || '#F2F5F7',
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = colors?.accent || colors?.primary || '#B87333'}
+                    onBlur={(e) => e.currentTarget.style.borderColor = colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'}
                     disabled={isGenerating}
                   >
                     <option value="1-column">1 Column</option>
@@ -673,16 +722,42 @@ export function EditorView({ postId }: EditorViewProps) {
               )}
 
               {generationError && (
-                <div className="p-4 bg-red-900/20 border border-red-500/30">
-                  <p className="text-sm text-red-300">{generationError}</p>
+                <div
+                  className="p-4 border"
+                  style={{
+                    backgroundColor: colors?.errorBg || 'rgba(153, 27, 27, 0.2)',
+                    borderColor: colors?.error || 'rgba(239, 68, 68, 0.3)',
+                  }}
+                >
+                  <p
+                    className="text-sm"
+                    style={{ color: colors?.error || '#FCA5A5' }}
+                  >
+                    {generationError}
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-3 justify-end pt-4 border-t border-[#B87333]/20">
+            <div
+              className="flex gap-3 justify-end pt-4 border-t"
+              style={{ borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)' }}
+            >
               <button
                 onClick={() => setShowGenerateDialog(false)}
-                className="px-6 py-2.5 border border-[#F2F5F7]/20 text-[#F2F5F7] hover:border-[#B87333]/50 hover:text-[#B87333] transition-all font-['Inter']"
+                className="px-6 py-2.5 border transition-all font-['Inter']"
+                style={{
+                  borderColor: colors?.buttonSecondary || 'rgba(242, 245, 247, 0.2)',
+                  color: colors?.buttonSecondaryText || colors?.text || '#F2F5F7',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = colors?.accent || colors?.primary || 'rgba(184, 115, 51, 0.5)';
+                  e.currentTarget.style.color = colors?.accent || colors?.primary || '#B87333';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = colors?.buttonSecondary || 'rgba(242, 245, 247, 0.2)';
+                  e.currentTarget.style.color = colors?.buttonSecondaryText || colors?.text || '#F2F5F7';
+                }}
                 disabled={isGenerating}
               >
                 Cancel
@@ -690,7 +765,19 @@ export function EditorView({ postId }: EditorViewProps) {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || (generateAction !== "seo" && !generatePrompt.trim())}
-                className="px-6 py-2.5 bg-[#B87333] text-[#0A192F] hover:bg-[#B87333]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-['Inter'] font-medium"
+                className="px-6 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-['Inter'] font-medium"
+                style={{
+                  backgroundColor: colors?.buttonPrimary || colors?.accent || colors?.primary || '#B87333',
+                  color: colors?.buttonPrimaryText || colors?.background || '#0A192F',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isGenerating && (generateAction === "seo" || generatePrompt.trim())) {
+                    e.currentTarget.style.opacity = '0.9';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                }}
               >
                 {isGenerating ? (
                   <span className="flex items-center gap-2">

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.10.0...v0.11.0) (2026-04-05)
+
+### ✨ Features
+
+* add layout and classNames props for customizable editor layout ([f5762d1](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/f5762d1bfaf2df72e9b4f909013723476af7e116))
+
 ## [0.10.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.9.0...v0.10.0) (2026-04-05)
 
 ### ✨ Features

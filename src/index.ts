@@ -80,6 +80,7 @@ export {
   analyzeContent,
   formatReadingTime,
   getReadingTimeDuration,
+  generateSlug,
 } from "./utils/seo-analysis";
 
 // SEO Utils - Defaults & Validation

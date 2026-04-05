@@ -276,3 +276,18 @@ export function formatReadingTime(minutes: number): string {
 export function getReadingTimeDuration(minutes: number): string {
   return `PT${minutes}M`;
 }
+
+/**
+ * Generate a URL-friendly slug from a title
+ * @param title - The title to convert to a slug
+ * @returns URL-friendly slug (lowercase, hyphenated, no special chars)
+ */
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD') // Normalize to decomposed form
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics (accents)
+    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .replace(/-{2,}/g, '-'); // Replace multiple hyphens with single hyphen
+}

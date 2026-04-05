@@ -61,6 +61,8 @@ export type {
 export type {
   GenerateCompleteBlogRequest,
   GenerateCompleteBlogResponse,
+  GenerateLayoutRequest,
+  GenerateLayoutResponse,
   GenerateSectionRequest,
   GenerateSectionResponse,
   GenerateSEORequest,

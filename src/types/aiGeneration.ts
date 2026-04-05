@@ -54,6 +54,44 @@ export interface GenerateCompleteBlogResponse {
 }
 
 /**
+ * Request to generate blog post layout structure only
+ */
+export interface GenerateLayoutRequest {
+  /** The topic or prompt describing what the blog post should be about */
+  prompt: string;
+  /** Optional: Desired layout preferences */
+  layoutPreference?: LayoutType[];
+  /** Optional: Target audience or tone */
+  tone?: string;
+  /** Optional: Desired length (short, medium, long) */
+  length?: "short" | "medium" | "long";
+  /** Optional: Additional instructions */
+  additionalInstructions?: string;
+}
+
+/**
+ * Response from layout generation
+ */
+export interface GenerateLayoutResponse {
+  /** Generated blog post title */
+  title: string;
+  /** Generated URL-friendly slug */
+  slug: string;
+  /** Generated excerpt/summary */
+  excerpt: string;
+  /** Layout structure with section types and descriptions (no content yet) */
+  layout: Array<{
+    id: string;
+    type: LayoutType;
+    description: string; // What this section should contain
+  }>;
+  /** Suggested category */
+  category?: string;
+  /** Suggested tags */
+  tags: string[];
+}
+
+/**
  * Request to generate a single section
  */
 export interface GenerateSectionRequest {

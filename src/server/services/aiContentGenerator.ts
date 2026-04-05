@@ -9,6 +9,8 @@ import type { ContentBlock, TextBlock, QuoteBlock } from "../../types/blocks";
 import type {
   GenerateCompleteBlogRequest,
   GenerateCompleteBlogResponse,
+  GenerateLayoutRequest,
+  GenerateLayoutResponse,
   GenerateSectionRequest,
   GenerateSectionResponse,
   GenerateSEORequest,
@@ -53,6 +55,91 @@ export class AIContentGenerator {
       maxTokens: config.maxTokens || 4000,
       temperature: config.temperature || 0.7,
     };
+  }
+
+  /**
+   * Generate layout structure only (Step 1)
+   * Returns title, excerpt, and section structure without content
+   */
+  async generateLayout(
+    request: GenerateLayoutRequest
+  ): Promise<GenerateLayoutResponse> {
+    const systemPrompt = `You are an expert blog content strategist. Generate a blog post layout structure.
+
+⚠️ CRITICAL: YOUR RESPONSE MUST BE 100% VALID JSON ⚠️
+
+JSON FORMATTING RULES - ZERO TOLERANCE FOR ERRORS:
+1. Response starts with { and ends with } - NOTHING ELSE
+2. NO markdown code blocks (no \`\`\`json or \`\`\`)
+3. NO explanatory text before or after the JSON
+4. ALL quotes inside strings MUST be escaped: use \\" not "
+5. NO literal line breaks in strings - use \\n instead
+6. NO trailing commas after the last item in arrays or objects
+7. ALL object keys must be in "double quotes"
+8. Close EVERY bracket and brace you open
+
+RESPONSE STRUCTURE:
+{
+  "title": "Blog post title",
+  "slug": "url-friendly-slug",
+  "excerpt": "Brief summary (150-200 chars)",
+  "layout": [
+    {
+      "id": "section-1",
+      "type": "hero" | "two-column" | "three-column" | "full-width" | "sidebar-left" | "sidebar-right",
+      "description": "What this section should contain"
+    }
+  ],
+  "category": "suggested category",
+  "tags": ["tag1", "tag2"]
+}
+
+AVAILABLE LAYOUT TYPES:
+- hero: Eye-catching introduction with large visual
+- two-column: Content split into two columns
+- three-column: Content split into three columns
+- full-width: Single column spanning full width
+- sidebar-left: Main content with sidebar on left
+- sidebar-right: Main content with sidebar on right
+
+${request.length === 'short' ? 'Generate 2-3 sections.' : request.length === 'long' ? 'Generate 5-7 sections.' : 'Generate 3-5 sections.'}
+${request.layoutPreference ? `Prefer these layouts: ${request.layoutPreference.join(', ')}` : ''}
+${request.tone ? `Tone: ${request.tone}` : ''}
+${request.additionalInstructions ? `Additional: ${request.additionalInstructions}` : ''}`;
+
+    const userPrompt = `Generate blog post layout for: ${request.prompt}`;
+
+    const message = await this.anthropic.messages.create({
+      model: this.config.model,
+      max_tokens: 1000, // Small response - just structure
+      temperature: this.config.temperature,
+      system: [
+        {
+          type: "text",
+          text: systemPrompt,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      messages: [
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+    });
+
+    const responseText =
+      message.content[0].type === "text" ? message.content[0].text : "";
+
+    const cleanedText = stripMarkdownCodeBlocks(responseText);
+
+    try {
+      return JSON.parse(cleanedText);
+    } catch (error) {
+      console.error("JSON Parse Error (Layout):", error);
+      console.error("Response:", cleanedText);
+      throw new Error(`Failed to parse layout response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**

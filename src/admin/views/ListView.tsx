@@ -17,17 +17,17 @@ export function ListView() {
   const { posts, total, loading, error, fetchPosts, deletePost, publishPost } = usePosts();
   const { categories, tags } = useTaxonomy();
 
-  const Button = components.Button;
-  const Input = components.Input;
-  const Badge = components.Badge;
+  const Button = components?.Button;
+  const Input = components?.Input;
+  const Badge = components?.Badge;
 
   // Filters state
   const [filters, setFilters] = useState<BlogFilterParams>({
     page: 1,
-    limit: 10,
+    pageSize: 10,
     status: undefined,
     category: undefined,
-    tags: undefined,
+    tag: undefined,
     search: undefined,
   });
 
@@ -82,7 +82,7 @@ export function ListView() {
     }
   };
 
-  const totalPages = Math.ceil(total / (filters.limit || 10));
+  const totalPages = Math.ceil(total / (filters.pageSize || 10));
 
   return (
     <div className="space-y-6">

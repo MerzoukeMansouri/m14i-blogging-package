@@ -141,7 +141,7 @@ export function PostDetailView({ slug, className = "" }: PostDetailViewProps) {
 
         {/* Post Content */}
         <div className="prose prose-lg max-w-none">
-          <BlogPreview sections={post.sections} />
+          <BlogPreview title={post.title} sections={post.sections} />
         </div>
       </article>
 

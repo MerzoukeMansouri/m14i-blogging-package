@@ -87,6 +87,7 @@ const DEFAULT_LABELS: Required<BlogAdminLabels> = {
   next: "Suivant",
 
   // Status
+  status: "Statut",
   draft: "Brouillon",
   published: "Publié",
   archived: "Archivé",

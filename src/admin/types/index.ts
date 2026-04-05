@@ -82,6 +82,7 @@ export interface BlogAdminLabels {
   next?: string;
 
   // Status
+  status?: string;
   draft?: string;
   published?: string;
   archived?: string;

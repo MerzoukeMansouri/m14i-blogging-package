@@ -5,7 +5,7 @@ import type { LayoutSection } from "../src/types";
 import * as ShadcnComponents from "./mocks/shadcn-components";
 
 const meta: Meta<typeof BlogBuilder> = {
-  title: "Components/BlogBuilder",
+  title: "Core Components/BlogBuilder",
   component: BlogBuilder,
   parameters: {
     layout: "fullscreen",

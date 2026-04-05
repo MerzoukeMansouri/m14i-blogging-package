@@ -3,7 +3,7 @@ import { BlogPreview } from "../src/components/BlogPreview";
 import type { LayoutSection } from "../src/types";
 
 const meta: Meta<typeof BlogPreview> = {
-  title: "Components/BlogPreview",
+  title: "Core Components/BlogPreview",
   component: BlogPreview,
   parameters: {
     layout: "padded",

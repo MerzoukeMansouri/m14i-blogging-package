@@ -54,7 +54,8 @@
       {
         "npmPublish": true,
         "tarballDir": "dist",
-        "pkgRoot": "."
+        "pkgRoot": ".",
+        "provenance": true
       }
     ],
     [

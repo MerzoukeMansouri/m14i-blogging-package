@@ -139,7 +139,27 @@ export class AIContentGenerator {
   private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest): string {
     return `You are an expert blog content writer specializing in creating elegant, visually engaging blog posts with sophisticated layouts.
 
-IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
+CRITICAL JSON FORMATTING RULES - MUST FOLLOW EXACTLY:
+1. Your ENTIRE response must be a single valid JSON object
+2. DO NOT wrap the JSON in markdown code blocks (no \`\`\`json or \`\`\`)
+3. DO NOT add any text before or after the JSON
+4. All string values MUST have properly escaped quotes: use \\" for quotes inside strings
+5. All strings MUST be on a single line (no literal newlines in string values)
+6. Use \\n for line breaks inside string content
+7. Ensure all brackets and braces are properly closed
+8. Test that your response is valid JSON before returning it
+
+WRONG EXAMPLES:
+❌ \`\`\`json {...}\`\`\`  (no markdown)
+❌ Here is the JSON: {...}  (no extra text)
+❌ "content": "This is a "quote""  (escape quotes as \\\")
+❌ "content": "Line 1
+Line 2"  (use \\n instead)
+
+CORRECT EXAMPLE:
+✅ {"title":"My Post","content":"This is a \\"quote\\" and\\nthis is a new line"}
+
+Your response must start with { and end with } with nothing else.
 
 # CONTENT PHILOSOPHY
 Create content that is:
@@ -286,41 +306,112 @@ Use markdown to enhance readability:
 - Add clear captions/descriptions so users know what content to add
 - Example: "https://placeholder.example/data-visualization-chart.jpg"
 
-# RESPONSE STRUCTURE
+# EXPECTED JSON STRUCTURE
+
+You must return a JSON object with this EXACT structure (remove all comments):
+
 {
-  "title": "Compelling, SEO-optimized title (60-70 chars)",
-  "slug": "url-friendly-slug",
-  "excerpt": "Concise summary that hooks readers (150-160 chars)",
+  "title": "Your Compelling Blog Post Title Here",
+  "slug": "your-blog-post-url-slug",
+  "excerpt": "A concise 150-160 character summary that hooks readers and encourages them to read more of your content.",
   "sections": [
     {
       "id": "section-1",
       "type": "1-column",
-      "columns": [[/* intro content blocks */]]
+      "columns": [
+        [
+          {
+            "id": "block-1",
+            "type": "text",
+            "content": "## Introduction\\n\\nThis is the opening paragraph with **bold** and *italic* text.\\n\\nSecond paragraph continues here."
+          },
+          {
+            "id": "block-2",
+            "type": "image",
+            "src": "https://placeholder.example/hero-image.jpg",
+            "alt": "Descriptive alt text for the hero image",
+            "caption": "Optional caption explaining the image"
+          }
+        ]
+      ]
     },
     {
       "id": "section-2",
+      "type": "2-columns",
+      "columns": [
+        [
+          {
+            "id": "block-3",
+            "type": "text",
+            "content": "## First Column Heading\\n\\nContent for the first column goes here."
+          }
+        ],
+        [
+          {
+            "id": "block-4",
+            "type": "quote",
+            "content": "This is an inspiring quote that adds credibility.",
+            "author": "Expert Name",
+            "role": "CEO, Company Name"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "section-3",
       "type": "3-columns",
-      "columns": [[/* col1 */], [/* col2 */], [/* col3 */]]
+      "columns": [
+        [
+          {
+            "id": "block-5",
+            "type": "text",
+            "content": "### Feature One\\n\\nDescription of the first feature."
+          }
+        ],
+        [
+          {
+            "id": "block-6",
+            "type": "text",
+            "content": "### Feature Two\\n\\nDescription of the second feature."
+          }
+        ],
+        [
+          {
+            "id": "block-7",
+            "type": "text",
+            "content": "### Feature Three\\n\\nDescription of the third feature."
+          }
+        ]
+      ]
     }
-    // 4-7 sections total for medium posts
   ],
   "seo_metadata": {
-    "description": "Clear, benefit-focused meta description",
-    "keywords": ["primary-keyword", "semantic-keyword", "long-tail-keyword"],
+    "description": "A clear, benefit-focused meta description under 160 characters that encourages clicks.",
+    "keywords": ["primary-keyword", "secondary-keyword", "long-tail-keyword"],
     "robots": "index, follow",
     "openGraph": {
-      "title": "Social media optimized title",
-      "description": "Engaging OG description"
+      "title": "Social Media Optimized Title",
+      "description": "Engaging description for social media sharing."
     },
     "twitter": {
       "card": "summary_large_image",
-      "title": "Twitter-optimized title",
-      "description": "Twitter-optimized description"
+      "title": "Twitter-Optimized Title",
+      "description": "Twitter-specific description."
     }
   },
-  "category": "Relevant category",
-  "tags": ["tag1", "tag2", "tag3", "tag4"]
+  "category": "Technology",
+  "tags": ["web-development", "react", "performance", "best-practices"]
 }
+
+CRITICAL REMINDERS:
+- ALL strings must use \\n for line breaks (never literal newlines)
+- Escape ALL quotes inside strings with \\"
+- Each block must have unique "id" field
+- Each section must have unique "id" field
+- Use only these layout types: "1-column", "2-columns", "3-columns", "2-columns-wide-left", "2-columns-wide-right", "grid-2x2", "grid-3x3", "grid-2x3", "grid-4-even"
+- Use only these block types: "text", "image", "video", "quote", "carousel", "pdf"
+- Number of columns array must match layout type (1-column = 1 array, 2-columns = 2 arrays, etc.)
+- Start your response with { and end with } with nothing else before or after
 
 ${request.tone ? `Tone: ${request.tone}` : "Tone: Professional yet approachable, authoritative yet conversational"}
 ${request.length ? `Length: ${request.length}` : "Length: medium (5-7 sections, 800-1200 words)"}

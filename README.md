@@ -49,17 +49,31 @@ User creates content in BlogBuilder
 
 ## Installation
 
+### Basic Installation
+
 ```bash
-npm install m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+npm install m14i-blogging
 # or
-pnpm add m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+pnpm add m14i-blogging
 # or
-yarn add m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+yarn add m14i-blogging
 ```
+
+Modern package managers (npm 7+, pnpm, yarn) will automatically prompt you to install peer dependencies if they're missing.
+
+### Manual Peer Dependencies (if needed)
+
+If your package manager doesn't auto-install peer dependencies, you may need:
+
+```bash
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
+```
+
+**Note:** Most React projects already have `react` and `react-dom` installed, so you typically only need the additional dependencies listed above.
 
 ### Prerequisites
 
-This package requires the following in your Next.js project:
+This package requires the following in your project:
 
 #### 1. Tailwind CSS
 

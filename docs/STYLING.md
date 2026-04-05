@@ -2,6 +2,10 @@
 
 Complete guide to customizing the appearance of your blog components.
 
+**Package Links:**
+- npm: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- Storybook: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
@@ -312,7 +316,7 @@ Create a `blog-theme.css` file:
 Import in your app:
 
 ```tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './blog-theme.css';
 ```
 
@@ -543,7 +547,7 @@ function BlogWithThemeToggle() {
 
 ```tsx
 // app/layout.tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './blog-theme.css';  // Your overrides
 
 // app/blog/[slug]/page.tsx
@@ -558,7 +562,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
 
 ```tsx
 // main.tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './index.css';  // Your theme
 
 // App.tsx
@@ -593,8 +597,8 @@ Ensure colors are in HSL format without `hsl()`:
 Check CSS specificity. Your custom CSS should be imported **after** the library CSS:
 
 ```tsx
-import 'm14i-blogging/dist/index.css';  // Library styles
-import './custom-theme.css';             // Your overrides (wins)
+import 'm14i-blogging/styles';  // Library styles
+import './custom-theme.css';     // Your overrides (wins)
 ```
 
 ### className props not working?
@@ -608,11 +612,12 @@ className="..."                      // ❌ Wrong prop name
 
 ---
 
-## Support
+## Resources
 
-For issues, feature requests, or questions:
-- GitHub Issues: [m14i/m14i-blogging](https://github.com/m14i/m14i-blogging)
-- Documentation: [Full Docs](https://m14i-blogging.dev)
+- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- **Storybook**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+- **GitHub**: [https://github.com/MerzoukeMansouri/m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package)
+- **Theme Playground**: Check the "Theme Playground" story in Storybook for interactive customization
 
 ---
 

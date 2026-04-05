@@ -2,6 +2,10 @@
 
 This guide provides comprehensive documentation for the SEO features built into m14i-blogging, helping you optimize your blog content for search engines and social media.
 
+**Package Links:**
+- npm: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- Storybook: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -43,7 +47,11 @@ All SEO fields are **optional** - the package intelligently auto-generates missi
 npm install m14i-blogging
 # or
 pnpm add m14i-blogging
+# or
+yarn add m14i-blogging
 ```
+
+Modern package managers will automatically prompt you to install peer dependencies if needed.
 
 ### 2. Create SEO Configuration
 
@@ -1114,6 +1122,11 @@ The m14i-blogging package provides comprehensive, automatic SEO optimization:
 ✅ **Validation** - Built-in SEO scoring and warnings
 ✅ **Flexible** - Use as much or as little as you need
 
-For questions or issues, visit: https://github.com/yourusername/m14i-blogging/issues
+## Resources
+
+- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- **Storybook**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+- **GitHub**: [https://github.com/MerzoukeMansouri/m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package)
+- **GitHub Issues**: [https://github.com/MerzoukeMansouri/m14i-blogging-package/issues](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues)
 
 Happy blogging! 🚀

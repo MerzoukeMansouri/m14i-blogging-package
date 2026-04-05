@@ -410,14 +410,18 @@ Si vous utilisiez le content block "Gallery", voici comment migrer vers les grid
 
 ## Storybook
 
-Explorez tous les exemples dans Storybook:
+Explore all examples in the live Storybook:
+
+**[View Storybook →](https://merzoukemansouri.github.io/m14i-blogging-package)**
+
+Navigate to **Layouts/Gallery Grids** to see 9 interactive examples.
+
+You can also run Storybook locally:
 
 ```bash
 npm run storybook
 ```
 
-Naviguez vers **Layouts/Gallery Grids** pour voir 9 exemples interactifs.
-
 ---
 
-**Les grid layouts transforment votre blogging avec une flexibilité maximale!** 🎨✨
+**Grid layouts transform your blogging with maximum flexibility!** 🎨✨

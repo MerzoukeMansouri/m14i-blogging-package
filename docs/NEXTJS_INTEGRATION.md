@@ -2,6 +2,10 @@
 
 Complete guide for integrating `m14i-blogging` into your Next.js application.
 
+**Package Links:**
+- npm: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- Storybook: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -25,11 +29,19 @@ Complete guide for integrating `m14i-blogging` into your Next.js application.
 ### 1. Install the Package
 
 ```bash
-npm install m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+npm install m14i-blogging
 # or
-pnpm add m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+pnpm add m14i-blogging
 # or
-yarn add m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+yarn add m14i-blogging
+```
+
+Modern package managers will automatically prompt you to install peer dependencies if needed.
+
+If your package manager doesn't auto-install them:
+
+```bash
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
 ### 2. Install Tailwind CSS (if not already installed)
@@ -564,4 +576,11 @@ import { BlogPreview } from 'm14i-blogging'
 - 📚 [Main README](../README.md)
 - 🎨 [Styling Guide](./STYLING.md)
 - 🚀 [SEO Guide](./SEO_GUIDE.md)
+- 📖 [Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package)
 - 💬 [GitHub Issues](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues)
+
+## Resources
+
+- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- **Storybook**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+- **GitHub**: [https://github.com/MerzoukeMansouri/m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package)

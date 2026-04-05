@@ -2,10 +2,28 @@
 
 Get started with m14i-blogging in 5 minutes.
 
+**Package Links:**
+- npm: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- Storybook: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+
 ## Installation
 
+### Basic Installation
+
 ```bash
-npm install m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-react
+npm install m14i-blogging
+# or
+pnpm add m14i-blogging
+# or
+yarn add m14i-blogging
+```
+
+Modern package managers will automatically prompt you to install peer dependencies if needed.
+
+### If Peer Dependencies Aren't Auto-Installed
+
+```bash
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
 ## Basic Setup
@@ -15,7 +33,7 @@ npm install m14i-blogging @hello-pangea/dnd react-markdown remark-gfm lucide-rea
 In your main app file (e.g., `_app.tsx`, `layout.tsx`, or `main.tsx`):
 
 ```tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 ```
 
 ### 2. Create a Blog Post Preview
@@ -85,7 +103,7 @@ Create a `blog-theme.css` file:
 Import it after the library CSS:
 
 ```tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './blog-theme.css';  // Your custom theme
 ```
 
@@ -124,7 +142,7 @@ function App() {
 
 ```tsx
 // app/layout.tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './globals.css';
 
 // app/blog/[slug]/page.tsx
@@ -141,7 +159,7 @@ export default function BlogPost({ params }) {
 
 ```tsx
 // pages/_app.tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 
 // pages/blog/[slug].tsx
 import { BlogPreview } from 'm14i-blogging';
@@ -155,7 +173,7 @@ export default function BlogPost({ post }) {
 
 ```tsx
 // main.tsx
-import 'm14i-blogging/dist/index.css';
+import 'm14i-blogging/styles';
 import './index.css';
 
 // App.tsx
@@ -166,7 +184,7 @@ import { BlogPreview } from 'm14i-blogging';
 
 ```tsx
 // app/root.tsx
-import blogStyles from 'm14i-blogging/dist/index.css?url';
+import blogStyles from 'm14i-blogging/styles?url';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: blogStyles },
@@ -252,7 +270,7 @@ function Editor() {
 - 📖 **[Complete Styling Guide](./STYLING.md)** - Full customization documentation
 - 🔍 **[SEO Guide](./SEO_GUIDE.md)** - Optimize for search engines
 - 📊 **[Gallery Layouts](./GALLERY_LAYOUTS.md)** - Advanced grid layouts
-- 📚 **Storybook** - Run `npm run storybook` to explore interactive examples
+- 📚 **[Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package)** - Interactive examples and playground
 - 🎨 **Theme Playground** - Try the Theme Playground story in Storybook
 - 📘 **[Full README](../README.md)** - Complete API reference
 
@@ -260,9 +278,15 @@ function Editor() {
 
 - Check the [Styling Guide](./STYLING.md) for customization examples
 - Review the [SEO Guide](./SEO_GUIDE.md) for optimization tips
-- Browse Storybook for live examples
+- Browse the [Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package) for examples
 - Explore [all documentation](./README.md) for complete guides
-- Open an issue on GitHub for bugs or questions
+- Open an issue on [GitHub](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues) for bugs or questions
+
+## Resources
+
+- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- **Storybook**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+- **GitHub**: [https://github.com/MerzoukeMansouri/m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package)
 
 ---
 

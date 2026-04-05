@@ -12,6 +12,7 @@ import {
   FileText,
   ImagePlay,
 } from "lucide-react";
+import { DEFAULT_COLORS, DEFAULT_UI_SETTINGS } from "./constants";
 
 export const DEFAULT_LAYOUTS: LayoutConfig[] = [
   { type: "1-column", label: "1 Colonne", icon: LayoutGrid },
@@ -36,18 +37,9 @@ export const DEFAULT_CONFIG: Required<BlogBuilderConfig> = {
   layouts: DEFAULT_LAYOUTS,
   blocks: DEFAULT_BLOCKS,
   theme: {
-    colors: {
-      primary: "hsl(var(--primary))",
-      border: "hsl(var(--border))",
-      background: "hsl(var(--background))",
-      accent: "hsl(var(--accent))",
-    },
+    colors: DEFAULT_COLORS,
   },
-  ui: {
-    showPreviewToggle: true,
-    compactMode: false,
-    sidebarWidth: "320px",
-  },
+  ui: DEFAULT_UI_SETTINGS,
   callbacks: {
     onSave: undefined,
     onChange: undefined,
@@ -56,22 +48,26 @@ export const DEFAULT_CONFIG: Required<BlogBuilderConfig> = {
 };
 
 export function mergeConfig(userConfig?: BlogBuilderConfig): Required<BlogBuilderConfig> {
+  if (!userConfig) {
+    return DEFAULT_CONFIG;
+  }
+
   return {
-    layouts: userConfig?.layouts ?? DEFAULT_CONFIG.layouts,
-    blocks: userConfig?.blocks ?? DEFAULT_CONFIG.blocks,
+    layouts: userConfig.layouts || DEFAULT_CONFIG.layouts,
+    blocks: userConfig.blocks || DEFAULT_CONFIG.blocks,
     theme: {
       colors: {
         ...DEFAULT_CONFIG.theme.colors,
-        ...userConfig?.theme?.colors,
+        ...(userConfig.theme?.colors || {}),
       },
     },
     ui: {
       ...DEFAULT_CONFIG.ui,
-      ...userConfig?.ui,
+      ...(userConfig.ui || {}),
     },
     callbacks: {
       ...DEFAULT_CONFIG.callbacks,
-      ...userConfig?.callbacks,
+      ...(userConfig.callbacks || {}),
     },
   };
 }

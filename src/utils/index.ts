@@ -1,4 +1,5 @@
 import type { LayoutType, ContentBlock, ContentBlockType } from "../types";
+import { DEFAULT_CONTENT_PLACEHOLDERS, DEFAULT_CAROUSEL_SETTINGS, DEFAULT_PDF_SETTINGS } from "../config/constants";
 
 // Helper pour créer des colonnes vides selon le layout
 export function createEmptyColumns(layoutType: LayoutType): ContentBlock[][] {
@@ -62,22 +63,20 @@ export function getLayoutLabel(layoutType: LayoutType): string {
 export function createDefaultBlock(type: ContentBlockType): ContentBlock {
   const id = `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-  const blockDefaults: Record<ContentBlockType, Omit<ContentBlock, "id">> = {
-    text: { type: "text", content: "Votre texte ici... (Markdown supporté)" },
-    image: { type: "image", src: "", alt: "" },
-    video: { type: "video", url: "" },
-    carousel: {
-      type: "carousel",
-      slides: [],
-      autoPlay: false,
-      showDots: true,
-      showArrows: true,
-      loop: true,
-      aspectRatio: "16/9"
-    },
-    quote: { type: "quote", content: "Votre citation ici" },
-    pdf: { type: "pdf", url: "", displayMode: "both" },
-  };
-
-  return { id, ...blockDefaults[type] } as ContentBlock;
+  switch (type) {
+    case "text":
+      return { id, type, content: DEFAULT_CONTENT_PLACEHOLDERS.text };
+    case "image":
+      return { id, type, src: "", alt: "" };
+    case "video":
+      return { id, type, url: "" };
+    case "carousel":
+      return { id, type, slides: [], ...DEFAULT_CAROUSEL_SETTINGS };
+    case "quote":
+      return { id, type, content: DEFAULT_CONTENT_PLACEHOLDERS.quote };
+    case "pdf":
+      return { id, type, url: "", displayMode: DEFAULT_PDF_SETTINGS.displayMode };
+    default:
+      throw new Error(`Unknown block type: ${type}`);
+  }
 }

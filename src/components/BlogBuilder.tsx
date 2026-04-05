@@ -1,6 +1,9 @@
 "use client";
 
-import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { Trash2 } from "lucide-react";
+import { getLayoutClasses, getLayoutLabel } from "../utils";
+import { ContentBlockInlineEditor } from "./ContentBlockInlineEditor";
 import type {
   LayoutSection,
   ContentBlock,
@@ -10,8 +13,6 @@ import type {
 } from "../types";
 import { createEmptyColumns, createDefaultBlock } from "../utils";
 import { mergeConfig } from "../config/defaults";
-import { BlogBuilderSidebar } from "./BlogBuilderSidebar";
-import { BlogBuilderSection } from "./BlogBuilderSection";
 
 // NOTE: This component requires shadcn/ui components:
 // Button, Card, CardContent, CardHeader

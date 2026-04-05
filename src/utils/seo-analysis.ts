@@ -6,11 +6,7 @@
 import type { BlogPost, LayoutSection, ContentBlock } from '../types';
 import type { ContentAnalysis } from '../types/seo';
 
-/**
- * Average reading speed in words per minute
- * Default: 200 WPM (average adult reading speed)
- */
-const READING_SPEED_WPM = 200;
+import { READING_SPEED_WPM } from '../config/constants';
 
 /**
  * Extract plain text from markdown content

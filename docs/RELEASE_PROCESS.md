@@ -17,7 +17,7 @@ Semantic-release **automatically**:
 
 ## 📝 Commit Message Format
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+Use [Conventional Commits](https://www.conventionalcommits.org/) format for all commits:
 
 ```
 <type>(<scope>): <subject>

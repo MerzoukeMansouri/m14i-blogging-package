@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.3.0...v0.4.0) (2026-04-05)
+
+### ✨ Features
+
+* add dynamic category and tag management (v0.4.0) ([e7dfb94](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/e7dfb94ce14e0345fa50f898505c73c5f84852f0))
+
 ## [0.3.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.7...v0.3.0) (2026-04-05)
 
 ### ✨ Features

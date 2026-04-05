@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.13.0...v0.13.1) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* afficher la progression de génération DANS le dialog au lieu de derrière ([d268f2d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/d268f2ddc2a78b7f22cd3b4c30ccc0ec23682ff3))
+
 ## [0.13.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.12.0...v0.13.0) (2026-04-05)
 
 ### ✨ Features

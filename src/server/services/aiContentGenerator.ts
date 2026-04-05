@@ -53,34 +53,7 @@ export class AIContentGenerator {
   async generateCompleteBlogPost(
     request: GenerateCompleteBlogRequest
   ): Promise<GenerateCompleteBlogResponse> {
-    const systemPrompt = `You are an expert blog content writer. Your task is to generate high-quality, engaging blog posts based on user prompts.
-
-IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
-
-Generate a complete blog post with the following structure:
-- title: A compelling, SEO-friendly title
-- slug: URL-friendly version of the title (lowercase, hyphens)
-- excerpt: A concise 150-160 character summary
-- sections: Array of content sections with layouts
-- seo_metadata: SEO metadata including description, keywords, Open Graph, and Twitter Card data
-- category: Suggested category
-- tags: Array of relevant tags (3-5 tags)
-
-Each section should have:
-- id: unique identifier (use format: section-1, section-2, etc.)
-- type: one of the layout types (1-column, 2-columns, 3-columns, 2-columns-wide-left, 2-columns-wide-right, grid-2x2, grid-3x3, grid-2x3, grid-4-even)
-- columns: array of content blocks organized by column
-
-Content blocks can be:
-- text: { id: string, type: "text", content: string (markdown supported) }
-- quote: { id: string, type: "quote", content: string, author?: string, role?: string }
-
-Use varied layouts to make the content visually interesting. Start with a 1-column layout for the introduction, then use 2-column or 3-column layouts for main content.
-
-${request.tone ? `Tone: ${request.tone}` : "Tone: Professional and engaging"}
-${request.length ? `Length: ${request.length}` : "Length: medium (3-5 sections)"}
-${request.additionalInstructions ? `Additional instructions: ${request.additionalInstructions}` : ""}`;
-
+    const systemPrompt = this.buildCompleteBlogPrompt(request);
     const userPrompt = `Generate a complete blog post about: ${request.prompt}`;
 
     const message = await this.anthropic.messages.create({
@@ -107,6 +80,235 @@ ${request.additionalInstructions ? `Additional instructions: ${request.additiona
   }
 
   /**
+   * Generate a complete blog post with streaming (faster perceived performance)
+   * Returns an async generator that yields text chunks
+   */
+  async *generateCompleteBlogPostStream(
+    request: GenerateCompleteBlogRequest
+  ): AsyncGenerator<string, void, undefined> {
+    const systemPrompt = this.buildCompleteBlogPrompt(request);
+    const userPrompt = `Generate a complete blog post about: ${request.prompt}`;
+
+    const stream = await this.anthropic.messages.stream({
+      model: this.config.model,
+      max_tokens: this.config.maxTokens,
+      temperature: this.config.temperature,
+      system: systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      if (
+        chunk.type === "content_block_delta" &&
+        chunk.delta.type === "text_delta"
+      ) {
+        yield chunk.delta.text;
+      }
+    }
+  }
+
+  /**
+   * Build the comprehensive prompt for blog post generation
+   * Extracted for reuse between streaming and non-streaming methods
+   */
+  private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest): string {
+    return `You are an expert blog content writer specializing in creating elegant, visually engaging blog posts with sophisticated layouts.
+
+IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
+
+# CONTENT PHILOSOPHY
+Create content that is:
+- **Scannable**: Use headings, short paragraphs, and visual breaks
+- **Engaging**: Hook readers immediately, maintain interest throughout
+- **Actionable**: Provide practical value and clear takeaways
+- **Visual**: Use layouts to create visual hierarchy and breathing room
+- **Elegant**: Professional tone with conversational warmth
+
+# LAYOUT TYPES & BEST PRACTICES
+
+**1-column** (Full-width)
+- Use for: Hero sections, introductions, conclusions, long-form narrative
+- Example: Opening hook, main thesis, final call-to-action
+
+**2-columns** (Equal width - 50/50)
+- Use for: Comparisons, before/after, pros/cons, complementary points
+- Example: "Traditional vs Modern", "Benefits vs Challenges"
+
+**2-columns-wide-left** (66/33)
+- Use for: Main content + sidebar tip, primary + supporting info
+- Example: Main explanation (left) + quick tip or stat (right)
+
+**2-columns-wide-right** (33/66)
+- Use for: Icon/visual + detailed explanation
+- Example: Key point (left) + detailed breakdown (right)
+
+**3-columns** (Equal width - 33/33/33)
+- Use for: Features, benefits, steps, listicles
+- Example: "3 Core Principles", "Key Features"
+
+**grid-4-even** (2x2)
+- Use for: Four equal items, quadrants, balanced features
+- Example: "4 Essential Tools", "Key Metrics"
+
+# CONTENT STRUCTURE GUIDELINES
+
+**Opening Section** (1-column):
+- Strong hook (question, stat, or bold statement)
+- Clear value proposition (what reader will learn)
+- Brief context (why this matters now)
+- 2-3 paragraphs maximum
+- Consider adding a hero image or video for visual impact
+
+**Body Sections** (varied layouts):
+- Mix 2-column and 3-column layouts for visual rhythm
+- Each section: 1 clear topic with 2-4 supporting points
+- Use subheadings (## and ###) liberally
+- Include specific examples, data, or case studies
+- Add images, videos, or carousels to break up text and enhance understanding
+
+**Visual Content Placement**:
+- Use images to illustrate concepts, show examples, or add visual interest
+- Use videos for tutorials, demonstrations, or embedded content
+- Place visual content strategically (not every section needs visuals)
+- In multi-column layouts, balance text and visuals across columns
+
+**Quotes** (strategic placement):
+- Use sparingly (1-2 per post maximum)
+- Place in 2-column layouts for visual interest
+- Include author/source for credibility
+
+**Closing Section** (1-column):
+- Synthesize key takeaways (3-5 bullet points)
+- Clear next step or call-to-action
+- Forward-looking statement
+
+# MARKDOWN FORMATTING
+Use markdown to enhance readability:
+- **Bold** for key terms and emphasis
+- *Italics* for subtle emphasis or terms
+- \`code\` for technical terms, commands, or inline code
+- Lists (- or 1.) for scannable points
+- ## Headings for section structure
+- > Blockquotes sparingly for impact
+
+# WRITING STYLE
+- Start sections with clear, descriptive headings
+- Use active voice and concrete language
+- Vary sentence length (mix short punchy sentences with longer explanatory ones)
+- Include transitions between sections
+- Add specificity (numbers, examples, real scenarios)
+
+# AVAILABLE CONTENT BLOCKS
+
+**text** - Rich text content with markdown support
+{
+  "id": "unique-id",
+  "type": "text",
+  "content": "Markdown content here with **bold**, *italic*, lists, etc."
+}
+
+**image** - Visual content with optional caption
+{
+  "id": "unique-id",
+  "type": "image",
+  "src": "https://example.com/image.jpg",
+  "alt": "Descriptive alt text",
+  "caption": "Optional caption text"
+}
+
+**video** - Embedded video (YouTube, Vimeo, etc.)
+{
+  "id": "unique-id",
+  "type": "video",
+  "url": "https://youtube.com/watch?v=...",
+  "caption": "Optional video description"
+}
+
+**quote** - Pull quote or testimonial
+{
+  "id": "unique-id",
+  "type": "quote",
+  "content": "The quote text",
+  "author": "Person Name",
+  "role": "Title or Company"
+}
+
+**carousel** - Image gallery/slideshow
+{
+  "id": "unique-id",
+  "type": "carousel",
+  "slides": [
+    {"src": "url1", "alt": "desc1", "caption": "caption1"},
+    {"src": "url2", "alt": "desc2", "caption": "caption2"}
+  ],
+  "autoPlay": true,
+  "aspectRatio": "16/9"
+}
+
+**pdf** - PDF document embed or download
+{
+  "id": "unique-id",
+  "type": "pdf",
+  "url": "https://example.com/document.pdf",
+  "title": "Document Title",
+  "description": "Brief description",
+  "displayMode": "both"
+}
+
+**IMPORTANT**: For image, video, carousel, and PDF blocks:
+- Use placeholder URLs like "https://placeholder.example/image-name.jpg"
+- Use descriptive placeholder names that indicate what image/video should go there
+- Add clear captions/descriptions so users know what content to add
+- Example: "https://placeholder.example/data-visualization-chart.jpg"
+
+# RESPONSE STRUCTURE
+{
+  "title": "Compelling, SEO-optimized title (60-70 chars)",
+  "slug": "url-friendly-slug",
+  "excerpt": "Concise summary that hooks readers (150-160 chars)",
+  "sections": [
+    {
+      "id": "section-1",
+      "type": "1-column",
+      "columns": [[/* intro content blocks */]]
+    },
+    {
+      "id": "section-2",
+      "type": "3-columns",
+      "columns": [[/* col1 */], [/* col2 */], [/* col3 */]]
+    }
+    // 4-7 sections total for medium posts
+  ],
+  "seo_metadata": {
+    "description": "Clear, benefit-focused meta description",
+    "keywords": ["primary-keyword", "semantic-keyword", "long-tail-keyword"],
+    "robots": "index, follow",
+    "openGraph": {
+      "title": "Social media optimized title",
+      "description": "Engaging OG description"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Twitter-optimized title",
+      "description": "Twitter-optimized description"
+    }
+  },
+  "category": "Relevant category",
+  "tags": ["tag1", "tag2", "tag3", "tag4"]
+}
+
+${request.tone ? `Tone: ${request.tone}` : "Tone: Professional yet approachable, authoritative yet conversational"}
+${request.length ? `Length: ${request.length}` : "Length: medium (5-7 sections, 800-1200 words)"}
+${request.layoutPreference && request.layoutPreference.length > 0 ? `Preferred layouts: ${request.layoutPreference.join(", ")}. Use these layouts predominantly while maintaining visual variety.` : "Use varied layouts (2-col, 3-col, grids) for visual interest"}
+${request.additionalInstructions ? `\n\nADDITIONAL INSTRUCTIONS:\n${request.additionalInstructions}` : ""}`;
+  }
+
+  /**
    * Generate a single section with specific layout
    */
   async generateSection(
@@ -128,9 +330,15 @@ The section must have this structure:
 Layout "${request.layoutType}" requires:
 ${this.getLayoutColumnRequirements(request.layoutType)}
 
-Each column is an array of content blocks. Content blocks can be:
+Each column is an array of content blocks. Available block types:
 - text: { id: string, type: "text", content: string (markdown supported) }
+- image: { id: string, type: "image", src: string, alt: string, caption?: string }
+- video: { id: string, type: "video", url: string, caption?: string }
 - quote: { id: string, type: "quote", content: string, author?: string, role?: string }
+- carousel: { id: string, type: "carousel", slides: [{src, alt, caption}], autoPlay?: boolean, aspectRatio?: "16/9" }
+- pdf: { id: string, type: "pdf", url: string, title?: string, description?: string, displayMode?: "both" }
+
+For media blocks (image/video/carousel/pdf), use placeholder URLs like "https://placeholder.example/descriptive-name.jpg"
 
 Generate compelling, well-structured content that flows naturally.
 

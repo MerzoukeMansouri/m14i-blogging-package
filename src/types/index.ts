@@ -28,6 +28,35 @@ export type {
   BlogBuilderConfig,
 } from "./config";
 
+// Re-export database types
+export type {
+  // Blog post types
+  BlogPostStatus,
+  BlogPostRow,
+  BlogPostInsert,
+  BlogPostUpdate,
+  BlogPostWithAuthor,
+  BlogFilterParams,
+  BlogPostListResponse,
+  BlogStats,
+  BlogCategory,
+  BlogTag,
+  // Media types
+  BlogMediaType,
+  BlogMediaRow,
+  BlogMediaInsert,
+  BlogMediaUpdate,
+  // Category & tag management (v0.4.0+)
+  CategoryRow,
+  CategoryInsert,
+  CategoryUpdate,
+  CategoryWithCount,
+  TagRow,
+  TagInsert,
+  TagUpdate,
+  TagWithCount,
+} from "./database";
+
 export interface BlogPost {
   id?: string;
   title: string;

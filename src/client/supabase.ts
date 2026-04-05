@@ -530,6 +530,246 @@ export function createBlogClient(
           .sort((a, b) => b.postCount - a.postCount);
       },
     },
+
+    /**
+     * Category management operations (v0.4.0+)
+     */
+    categories: {
+      /**
+       * List all categories
+       */
+      async list(): Promise<import("../types/database").CategoryRow[]> {
+        const { data, error } = await supabase
+          .from("blog.categories")
+          .select("*")
+          .order("display_order", { ascending: true });
+
+        if (error) {
+          throw new Error(`Failed to fetch categories: ${error.message}`);
+        }
+
+        return (data as unknown as import("../types/database").CategoryRow[]) || [];
+      },
+
+      /**
+       * List categories with post counts
+       */
+      async listWithCounts(): Promise<import("../types/database").CategoryWithCount[]> {
+        const { data, error } = await supabase
+          .rpc("blog.get_categories_with_counts");
+
+        if (error) {
+          throw new Error(`Failed to fetch categories with counts: ${error.message}`);
+        }
+
+        return (data as unknown as import("../types/database").CategoryWithCount[]) || [];
+      },
+
+      /**
+       * Get category by ID
+       */
+      async getById(id: string): Promise<import("../types/database").CategoryRow | null> {
+        const { data, error } = await supabase
+          .from("blog.categories")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) {
+          if (error.code === "PGRST116") return null;
+          throw new Error(`Failed to fetch category: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").CategoryRow;
+      },
+
+      /**
+       * Get category by slug
+       */
+      async getBySlug(slug: string): Promise<import("../types/database").CategoryRow | null> {
+        const { data, error } = await supabase
+          .from("blog.categories")
+          .select("*")
+          .eq("slug", slug)
+          .single();
+
+        if (error) {
+          if (error.code === "PGRST116") return null;
+          throw new Error(`Failed to fetch category: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").CategoryRow;
+      },
+
+      /**
+       * Create a new category
+       */
+      async create(category: import("../types/database").CategoryInsert): Promise<import("../types/database").CategoryRow> {
+        const { data, error } = await supabase
+          .from("blog.categories")
+          .insert(category)
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Failed to create category: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").CategoryRow;
+      },
+
+      /**
+       * Update an existing category
+       */
+      async update(id: string, updates: import("../types/database").CategoryUpdate): Promise<import("../types/database").CategoryRow> {
+        const { data, error } = await supabase
+          .from("blog.categories")
+          .update(updates)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Failed to update category: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").CategoryRow;
+      },
+
+      /**
+       * Delete a category
+       */
+      async delete(id: string): Promise<void> {
+        const { error } = await supabase
+          .from("blog.categories")
+          .delete()
+          .eq("id", id);
+
+        if (error) {
+          throw new Error(`Failed to delete category: ${error.message}`);
+        }
+      },
+    },
+
+    /**
+     * Tag management operations (v0.4.0+)
+     */
+    tags: {
+      /**
+       * List all tags
+       */
+      async list(): Promise<import("../types/database").TagRow[]> {
+        const { data, error } = await supabase
+          .from("blog.tags")
+          .select("*")
+          .order("name", { ascending: true });
+
+        if (error) {
+          throw new Error(`Failed to fetch tags: ${error.message}`);
+        }
+
+        return (data as unknown as import("../types/database").TagRow[]) || [];
+      },
+
+      /**
+       * List tags with post counts
+       */
+      async listWithCounts(): Promise<import("../types/database").TagWithCount[]> {
+        const { data, error } = await supabase
+          .rpc("blog.get_tags_with_counts");
+
+        if (error) {
+          throw new Error(`Failed to fetch tags with counts: ${error.message}`);
+        }
+
+        return (data as unknown as import("../types/database").TagWithCount[]) || [];
+      },
+
+      /**
+       * Get tag by ID
+       */
+      async getById(id: string): Promise<import("../types/database").TagRow | null> {
+        const { data, error } = await supabase
+          .from("blog.tags")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) {
+          if (error.code === "PGRST116") return null;
+          throw new Error(`Failed to fetch tag: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").TagRow;
+      },
+
+      /**
+       * Get tag by slug
+       */
+      async getBySlug(slug: string): Promise<import("../types/database").TagRow | null> {
+        const { data, error } = await supabase
+          .from("blog.tags")
+          .select("*")
+          .eq("slug", slug)
+          .single();
+
+        if (error) {
+          if (error.code === "PGRST116") return null;
+          throw new Error(`Failed to fetch tag: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").TagRow;
+      },
+
+      /**
+       * Create a new tag
+       */
+      async create(tag: import("../types/database").TagInsert): Promise<import("../types/database").TagRow> {
+        const { data, error } = await supabase
+          .from("blog.tags")
+          .insert(tag)
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Failed to create tag: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").TagRow;
+      },
+
+      /**
+       * Update an existing tag
+       */
+      async update(id: string, updates: import("../types/database").TagUpdate): Promise<import("../types/database").TagRow> {
+        const { data, error } = await supabase
+          .from("blog.tags")
+          .update(updates)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Failed to update tag: ${error.message}`);
+        }
+
+        return data as unknown as import("../types/database").TagRow;
+      },
+
+      /**
+       * Delete a tag
+       */
+      async delete(id: string): Promise<void> {
+        const { error } = await supabase
+          .from("blog.tags")
+          .delete()
+          .eq("id", id);
+
+        if (error) {
+          throw new Error(`Failed to delete tag: ${error.message}`);
+        }
+      },
+    },
   };
 }
 

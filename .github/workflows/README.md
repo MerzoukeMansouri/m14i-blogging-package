@@ -1,49 +1,56 @@
 # GitHub Actions Workflows
 
-This directory contains automated workflows for the m14i-blogging package.
+This directory contains the automated workflow for the m14i-blogging package.
 
-## Workflows
+## Workflow
 
-### 1. `publish.yml` - NPM Package Publishing
-
-**Trigger**: Push to `main` branch (when version in package.json changes)
-
-**What it does**:
-1. Checks if the version in `package.json` has changed
-2. If changed, creates a git tag (e.g., `v0.1.1`)
-3. Builds the package
-4. Publishes to npm registry
-5. Creates a GitHub Release
-
-**Requirements**:
-- `NPM_TOKEN` secret must be set in repository settings
-
-**How to trigger a release**:
-```bash
-# Bump version (patch/minor/major)
-pnpm run release:patch
-
-# This will:
-# - Update package.json version
-# - Commit the change
-# - Create and push a tag
-# - Trigger the publish workflow
-```
-
-### 2. `storybook.yml` - Storybook Deployment
+### `release.yml` - Release & Deploy
 
 **Trigger**: Push to `main` branch
 
 **What it does**:
-1. Installs dependencies
-2. Builds Storybook
-3. Deploys to GitHub Pages
+
+This single workflow handles both package releases and Storybook deployment in two jobs:
+
+#### Job 1: Release Package
+1. Analyzes commits using conventional commit format
+2. Determines next version automatically (major/minor/patch)
+3. Updates `package.json` and `CHANGELOG.md`
+4. Creates git tag
+5. Builds the package
+6. Publishes to npm registry
+7. Creates GitHub Release with generated notes
+
+#### Job 2: Deploy Storybook
+8. Builds Storybook
+9. Deploys to GitHub Pages
+10. Updates documentation site
 
 **Requirements**:
+- `NPM_TOKEN` secret must be set in repository settings
 - GitHub Pages must be enabled with "GitHub Actions" as source
+- Commits must follow [Conventional Commits](https://www.conventionalcommits.org/) format
 
-**Result**:
+**How releases work**:
+```bash
+# No manual version bumping needed!
+# Just commit with conventional format:
+git commit -m "feat: add new feature"    # → Minor release (0.1.0 → 0.2.0)
+git commit -m "fix: resolve bug"         # → Patch release (0.1.0 → 0.1.1)
+git commit -m "feat!: breaking change"   # → Major release (0.1.0 → 1.0.0)
+
+# Push to main (via PR or direct)
+git push origin main
+
+# This single workflow:
+# ✅ Releases package (if commits trigger a release)
+# ✅ Deploys Storybook to GitHub Pages (always)
+```
+
+**Results**:
+- Package published to npm: `m14i-blogging@<version>`
 - Storybook accessible at: `https://MerzoukeMansouri.github.io/m14i-blogging-package/`
+- GitHub Release created with changelog
 
 ## Setup Instructions
 

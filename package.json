@@ -26,9 +26,7 @@
     "dev": "tsup --watch",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "release:patch": "npm version patch && git push --follow-tags",
-    "release:minor": "npm version minor && git push --follow-tags",
-    "release:major": "npm version major && git push --follow-tags"
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "blog",
@@ -63,6 +61,12 @@
   },
   "devDependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@storybook/addon-docs": "^10.3.4",
     "@storybook/addon-vitest": "^10.3.4",
     "@storybook/builder-vite": "^10.3.4",
@@ -84,6 +88,7 @@
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "semantic-release": "^25.0.3",
     "storybook": "^10.3.4",
     "tailwindcss": "^4.2.2",
     "tsup": "^8.5.1",

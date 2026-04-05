@@ -4,17 +4,24 @@ Thank you for your interest in contributing to m14i-blogging! This document prov
 
 ## 🚀 Release Process
 
-This project uses automated GitHub Actions for publishing packages and deploying Storybook.
+This project uses **[semantic-release](https://github.com/semantic-release/semantic-release)** for fully automated versioning and publishing based on conventional commits.
 
-### How Releases Work
+### How It Works
 
-1. **Version Bumping**: Use npm version commands to bump the version
-2. **Automatic Publishing**: When you push to `main`, GitHub Actions will:
-   - Check if the version in `package.json` has changed
-   - If changed, it will publish to npm and create a GitHub release
-   - Deploy the Storybook to GitHub Pages
+**Releases are completely automatic!** You don't manually bump versions. Instead:
 
-### Creating a Release
+1. **Write conventional commits** (e.g., `feat:`, `fix:`)
+2. **Merge to `main`**
+3. **semantic-release** automatically:
+   - Determines the next version
+   - Generates changelog
+   - Publishes to npm
+   - Creates GitHub release
+   - Deploys Storybook
+
+👉 **See [Release Process Guide](./docs/RELEASE_PROCESS.md) for detailed documentation**
+
+### Quick Start
 
 #### 1. Make Your Changes
 
@@ -22,65 +29,35 @@ This project uses automated GitHub Actions for publishing packages and deploying
 # Create a feature branch
 git checkout -b feature/my-new-feature
 
-# Make your changes
-# ... code, commit, etc.
+# Make changes and commit using conventional format
+git add .
+git commit -m "feat: add new awesome feature"
 
 # Push your branch
 git push origin feature/my-new-feature
 ```
 
-#### 2. Create a Pull Request
+#### 2. Create Pull Request
 
 - Open a PR to merge into `main`
 - Get it reviewed and approved
 - Merge the PR
 
-#### 3. Bump the Version
+#### 3. Automatic Release & Deployment
 
-After merging to `main`, bump the version using one of these commands:
+When merged to `main`, one workflow automatically:
 
-**Patch Release** (Bug fixes: 0.1.0 → 0.1.1):
-```bash
-pnpm run release:patch
+```
+Commit: "feat: add carousel"
+  ↓
+Version: 0.1.0 → 0.2.0 (minor)
+  ↓
+✅ Publish to npm
+✅ Create GitHub release
+✅ Deploy Storybook to GitHub Pages
 ```
 
-**Minor Release** (New features: 0.1.0 → 0.2.0):
-```bash
-pnpm run release:minor
-```
-
-**Major Release** (Breaking changes: 0.1.0 → 1.0.0):
-```bash
-pnpm run release:major
-```
-
-These commands will:
-- Update the version in `package.json`
-- Create a git commit with the version bump
-- Create a git tag (e.g., `v0.1.1`)
-- Push both the commit and tag to GitHub
-
-#### 4. Automatic Publishing
-
-Once you push the version tag, GitHub Actions will automatically:
-
-1. **Build the package**
-2. **Publish to npm** (requires `NPM_TOKEN` secret)
-3. **Create a GitHub Release** with release notes
-4. **Deploy Storybook** to GitHub Pages
-
-### Manual Version Bump (Alternative)
-
-If you prefer manual control:
-
-```bash
-# Update version in package.json manually
-# Then commit and tag:
-git add package.json
-git commit -m "chore: bump version to 0.1.1"
-git tag v0.1.1
-git push origin main --tags
-```
+**Everything happens in a single workflow run!**
 
 ## 📝 Commit Message Convention
 

@@ -19,6 +19,16 @@ import type {
 } from "../../types/aiGeneration";
 
 /**
+ * Helper: Strip markdown code blocks from JSON response
+ */
+function stripMarkdownCodeBlocks(text: string): string {
+  // Remove ```json ... ``` or ``` ... ``` wrapping
+  const codeBlockPattern = /^```(?:json)?\s*\n?([\s\S]*?)\n?```$/;
+  const match = text.trim().match(codeBlockPattern);
+  return match ? match[1].trim() : text.trim();
+}
+
+/**
  * AI Content Generator class
  */
 export class AIContentGenerator {
@@ -89,8 +99,9 @@ ${request.additionalInstructions ? `Additional instructions: ${request.additiona
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Parse the JSON response
-    const result = JSON.parse(responseText) as GenerateCompleteBlogResponse;
+    // Parse the JSON response (strip markdown code blocks first)
+    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    const result = JSON.parse(cleanedText) as GenerateCompleteBlogResponse;
 
     return result;
   }
@@ -143,8 +154,9 @@ ${request.context ? `Context from the rest of the post: ${request.context}` : ""
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Parse the JSON response
-    const result = JSON.parse(responseText) as GenerateSectionResponse;
+    // Parse the JSON response (strip markdown code blocks first)
+    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    const result = JSON.parse(cleanedText) as GenerateSectionResponse;
 
     return result;
   }
@@ -204,8 +216,9 @@ ${request.tags ? `Existing tags: ${request.tags.join(", ")}` : ""}`;
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Parse the JSON response
-    const result = JSON.parse(responseText) as GenerateSEOResponse;
+    // Parse the JSON response (strip markdown code blocks first)
+    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    const result = JSON.parse(cleanedText) as GenerateSEOResponse;
 
     return result;
   }
@@ -263,8 +276,9 @@ Return the result in this format:
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Parse the JSON response
-    const result = JSON.parse(responseText) as ImproveContentResponse;
+    // Parse the JSON response (strip markdown code blocks first)
+    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    const result = JSON.parse(cleanedText) as ImproveContentResponse;
 
     return result;
   }

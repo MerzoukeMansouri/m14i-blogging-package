@@ -529,7 +529,7 @@ function getEmbedUrl(url: string): string | null {
 }
 
 // Helper component for empty state
-function EmptyState({ message }: { message: string }): JSX.Element {
+function EmptyState({ message }: { message: string }): React.ReactElement {
   return (
     <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center text-muted-foreground text-sm">
       {message}

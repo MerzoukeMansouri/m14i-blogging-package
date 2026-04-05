@@ -43,7 +43,7 @@ export function ContentBlockInlineEditor({
   onChange,
   components,
   onImprove,
-}: ContentBlockInlineEditorProps): JSX.Element | null {
+}: ContentBlockInlineEditorProps): React.ReactElement | null {
   // Map block types to their respective editor components
   const editorComponentMap = {
     text: TextEditor,
@@ -54,7 +54,7 @@ export function ContentBlockInlineEditor({
     carousel: CarouselEditor,
   } as const;
 
-  const EditorComponent = editorComponentMap[block.type as keyof typeof editorComponentMap];
+  const EditorComponent = editorComponentMap[block.type as keyof typeof editorComponentMap] as any;
 
   if (!EditorComponent) {
     return null;
@@ -62,8 +62,8 @@ export function ContentBlockInlineEditor({
 
   return (
     <EditorComponent
-      block={block as any}
-      onChange={onChange as any}
+      block={block}
+      onChange={onChange}
       components={components}
       onImprove={onImprove}
     />

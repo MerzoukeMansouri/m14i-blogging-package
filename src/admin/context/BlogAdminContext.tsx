@@ -61,11 +61,13 @@ const DEFAULT_FEATURES: Required<BlogAdminFeatures> = {
   seo: true,
   autoSave: true,
   preview: true,
+  featuredImage: true,
 };
 
 const DEFAULT_LABELS: Required<BlogAdminLabels> = {
   // Actions
   newPost: "Nouvel article",
+  editPost: "Modifier l'article",
   saveDraft: "Enregistrer le brouillon",
   publish: "Publier",
   unpublish: "Dépublier",

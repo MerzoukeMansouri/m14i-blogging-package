@@ -42,8 +42,8 @@ export interface BlogBuilderProps {
     SelectValue: React.ComponentType<any>;
     SelectContent: React.ComponentType<any>;
     SelectItem: React.ComponentType<any>;
-    PlusIcon: React.ComponentType<{ className?: string }>;
-    XIcon: React.ComponentType<{ className?: string }>;
+    PlusIcon: React.ComponentType<{ className?: string }> | React.ForwardRefExoticComponent<any>;
+    XIcon: React.ComponentType<{ className?: string }> | React.ForwardRefExoticComponent<any>;
   };
   // Optional AI improvement callback
   onImproveContent?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;

@@ -8,7 +8,7 @@ interface BlogBuilderSidebarProps {
   blocks: BlockConfig[];
 }
 
-export function BlogBuilderSidebar({ layouts, blocks }: BlogBuilderSidebarProps): JSX.Element {
+export function BlogBuilderSidebar({ layouts, blocks }: BlogBuilderSidebarProps): React.ReactElement {
   return (
     <div className="w-80 border-r bg-card overflow-y-auto">
       <div className="p-6 space-y-6">

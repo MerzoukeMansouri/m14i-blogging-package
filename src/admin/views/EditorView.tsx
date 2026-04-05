@@ -14,7 +14,7 @@ import { CategoryDialog } from "../components/CategoryDialog";
 import { TagDialog } from "../components/TagDialog";
 import { buildPath } from "../utils/router";
 import { BlogAdminAPIClient } from "../api/client";
-import type { BlogPostRow } from "../../types/database";
+import type { BlogPostRow, BlogPostInsert } from "../../types/database";
 import type { LayoutType } from "../../types/layouts";
 
 export interface EditorViewProps {
@@ -30,7 +30,7 @@ function CardWrapper({
   Card?: React.ComponentType<{ children: React.ReactNode }>;
   children: React.ReactNode;
   fallbackClassName?: string;
-}): JSX.Element {
+}): React.ReactElement {
   if (Card) {
     return <Card>{children}</Card>;
   }
@@ -54,7 +54,7 @@ function ActionButton({
   size?: string;
   children: React.ReactNode;
   fallbackClassName: string;
-}): JSX.Element {
+}): React.ReactElement {
   if (Button) {
     return (
       <Button variant={variant} size={size} onClick={onClick} disabled={disabled}>
@@ -86,7 +86,7 @@ function InputField({
   placeholder?: string;
   className?: string;
   type?: string;
-}): JSX.Element {
+}): React.ReactElement {
   if (Input) {
     return (
       <Input
@@ -139,10 +139,10 @@ export function EditorView({ postId }: EditorViewProps) {
     setSaving,
   } = usePostEditor(initialPost);
 
-  const Button = components.Button;
-  const Input = components.Input;
-  const Card = components.Card;
-  const { BlogBuilder, ...blogBuilderComponents } = components;
+  const Button = components?.Button;
+  const Input = components?.Input;
+  const Card = components?.Card;
+  const BlogBuilder = components?.BlogBuilder;
 
   // Load existing post if editing
   useEffect(() => {
@@ -150,7 +150,7 @@ export function EditorView({ postId }: EditorViewProps) {
 
     async function loadPost() {
       try {
-        const post = await getPost(postId);
+        const post = await getPost(postId!);
         setInitialPost(post);
       } catch (err) {
         console.error("Error loading post:", err);
@@ -182,7 +182,7 @@ export function EditorView({ postId }: EditorViewProps) {
       if (postId) {
         savedPost = await updatePost(postId, postData);
       } else {
-        savedPost = await createPost(postData);
+        savedPost = await createPost(postData as BlogPostInsert);
         navigateToPath(buildPath(basePath, "edit", { id: savedPost.id }));
       }
 
@@ -204,7 +204,7 @@ export function EditorView({ postId }: EditorViewProps) {
       if (postId) {
         savedPost = await updatePost(postId, postData);
       } else {
-        savedPost = await createPost(postData);
+        savedPost = await createPost(postData as BlogPostInsert);
         navigateToPath(buildPath(basePath, "edit", { id: savedPost.id }));
       }
 
@@ -241,7 +241,10 @@ export function EditorView({ postId }: EditorViewProps) {
       updateField("sections", result.sections);
       updateField("category", result.category || "");
       updateField("tags", result.tags || []);
-      updateField("seo_metadata", result.seo_metadata || {});
+      updateField("seo_metadata", {
+        metaTitle: result.title,
+        metaDescription: result.seo_metadata?.description || result.excerpt || "",
+      });
 
       setShowGenerateDialog(false);
       setGeneratePrompt("");
@@ -295,7 +298,10 @@ export function EditorView({ postId }: EditorViewProps) {
       });
 
       // Update SEO metadata and tags
-      updateField("seo_metadata", result.seo_metadata || {});
+      updateField("seo_metadata", {
+        metaTitle: result.seo_metadata?.description || state.title,
+        metaDescription: result.seo_metadata?.description || state.excerpt || "",
+      });
       if (result.tags && result.tags.length > 0) {
         updateField("tags", result.tags);
       }
@@ -487,8 +493,6 @@ export function EditorView({ postId }: EditorViewProps) {
                 <BlogBuilder
                   sections={state.sections}
                   onChange={(sections: any) => updateField("sections", sections)}
-                  components={blogBuilderComponents}
-                  onImproveContent={handleImproveContent}
                 />
               </div>
             </CardWrapper>

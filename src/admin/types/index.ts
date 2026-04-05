@@ -52,6 +52,7 @@ export interface BlogAdminFeatures {
   seo?: boolean;
   autoSave?: boolean;
   preview?: boolean;
+  featuredImage?: boolean;
 }
 
 // ============================================================================
@@ -61,6 +62,7 @@ export interface BlogAdminFeatures {
 export interface BlogAdminLabels {
   // Actions
   newPost?: string;
+  editPost?: string;
   saveDraft?: string;
   publish?: string;
   unpublish?: string;

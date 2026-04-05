@@ -37,7 +37,7 @@ export function BlogBuilderSection({
   onDeleteBlock,
   onUpdateBlock,
   components,
-}: BlogBuilderSectionProps): JSX.Element {
+}: BlogBuilderSectionProps): React.ReactElement {
   const { Button, Card, CardContent, CardHeader } = components;
 
   return (
@@ -88,7 +88,7 @@ function BlogBuilderColumn({
   onDeleteBlock,
   onUpdateBlock,
   components,
-}: BlogBuilderColumnProps): JSX.Element {
+}: BlogBuilderColumnProps): React.ReactElement {
   const { Button } = components;
 
   return (

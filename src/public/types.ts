@@ -5,6 +5,9 @@
 import type { BlogPostRow } from "../types";
 import type { ComponentType, ReactNode } from "react";
 
+// Re-export BlogPostRow for use in hooks
+export type { BlogPostRow };
+
 // ============================================================================
 // Layout Types
 // ============================================================================

@@ -31,7 +31,7 @@ interface TextEditorProps {
   onImprove?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;
 }
 
-export function TextEditor({ block, onChange, components, onImprove }: TextEditorProps): JSX.Element {
+export function TextEditor({ block, onChange, components, onImprove }: TextEditorProps): React.ReactElement {
   const { Label, Textarea, Button } = components;
   const [isImproving, setIsImproving] = React.useState(false);
   const [showImprovementMenu, setShowImprovementMenu] = React.useState(false);
@@ -128,7 +128,7 @@ interface ImageEditorProps {
   components: EditorComponents;
 }
 
-export function ImageEditor({ block, onChange, components }: ImageEditorProps): JSX.Element {
+export function ImageEditor({ block, onChange, components }: ImageEditorProps): React.ReactElement {
   const { Label, Input } = components;
 
   return (
@@ -177,7 +177,7 @@ interface VideoEditorProps {
   components: EditorComponents;
 }
 
-export function VideoEditor({ block, onChange, components }: VideoEditorProps): JSX.Element {
+export function VideoEditor({ block, onChange, components }: VideoEditorProps): React.ReactElement {
   const { Label, Input } = components;
 
   return (
@@ -216,7 +216,7 @@ interface QuoteEditorProps {
   components: EditorComponents;
 }
 
-export function QuoteEditor({ block, onChange, components }: QuoteEditorProps): JSX.Element {
+export function QuoteEditor({ block, onChange, components }: QuoteEditorProps): React.ReactElement {
   const { Label, Input, Textarea } = components;
 
   return (
@@ -264,7 +264,7 @@ interface PDFEditorProps {
   components: EditorComponents;
 }
 
-export function PDFEditor({ block, onChange, components }: PDFEditorProps): JSX.Element {
+export function PDFEditor({ block, onChange, components }: PDFEditorProps): React.ReactElement {
   const { Label, Input, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = components;
 
   return (
@@ -345,7 +345,7 @@ interface CarouselSlideEditorProps {
   components: EditorComponents;
 }
 
-function CarouselSlideEditor({ slide, index, onUpdate, onRemove, components }: CarouselSlideEditorProps): JSX.Element {
+function CarouselSlideEditor({ slide, index, onUpdate, onRemove, components }: CarouselSlideEditorProps): React.ReactElement {
   const { Input, Button, XIcon } = components;
 
   return (
@@ -405,7 +405,7 @@ interface CarouselEditorProps {
   components: EditorComponents;
 }
 
-export function CarouselEditor({ block, onChange, components }: CarouselEditorProps): JSX.Element {
+export function CarouselEditor({ block, onChange, components }: CarouselEditorProps): React.ReactElement {
   const { Label, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Button, PlusIcon } = components;
 
   const updateSlide = (index: number, slide: CarouselBlock['slides'][0]): void => {

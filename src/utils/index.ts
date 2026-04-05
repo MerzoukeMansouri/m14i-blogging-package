@@ -1,25 +1,21 @@
-import type { LayoutType, ContentBlock } from "../types";
+import type { LayoutType, ContentBlock, ContentBlockType } from "../types";
 
 // Helper pour créer des colonnes vides selon le layout
 export function createEmptyColumns(layoutType: LayoutType): ContentBlock[][] {
-  switch (layoutType) {
-    case "1-column":
-      return [[]];
-    case "2-columns":
-    case "2-columns-wide-left":
-    case "2-columns-wide-right":
-      return [[], []];
-    case "3-columns":
-      return [[], [], []];
-    case "grid-2x2":
-      return [[], [], [], []]; // 4 cells
-    case "grid-3x3":
-      return [[], [], [], [], [], [], [], [], []]; // 9 cells
-    case "grid-2x3":
-      return [[], [], [], [], [], []]; // 6 cells
-    case "grid-4-even":
-      return [[], [], [], []]; // 4 columns
-  }
+  const columnCounts: Record<LayoutType, number> = {
+    "1-column": 1,
+    "2-columns": 2,
+    "2-columns-wide-left": 2,
+    "2-columns-wide-right": 2,
+    "3-columns": 3,
+    "grid-2x2": 4,
+    "grid-3x3": 9,
+    "grid-2x3": 6,
+    "grid-4-even": 4,
+  };
+
+  const count = columnCounts[layoutType];
+  return Array.from({ length: count }, () => []);
 }
 
 // Helper pour obtenir les classes CSS du layout
@@ -47,24 +43,41 @@ export function getLayoutClasses(layoutType: LayoutType): string {
 }
 
 export function getLayoutLabel(layoutType: LayoutType): string {
-  switch (layoutType) {
-    case "1-column":
-      return "1 Colonne";
-    case "2-columns":
-      return "2 Colonnes";
-    case "2-columns-wide-left":
-      return "2 Colonnes (Large Gauche)";
-    case "2-columns-wide-right":
-      return "2 Colonnes (Large Droite)";
-    case "3-columns":
-      return "3 Colonnes";
-    case "grid-2x2":
-      return "Grille 2×2";
-    case "grid-3x3":
-      return "Grille 3×3";
-    case "grid-2x3":
-      return "Grille 2×3";
-    case "grid-4-even":
-      return "Grille 4 colonnes";
-  }
+  const labels: Record<LayoutType, string> = {
+    "1-column": "1 Colonne",
+    "2-columns": "2 Colonnes",
+    "2-columns-wide-left": "2 Colonnes (Large Gauche)",
+    "2-columns-wide-right": "2 Colonnes (Large Droite)",
+    "3-columns": "3 Colonnes",
+    "grid-2x2": "Grille 2×2",
+    "grid-3x3": "Grille 3×3",
+    "grid-2x3": "Grille 2×3",
+    "grid-4-even": "Grille 4 colonnes",
+  };
+
+  return labels[layoutType];
+}
+
+// Helper to create a default block with unique ID
+export function createDefaultBlock(type: ContentBlockType): ContentBlock {
+  const id = `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  const blockDefaults: Record<ContentBlockType, Omit<ContentBlock, "id">> = {
+    text: { type: "text", content: "Votre texte ici... (Markdown supporté)" },
+    image: { type: "image", src: "", alt: "" },
+    video: { type: "video", url: "" },
+    carousel: {
+      type: "carousel",
+      slides: [],
+      autoPlay: false,
+      showDots: true,
+      showArrows: true,
+      loop: true,
+      aspectRatio: "16/9"
+    },
+    quote: { type: "quote", content: "Votre citation ici" },
+    pdf: { type: "pdf", url: "", displayMode: "both" },
+  };
+
+  return { id, ...blockDefaults[type] } as ContentBlock;
 }

@@ -8,8 +8,6 @@ Get started with m14i-blogging in 5 minutes.
 
 ## Installation
 
-### Basic Installation
-
 ```bash
 npm install m14i-blogging
 # or
@@ -18,13 +16,7 @@ pnpm add m14i-blogging
 yarn add m14i-blogging
 ```
 
-Modern package managers will automatically prompt you to install peer dependencies if needed.
-
-### If Peer Dependencies Aren't Auto-Installed
-
-```bash
-npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
-```
+**Need detailed installation instructions?** See the **[Complete Installation Guide](./INSTALLATION.md)** for step-by-step setup, Tailwind configuration, and troubleshooting.
 
 ## Basic Setup
 
@@ -35,6 +27,8 @@ In your main app file (e.g., `_app.tsx`, `layout.tsx`, or `main.tsx`):
 ```tsx
 import 'm14i-blogging/styles';
 ```
+
+**Note:** You also need to configure Tailwind CSS. See [Installation Guide](./INSTALLATION.md) for details.
 
 ### 2. Create a Blog Post Preview
 

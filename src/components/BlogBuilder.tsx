@@ -9,9 +9,8 @@ import type {
   ContentBlockType,
   BlogBuilderConfig,
 } from "../types";
-import { createEmptyColumns, getLayoutClasses, getLayoutLabel } from "../utils";
+import { createEmptyColumns, getLayoutClasses, getLayoutLabel, createDefaultBlock } from "../utils";
 import { mergeConfig } from "../config/defaults";
-import { ContentBlockRenderer } from "./ContentBlockRenderer";
 import { ContentBlockInlineEditor } from "./ContentBlockInlineEditor";
 
 // NOTE: This component requires shadcn/ui components:
@@ -83,46 +82,37 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
     onChange(newSections);
   };
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = (result: DropResult): void => {
     const { source, destination, draggableId } = result;
 
     if (!destination) return;
 
-    console.log("Drag end:", { source, destination, draggableId });
-
-    // Si c'est un layout qu'on glisse (depuis la sidebar)
+    // Handle layout drag from sidebar
     if (source.droppableId === "layouts") {
       const layoutType = draggableId.replace("layout-", "") as LayoutType;
-      console.log("Adding layout:", layoutType);
       addLayout(layoutType);
       return;
     }
 
-    // Si c'est un nouveau bloc qu'on glisse (depuis la sidebar)
+    // Handle new block drag from sidebar
     if (source.droppableId === "blocks") {
       const blockType = draggableId.replace("block-", "") as ContentBlockType;
       const [, sectionIndex, columnIndex] = destination.droppableId.split("-");
 
-      const newBlock = createDefaultBlock(blockType);
       const newSections = [...sections];
-      newSections[parseInt(sectionIndex)].columns[parseInt(columnIndex)].splice(
-        destination.index,
-        0,
-        newBlock
-      );
+      const targetColumn = newSections[parseInt(sectionIndex)].columns[parseInt(columnIndex)];
+      targetColumn.splice(destination.index, 0, createDefaultBlock(blockType));
       onChange(newSections);
       return;
     }
 
-    // Si on réorganise des blocs existants
+    // Handle existing block reorganization
     const [, sourceSectionIdx, sourceColumnIdx] = source.droppableId.split("-");
     const [, destSectionIdx, destColumnIdx] = destination.droppableId.split("-");
 
     const newSections = [...sections];
-    const sourceColumn =
-      newSections[parseInt(sourceSectionIdx)].columns[parseInt(sourceColumnIdx)];
-    const destColumn =
-      newSections[parseInt(destSectionIdx)].columns[parseInt(destColumnIdx)];
+    const sourceColumn = newSections[parseInt(sourceSectionIdx)].columns[parseInt(sourceColumnIdx)];
+    const destColumn = newSections[parseInt(destSectionIdx)].columns[parseInt(destColumnIdx)];
 
     const [movedBlock] = sourceColumn.splice(source.index, 1);
     destColumn.splice(destination.index, 0, movedBlock);
@@ -367,21 +357,3 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
   );
 }
 
-function createDefaultBlock(type: ContentBlockType): ContentBlock {
-  const id = `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-  switch (type) {
-    case "text":
-      return { id, type: "text", content: "Votre texte ici... (Markdown supporté)" };
-    case "image":
-      return { id, type: "image", src: "", alt: "" };
-    case "video":
-      return { id, type: "video", url: "" };
-    case "carousel":
-      return { id, type: "carousel", slides: [], autoPlay: false, showDots: true, showArrows: true, loop: true, aspectRatio: "16/9" };
-    case "quote":
-      return { id, type: "quote", content: "Votre citation ici" };
-    case "pdf":
-      return { id, type: "pdf", url: "", displayMode: "both" };
-  }
-}

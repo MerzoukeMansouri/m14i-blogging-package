@@ -49,8 +49,6 @@ User creates content in BlogBuilder
 
 ## Installation
 
-### Basic Installation
-
 ```bash
 npm install m14i-blogging
 # or
@@ -59,80 +57,33 @@ pnpm add m14i-blogging
 yarn add m14i-blogging
 ```
 
-Modern package managers (npm 7+, pnpm, yarn) will automatically prompt you to install peer dependencies if they're missing.
+That's it! Modern package managers will handle peer dependencies automatically.
 
-### Manual Peer Dependencies (if needed)
+### Quick Setup
 
-If your package manager doesn't auto-install peer dependencies, you may need:
+1. **Configure Tailwind CSS** (required) - add package path to `tailwind.config.js`:
+   ```js
+   content: [
+     // ... your paths
+     './node_modules/m14i-blogging/dist/**/*.{js,mjs,cjs}',
+   ]
+   ```
 
-```bash
-npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
-```
+2. **Import styles** in your app:
+   ```tsx
+   import 'm14i-blogging/styles';
+   ```
 
-**Note:** Most React projects already have `react` and `react-dom` installed, so you typically only need the additional dependencies listed above.
+3. **Optional:** Install shadcn/ui (only if using BlogBuilder editor):
+   ```bash
+   npx shadcn@latest add label input textarea select button card
+   ```
 
-### Prerequisites
-
-This package requires the following in your project:
-
-#### 1. Tailwind CSS
-
-This package uses Tailwind CSS for styling. Make sure you have Tailwind CSS installed and configured:
-
-```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-```
-
-Update your `tailwind.config.js` to include the package in the content paths:
-
-```js
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    // Add this line to scan the m14i-blogging package
-    './node_modules/m14i-blogging/dist/**/*.{js,mjs,cjs}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-```
-
-#### 2. Import the CSS
-
-In your root layout or main CSS file, import the package styles:
-
-**For Next.js App Router** (`app/layout.tsx`):
-```tsx
-import 'm14i-blogging/styles';
-import './globals.css'; // Your global styles
-```
-
-**For Next.js Pages Router** (`pages/_app.tsx`):
-```tsx
-import 'm14i-blogging/styles';
-import '../styles/globals.css';
-```
-
-**Or import in your CSS file** (`globals.css`):
-```css
-@import 'm14i-blogging/styles';
-```
-
-#### 3. shadcn/ui Components (Required for BlogBuilder only)
-
-If you're using the **BlogBuilder** component (the editor), you need shadcn/ui components. Install them with:
-
-```bash
-npx shadcn@latest add label input textarea select button card
-```
-
-**Note:** If you're only using **BlogPreview** or other display components, shadcn/ui is NOT required.
+**Need detailed setup instructions?** See the **[Complete Installation Guide](./docs/INSTALLATION.md)** for:
+- Step-by-step installation
+- Framework-specific setup (Next.js, Vite, Remix)
+- Peer dependencies explanation
+- Troubleshooting common issues
 
 ## Quick Start
 

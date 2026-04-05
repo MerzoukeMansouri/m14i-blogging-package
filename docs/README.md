@@ -5,10 +5,16 @@ Complete documentation for the m14i-blogging package - a customizable blog build
 ## 📖 Table of Contents
 
 ### Getting Started
+- **[Installation Guide](./INSTALLATION.md)** - Complete installation instructions
+  - Step-by-step installation
+  - Peer dependencies explained
+  - Tailwind CSS setup
+  - Framework-specific setup (Next.js, Vite, Remix)
+  - Troubleshooting
+
 - **[Quick Start Guide](./QUICKSTART.md)** - Get up and running in 5 minutes
-  - Installation
   - Basic setup
-  - Framework integration (Next.js, Vite, Remix)
+  - First blog post
   - Common patterns
 
 ### Customization & Styling
@@ -37,7 +43,8 @@ Complete documentation for the m14i-blogging package - a customizable blog build
 ## 🚀 Quick Links
 
 ### For First-Time Users
-Start here: **[Quick Start Guide](./QUICKSTART.md)**
+1. **[Installation Guide](./INSTALLATION.md)** - Set up the package
+2. **[Quick Start Guide](./QUICKSTART.md)** - Build your first blog
 
 ### For Customization
 Visual customization: **[Styling Guide](./STYLING.md)**

@@ -9,13 +9,15 @@ Complete guide for integrating `m14i-blogging` into your Next.js application.
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
+- [Quick Installation](#quick-installation)
 - [Setup](#setup)
   - [App Router Setup](#app-router-setup)
   - [Pages Router Setup](#pages-router-setup)
 - [Basic Usage](#basic-usage)
 - [Advanced Integration](#advanced-integration)
 - [Troubleshooting](#troubleshooting)
+
+> **Note:** For detailed installation instructions, see the **[Complete Installation Guide](./INSTALLATION.md)**.
 
 ## Prerequisites
 
@@ -24,9 +26,7 @@ Complete guide for integrating `m14i-blogging` into your Next.js application.
 - Tailwind CSS 3+
 - Node.js 16+
 
-## Installation
-
-### 1. Install the Package
+## Quick Installation
 
 ```bash
 npm install m14i-blogging
@@ -36,29 +36,7 @@ pnpm add m14i-blogging
 yarn add m14i-blogging
 ```
 
-Modern package managers will automatically prompt you to install peer dependencies if needed.
-
-If your package manager doesn't auto-install them:
-
-```bash
-npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
-```
-
-### 2. Install Tailwind CSS (if not already installed)
-
-```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-```
-
-### 3. Install shadcn/ui Components (only if using BlogBuilder editor)
-
-```bash
-npx shadcn@latest init
-npx shadcn@latest add label input textarea select button card
-```
-
-**Note:** If you're only using the preview/display components, you can skip shadcn/ui.
+That's the basic installation! For complete setup including Tailwind CSS, peer dependencies, and shadcn/ui, see the **[Installation Guide](./INSTALLATION.md)**.
 
 ## Setup
 
@@ -515,47 +493,7 @@ export async function getBlogPost(slug: string) {
 
 ## Troubleshooting
 
-### CSS Not Loading
-
-**Problem:** Styles are not applied to components.
-
-**Solution:**
-1. Make sure you've imported the styles: `import 'm14i-blogging/styles'`
-2. Verify Tailwind config includes the package in `content` array
-3. Clear Next.js cache: `rm -rf .next && npm run dev`
-
-### TypeScript Errors
-
-**Problem:** TypeScript can't find types.
-
-**Solution:**
-1. Ensure `moduleResolution` is set to `"bundler"` or `"node16"` in `tsconfig.json`
-2. Try: `npm install --save-dev @types/react @types/react-dom`
-
-### Drag and Drop Not Working
-
-**Problem:** BlogBuilder drag and drop doesn't work.
-
-**Solution:**
-1. Ensure the component is client-side: add `'use client'` at the top of your file
-2. Verify `@hello-pangea/dnd` is installed: `npm install @hello-pangea/dnd`
-
-### shadcn/ui Components Not Found
-
-**Problem:** "Module not found" errors for shadcn components.
-
-**Solution:**
-1. Install required components: `npx shadcn@latest add label input textarea select button card`
-2. Make sure shadcn is properly initialized: `npx shadcn@latest init`
-
-### Build Errors
-
-**Problem:** Build fails with module errors.
-
-**Solution:**
-1. Clear cache and rebuild: `rm -rf .next node_modules && npm install && npm run build`
-2. Check that all peer dependencies are installed
-3. Ensure you're using Node.js 16+
+For common issues and solutions, see the **[Installation Guide - Troubleshooting](./INSTALLATION.md#troubleshooting)** section.
 
 ### Images Not Optimized
 
@@ -573,6 +511,7 @@ import { BlogPreview } from 'm14i-blogging'
 
 ## Need More Help?
 
+- 📦 [Installation Guide](./INSTALLATION.md) - Detailed setup and troubleshooting
 - 📚 [Main README](../README.md)
 - 🎨 [Styling Guide](./STYLING.md)
 - 🚀 [SEO Guide](./SEO_GUIDE.md)

@@ -69,8 +69,23 @@
     "react-markdown": "^9.0.0",
     "remark-gfm": "^4.0.0"
   },
+  "peerDependenciesMeta": {
+    "@supabase/supabase-js": {
+      "optional": true
+    },
+    "@supabase/ssr": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "@supabase/supabase-js": "^2.48.1",
+    "@supabase/ssr": "^0.6.1",
+    "@types/node": "^22.0.0",
+    "next": "^15.1.6",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.3...v0.6.0) (2026-04-05)
+
+### ✨ Features
+
+* enhance AI blog generation with comprehensive improvements ([cc54008](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/cc54008e33a787b8382867101683db55b89f7bf4))
+
 ## [0.5.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.5.2...v0.5.3) (2026-04-05)
 
 ### 🐛 Bug Fixes

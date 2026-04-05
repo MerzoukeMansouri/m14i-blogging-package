@@ -252,11 +252,7 @@ export function EditorView({ postId }: EditorViewProps) {
         metaDescription: layoutResult.excerpt || "",
       });
 
-      // Close dialog after layout is ready
-      setShowGenerateDialog(false);
-      setGeneratePrompt("");
-
-      // Transition to sections phase
+      // Transition to sections phase (keep dialog open to show progress)
       setGenerationPhase("sections");
 
       // Step 2: Generate content for each section progressively
@@ -296,11 +292,15 @@ export function EditorView({ postId }: EditorViewProps) {
         }
       }
 
+      // All sections generated successfully - close dialog
       setGenerationPhase("idle");
+      setShowGenerateDialog(false);
+      setGeneratePrompt("");
     } catch (err: any) {
       console.error("Error generating blog post:", err);
       setGenerationError(err.message || "Failed to generate blog post. Please try again.");
       setGenerationPhase("idle");
+      // Keep dialog open on error so user sees the error message
     } finally {
       setIsGenerating(false);
     }
@@ -826,6 +826,43 @@ export function EditorView({ postId }: EditorViewProps) {
                   >
                     {generationError}
                   </p>
+                </div>
+              )}
+
+              {/* Generation Progress in Dialog */}
+              {isGenerating && generateAction === "complete" && (
+                <div className="p-4 border rounded" style={{
+                  backgroundColor: colors?.background || '#0A192F',
+                  borderColor: colors?.border || 'rgba(184, 115, 51, 0.2)',
+                }}>
+                  {generationPhase === "layout" && (
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#B87333' }}></div>
+                      <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
+                        Generating blog structure...
+                      </span>
+                    </div>
+                  )}
+                  {generationPhase === "sections" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-full h-5 w-5 flex items-center justify-center text-xs" style={{
+                          backgroundColor: colors?.primary || '#B87333',
+                          color: colors?.buttonPrimaryText || '#0A192F'
+                        }}>
+                          ✓
+                        </div>
+                        <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
+                          Layout ready! Generating content...
+                        </span>
+                      </div>
+                      {generatingSections.size > 0 && (
+                        <div className="ml-8 text-xs" style={{ color: colors?.textMuted || 'rgba(242, 245, 247, 0.7)' }}>
+                          {generatingSections.size} section{generatingSections.size > 1 ? 's' : ''} remaining...
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

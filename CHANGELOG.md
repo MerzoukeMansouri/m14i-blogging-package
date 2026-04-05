@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.13.1...v0.14.0) (2026-04-05)
+
+### ✨ Features
+
+* afficher les sections du layout immédiatement avec placeholders + spinners ([9c3f0a2](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9c3f0a2d2cbcc810ac76605e72c5b9d578105685))
+
+### 🐛 Bug Fixes
+
+* add missing LayoutSection import to EditorView ([dff01ca](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/dff01cae4ab314c2030f752d6366292eaa165d15))
+* correct TypeScript type for placeholder sections ([3f112ed](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/3f112ed3bec48917ba4ce2db0d3c5cbabc8ee34a))
+
 ## [0.13.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.13.0...v0.13.1) (2026-04-05)
 
 ### 🐛 Bug Fixes

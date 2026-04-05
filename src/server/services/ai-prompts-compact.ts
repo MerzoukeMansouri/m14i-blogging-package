@@ -71,15 +71,26 @@ export function generateSectionPrompt(
 
   return `${l.writer}. Generate section ${layoutType}.
 
-JSON: {section:{id,type:"${layoutType}",columns:[[blocks]]}}
+CRITICAL JSON RULES:
+- ONLY valid JSON object
+- START with { and END with }
+- Escape ALL quotes in content with \\\"
+- NO newlines in strings (use \\\\n)
+- NO trailing commas
+- NO markdown code blocks
+- Test JSON validity before responding
+
+Response format: {section:{id,type:"${layoutType}",columns:[[blocks]]}}
 ${layoutType}: ${colReq}
 
-Blocks: text{id,type:"text",content:"md"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides:[{src,alt,caption}]}, pdf{id,type:"pdf",url,title,description}
+Blocks: text{id,type:"text",content:"markdown with escaped quotes"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides:[{src,alt,caption}]}, pdf{id,type:"pdf",url,title,description}
 Placeholder URLs: https://placeholder.example/name.jpg
 
-2025 ${lang === "fr" ? "rédaction" : "writing"}: 250-500w MAX, paragraphs 2-3 ${lang === "fr" ? "phrases" : "sentences"}, H2/H3 ${lang === "fr" ? "chaque" : "every"} 150-200w, ${lang === "fr" ? "voix active" : "active voice"}, sentences 15-20w, ${lang === "fr" ? "accroche+exemples+tutoyer" : "hook+examples+direct"}
+Content rules: 250-500w MAX, paragraphs 2-3 ${lang === "fr" ? "phrases" : "sentences"}, H2/H3 ${lang === "fr" ? "chaque" : "every"} 150-200w
 
-${context ? `Context:${context}` : ""}`;
+${context ? `Context:${context}` : ""}
+
+FINAL CHECK: Verify JSON is valid before sending!`;
 }
 
 export function generateCompletePrompt(req: {

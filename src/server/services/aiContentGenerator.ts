@@ -60,7 +60,13 @@ export class AIContentGenerator {
       model: this.config.model,
       max_tokens: this.config.maxTokens,
       temperature: this.config.temperature,
-      system: systemPrompt,
+      system: [
+        {
+          type: "text",
+          text: systemPrompt,
+          cache_control: { type: "ephemeral" }, // Cache system prompt for faster subsequent calls
+        },
+      ],
       messages: [
         {
           role: "user",
@@ -93,7 +99,13 @@ export class AIContentGenerator {
       model: this.config.model,
       max_tokens: this.config.maxTokens,
       temperature: this.config.temperature,
-      system: systemPrompt,
+      system: [
+        {
+          type: "text",
+          text: systemPrompt,
+          cache_control: { type: "ephemeral" }, // Cache system prompt for faster streaming
+        },
+      ],
       messages: [
         {
           role: "user",

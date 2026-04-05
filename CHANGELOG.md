@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.12.0...v0.13.0) (2026-04-05)
+
+### ✨ Features
+
+* amélioration majeure du prompt de génération de layout pour designs visuellement attractifs ([3e7cc65](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/3e7cc6592bdfdfe88e005ea873f15996b21a3585))
+
 ## [0.12.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.11.0...v0.12.0) (2026-04-05)
 
 ### ✨ Features

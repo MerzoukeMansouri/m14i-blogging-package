@@ -1,26 +1,57 @@
 {
   "name": "m14i-blogging",
   "version": "0.1.0",
-  "description": "Drag & drop blog builder with customizable layouts and content blocks",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "description": "Drag & drop blog builder with customizable layouts and content blocks for React and Next.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./styles": "./dist/index.css",
+    "./package.json": "./package.json"
+  },
   "files": [
-    "dist"
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "release:patch": "npm version patch && git push --follow-tags",
+    "release:minor": "npm version minor && git push --follow-tags",
+    "release:major": "npm version major && git push --follow-tags"
   },
   "keywords": [
     "blog",
     "builder",
     "cms",
     "drag-and-drop",
-    "react"
+    "react",
+    "nextjs",
+    "next.js",
+    "seo",
+    "markdown",
+    "tailwindcss"
   ],
-  "author": "",
+  "author": "M14I",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package"
+  },
+  "bugs": {
+    "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package/issues"
+  },
+  "homepage": "https://github.com/MerzoukeMansouri/m14i-blogging-package#readme",
   "packageManager": "pnpm@10.25.0",
   "peerDependencies": {
     "@hello-pangea/dnd": "^16.0.0",
@@ -32,12 +63,32 @@
   },
   "devDependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "@storybook/addon-docs": "^10.3.4",
+    "@storybook/addon-vitest": "^10.3.4",
+    "@storybook/builder-vite": "^10.3.4",
+    "@storybook/react": "^10.3.4",
+    "@storybook/react-vite": "^10.3.4",
+    "@storybook/test": "^8.6.15",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/browser-playwright": "^4.1.2",
+    "@vitest/coverage-v8": "^4.1.2",
+    "autoprefixer": "^10.4.27",
     "lucide-react": "^1.7.0",
+    "playwright": "^1.59.1",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "storybook": "^10.3.4",
+    "tailwindcss": "^4.2.2",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
   }
 }

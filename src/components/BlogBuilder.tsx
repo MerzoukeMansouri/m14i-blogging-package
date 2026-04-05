@@ -377,9 +377,11 @@ function createDefaultBlock(type: ContentBlockType): ContentBlock {
       return { id, type: "image", src: "", alt: "" };
     case "video":
       return { id, type: "video", url: "" };
-    case "gallery":
-      return { id, type: "gallery", images: [], columns: 3 };
+    case "carousel":
+      return { id, type: "carousel", slides: [], autoPlay: false, showDots: true, showArrows: true, loop: true, aspectRatio: "16/9" };
     case "quote":
       return { id, type: "quote", content: "Votre citation ici" };
+    case "pdf":
+      return { id, type: "pdf", url: "", displayMode: "both" };
   }
 }

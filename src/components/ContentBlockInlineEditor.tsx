@@ -140,31 +140,125 @@ export function ContentBlockInlineEditor({
         </div>
       );
 
-    case "gallery":
+    case "carousel":
       return (
         <div className="space-y-3">
+          {/* Carousel Settings */}
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-xs text-muted-foreground">Auto-play</Label>
+              <Select
+                value={block.autoPlay ? "true" : "false"}
+                onValueChange={(value) =>
+                  onChange({ ...block, autoPlay: value === "true" })
+                }
+              >
+                <SelectTrigger className="text-sm h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Non</SelectItem>
+                  <SelectItem value="true">Oui</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {block.autoPlay && (
+              <div>
+                <Label className="text-xs text-muted-foreground">Intervalle (ms)</Label>
+                <Input
+                  type="number"
+                  value={(block.autoPlayInterval || 3000).toString()}
+                  onChange={(e) =>
+                    onChange({ ...block, autoPlayInterval: parseInt(e.target.value) || 3000 })
+                  }
+                  placeholder="3000"
+                  className="text-xs h-8"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <Label className="text-xs text-muted-foreground">Flèches</Label>
+              <Select
+                value={block.showArrows !== false ? "true" : "false"}
+                onValueChange={(value) =>
+                  onChange({ ...block, showArrows: value === "true" })
+                }
+              >
+                <SelectTrigger className="text-sm h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Oui</SelectItem>
+                  <SelectItem value="false">Non</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">Points</Label>
+              <Select
+                value={block.showDots !== false ? "true" : "false"}
+                onValueChange={(value) =>
+                  onChange({ ...block, showDots: value === "true" })
+                }
+              >
+                <SelectTrigger className="text-sm h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Oui</SelectItem>
+                  <SelectItem value="false">Non</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">Loop</Label>
+              <Select
+                value={block.loop !== false ? "true" : "false"}
+                onValueChange={(value) =>
+                  onChange({ ...block, loop: value === "true" })
+                }
+              >
+                <SelectTrigger className="text-sm h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Oui</SelectItem>
+                  <SelectItem value="false">Non</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div>
-            <Label className="text-xs text-muted-foreground">Nombre de colonnes</Label>
+            <Label className="text-xs text-muted-foreground">Format (Aspect Ratio)</Label>
             <Select
-              value={block.columns.toString()}
+              value={block.aspectRatio || "16/9"}
               onValueChange={(value) =>
-                onChange({ ...block, columns: parseInt(value) as 2 | 3 | 4 })
+                onChange({ ...block, aspectRatio: value as "16/9" | "4/3" | "1/1" | "21/9" })
               }
             >
               <SelectTrigger className="text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="2">2 colonnes</SelectItem>
-                <SelectItem value="3">3 colonnes</SelectItem>
-                <SelectItem value="4">4 colonnes</SelectItem>
+                <SelectItem value="16/9">16:9 (Paysage)</SelectItem>
+                <SelectItem value="4/3">4:3 (Standard)</SelectItem>
+                <SelectItem value="1/1">1:1 (Carré)</SelectItem>
+                <SelectItem value="21/9">21:9 (Ultra-large)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
+          {/* Slides Management */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label className="text-xs text-muted-foreground">Images</Label>
+              <Label className="text-xs text-muted-foreground">Slides</Label>
               <Button
                 type="button"
                 variant="outline"
@@ -172,7 +266,7 @@ export function ContentBlockInlineEditor({
                 onClick={() =>
                   onChange({
                     ...block,
-                    images: [...block.images, { src: "", alt: "" }],
+                    slides: [...block.slides, { src: "", alt: "" }],
                   })
                 }
               >
@@ -181,16 +275,16 @@ export function ContentBlockInlineEditor({
               </Button>
             </div>
 
-            {block.images.length === 0 ? (
+            {block.slides.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-3 border rounded">
-                Aucune image
+                Aucune slide
               </p>
             ) : (
               <div className="space-y-2">
-                {block.images.map((image, index) => (
+                {block.slides.map((slide, index) => (
                   <div key={index} className="border rounded p-2 space-y-2 bg-muted/30">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium">Image {index + 1}</span>
+                      <span className="text-xs font-medium">Slide {index + 1}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -199,7 +293,7 @@ export function ContentBlockInlineEditor({
                         onClick={() =>
                           onChange({
                             ...block,
-                            images: block.images.filter((_, i) => i !== index),
+                            slides: block.slides.filter((_, i) => i !== index),
                           })
                         }
                       >
@@ -208,23 +302,43 @@ export function ContentBlockInlineEditor({
                     </div>
                     <Input
                       type="url"
-                      value={image.src}
+                      value={slide.src}
                       onChange={(e) => {
-                        const newImages = [...block.images];
-                        newImages[index].src = e.target.value;
-                        onChange({ ...block, images: newImages });
+                        const newSlides = [...block.slides];
+                        newSlides[index].src = e.target.value;
+                        onChange({ ...block, slides: newSlides });
                       }}
-                      placeholder="URL"
+                      placeholder="URL de l'image"
                       className="text-xs h-8"
                     />
                     <Input
-                      value={image.alt}
+                      value={slide.alt}
                       onChange={(e) => {
-                        const newImages = [...block.images];
-                        newImages[index].alt = e.target.value;
-                        onChange({ ...block, images: newImages });
+                        const newSlides = [...block.slides];
+                        newSlides[index].alt = e.target.value;
+                        onChange({ ...block, slides: newSlides });
                       }}
-                      placeholder="Alt"
+                      placeholder="Texte alternatif"
+                      className="text-xs h-8"
+                    />
+                    <Input
+                      value={slide.title || ""}
+                      onChange={(e) => {
+                        const newSlides = [...block.slides];
+                        newSlides[index].title = e.target.value;
+                        onChange({ ...block, slides: newSlides });
+                      }}
+                      placeholder="Titre (optionnel)"
+                      className="text-xs h-8"
+                    />
+                    <Input
+                      value={slide.caption || ""}
+                      onChange={(e) => {
+                        const newSlides = [...block.slides];
+                        newSlides[index].caption = e.target.value;
+                        onChange({ ...block, slides: newSlides });
+                      }}
+                      placeholder="Caption (optionnel)"
                       className="text-xs h-8"
                     />
                   </div>
@@ -264,6 +378,70 @@ export function ContentBlockInlineEditor({
               placeholder="ex: CEO de l'entreprise"
               className="text-sm"
             />
+          </div>
+        </div>
+      );
+
+    case "pdf":
+      return (
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs text-muted-foreground">URL du PDF</Label>
+            <Input
+              type="url"
+              value={block.url}
+              onChange={(e) => onChange({ ...block, url: e.target.value })}
+              placeholder="https://example.com/document.pdf"
+              className="text-sm"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Titre (optionnel)</Label>
+            <Input
+              value={block.title || ""}
+              onChange={(e) => onChange({ ...block, title: e.target.value })}
+              placeholder="Nom du document"
+              className="text-sm"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Description (optionnel)</Label>
+            <Textarea
+              value={block.description || ""}
+              onChange={(e) => onChange({ ...block, description: e.target.value })}
+              placeholder="Brève description du PDF"
+              className="min-h-[60px] text-sm resize-y"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Mode d'affichage</Label>
+            <Select
+              value={block.displayMode || "both"}
+              onValueChange={(value) =>
+                onChange({ ...block, displayMode: value as "embed" | "download" | "both" })
+              }
+            >
+              <SelectTrigger className="text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="embed">Intégré uniquement</SelectItem>
+                <SelectItem value="download">Téléchargement uniquement</SelectItem>
+                <SelectItem value="both">Intégré + Téléchargement</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Hauteur de l'embed (optionnel)</Label>
+            <Input
+              value={block.height || ""}
+              onChange={(e) => onChange({ ...block, height: e.target.value })}
+              placeholder="600px"
+              className="text-sm"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Par défaut: 600px
+            </p>
           </div>
         </div>
       );

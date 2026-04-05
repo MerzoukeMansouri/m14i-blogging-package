@@ -102,7 +102,14 @@ AVAILABLE LAYOUT TYPES:
 - sidebar-left: Main content with sidebar on left
 - sidebar-right: Main content with sidebar on right
 
-${request.length === 'short' ? 'Generate 2-3 sections.' : request.length === 'long' ? 'Generate 5-7 sections.' : 'Generate 3-5 sections.'}
+📏 BLOG LENGTH BEST PRACTICES (2025):
+- Target total: 1,500-2,500 words for optimal SEO and engagement
+- Short: ~1,000 words (2-3 sections)
+- Medium: ~1,500-2,000 words (3-4 sections)
+- Long: ~2,000-2,500 words (4-5 sections)
+- NEVER exceed 2,500 words - quality over quantity
+
+${request.length === 'short' ? 'Generate 2-3 sections for ~1,000 words total.' : request.length === 'long' ? 'Generate 4-5 sections for ~2,000-2,500 words total.' : 'Generate 3-4 sections for ~1,500-2,000 words total.'}
 ${request.layoutPreference ? `Prefer these layouts: ${request.layoutPreference.join(', ')}` : ''}
 ${request.tone ? `Tone: ${request.tone}` : ''}
 ${request.additionalInstructions ? `Additional: ${request.additionalInstructions}` : ''}`;
@@ -579,7 +586,32 @@ Each column is an array of content blocks. Available block types:
 
 For media blocks (image/video/carousel/pdf), use placeholder URLs like "https://placeholder.example/descriptive-name.jpg"
 
-Generate compelling, well-structured content that flows naturally.
+✍️ 2025 WRITING BEST PRACTICES - MANDATORY:
+
+**Length & Structure:**
+- Each section: 250-500 words MAX (concise and focused)
+- Paragraphs: 2-3 sentences only (never more than 4 lines)
+- Use H2/H3 headings every 150-200 words for scannability
+- Front-load key information - no lengthy introductions
+
+**Readability (Critical):**
+- Short sentences: 15-20 words average
+- Active voice only (avoid passive constructions)
+- Transition words: "However", "Therefore", "In fact", "Most importantly"
+- Break up text with bullet points and lists
+- ONE idea per paragraph
+
+**Formatting:**
+- Use **bold** for key terms and important points
+- Bullet lists for 3+ related items
+- Numbered lists for sequential steps
+- Include at least one visual element per section (image, quote, or video)
+
+**Engagement:**
+- Start with a hook or compelling statement
+- Use concrete examples instead of abstract concepts
+- Address reader directly ("you", "your")
+- End sections with clear takeaways or transitions
 
 ${request.context ? `Context from the rest of the post: ${request.context}` : ""}`;
 

@@ -12,8 +12,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       m14i-blogging:
-        specifier: 0.16.2
-        version: 0.16.2(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1)
+        specifier: 0.16.3
+        version: 0.16.3(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1)
     devDependencies:
       '@anthropic-ai/sdk':
         specifier: ^0.82.0
@@ -2377,6 +2377,26 @@ packages:
 
   m14i-blogging@0.16.2:
     resolution: {integrity: sha512-7z/y62hv/aVnMa9H5XhN8LoXfPshVjSz1imygsW2S6Rbj6wqmxO9ERVQip60qeqfRLX2FylDPAi3wHlHooCiVw==}
+    peerDependencies:
+      '@hello-pangea/dnd': ^16.0.0
+      '@supabase/ssr': '*'
+      '@supabase/supabase-js': '*'
+      lucide-react: ^0.0.0
+      next: '*'
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+      react-markdown: ^9.0.0
+      remark-gfm: ^4.0.0
+    peerDependenciesMeta:
+      '@supabase/ssr':
+        optional: true
+      '@supabase/supabase-js':
+        optional: true
+      next:
+        optional: true
+
+  m14i-blogging@0.16.3:
+    resolution: {integrity: sha512-4p8F/TRpdFTN7RIZqMGfmsBqvHUM6lFBcT2D6ArT+GYHxUhNGJ+BFWIfUESeNKGeu3M2S1RyqZoNTCAa+n8cbw==}
     peerDependencies:
       '@hello-pangea/dnd': ^16.0.0
       '@supabase/ssr': '*'
@@ -5787,6 +5807,21 @@ snapshots:
       '@hello-pangea/dnd': 18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@toon-format/toon': 2.1.0
       lucide-react: 1.7.0(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      react-markdown: 10.1.0(@types/react@19.2.14)(react@19.2.4)
+      remark-gfm: 4.0.1
+    optionalDependencies:
+      '@supabase/ssr': 0.6.1(@supabase/supabase-js@2.101.1)
+      '@supabase/supabase-js': 2.101.1
+      next: 15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+
+  m14i-blogging@0.16.3(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1):
+    dependencies:
+      '@hello-pangea/dnd': 18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@toon-format/toon': 2.1.0
+      lucide-react: 1.7.0(react@19.2.4)
+      m14i-blogging: 0.16.2(@hello-pangea/dnd@18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@supabase/ssr@0.6.1(@supabase/supabase-js@2.101.1))(@supabase/supabase-js@2.101.1)(lucide-react@1.7.0(react@19.2.4))(next@15.5.14(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)(remark-gfm@4.0.1)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       react-markdown: 10.1.0(@types/react@19.2.14)(react@19.2.4)

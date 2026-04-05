@@ -592,7 +592,30 @@ RESPOND ONLY WITH VALID JSON NOW:`;
 
     // Parse the JSON response (strip markdown code blocks first)
     const cleanedText = stripMarkdownCodeBlocks(responseText);
-    const result = JSON.parse(cleanedText) as GenerateSectionResponse;
+
+    // Try to parse JSON with detailed error reporting
+    let result: GenerateSectionResponse;
+    try {
+      result = JSON.parse(cleanedText) as GenerateSectionResponse;
+    } catch (error) {
+      // Log the problematic JSON for debugging
+      console.error("JSON Parse Error (Section):", error);
+      console.error("Raw response (first 500 chars):", responseText.substring(0, 500));
+      console.error("Cleaned JSON (first 500 chars):", cleanedText.substring(0, 500));
+      console.error("Cleaned JSON (last 500 chars):", cleanedText.substring(Math.max(0, cleanedText.length - 500)));
+
+      // Try to provide more context about where the error occurred
+      if (error instanceof SyntaxError) {
+        const match = error.message.match(/position (\d+)/);
+        if (match) {
+          const position = parseInt(match[1]);
+          const context = cleanedText.substring(Math.max(0, position - 100), Math.min(cleanedText.length, position + 100));
+          console.error(`Context around error position ${position}:`, context);
+        }
+      }
+
+      throw new Error(`Failed to parse section response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}. Check server logs for details.`);
+    }
 
     return result;
   }
@@ -635,7 +658,17 @@ ${request.tags ? `Existing tags: ${request.tags.join(", ")}` : ""}`;
 
     // Parse the JSON response (strip markdown code blocks first)
     const cleanedText = stripMarkdownCodeBlocks(responseText);
-    const result = JSON.parse(cleanedText) as GenerateSEOResponse;
+
+    // Try to parse JSON with detailed error reporting
+    let result: GenerateSEOResponse;
+    try {
+      result = JSON.parse(cleanedText) as GenerateSEOResponse;
+    } catch (error) {
+      console.error("JSON Parse Error (SEO):", error);
+      console.error("Raw response:", responseText.substring(0, 500));
+      console.error("Cleaned JSON:", cleanedText);
+      throw new Error(`Failed to parse SEO response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 
     return result;
   }

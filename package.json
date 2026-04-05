@@ -140,6 +140,6 @@
   },
   "dependencies": {
     "@toon-format/toon": "^2.1.0",
-    "m14i-blogging": "0.16.2"
+    "m14i-blogging": "0.16.3"
   }
 }

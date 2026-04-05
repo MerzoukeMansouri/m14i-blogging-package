@@ -127,6 +127,11 @@ export function EditorView({ postId }: EditorViewProps) {
   const [generateAction, setGenerateAction] = useState<"complete" | "section" | "seo">("complete");
   const [selectedLayoutType, setSelectedLayoutType] = useState<LayoutType>("1-column");
 
+  // Progressive generation state
+  const [generationPhase, setGenerationPhase] = useState<"idle" | "layout" | "sections">("idle");
+  const [generatingSections, setGeneratingSections] = useState<Set<string>>(new Set());
+  const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
+
   const {
     state,
     isDirty,
@@ -224,6 +229,9 @@ export function EditorView({ postId }: EditorViewProps) {
 
     setIsGenerating(true);
     setGenerationError(null);
+    setGenerationPhase("layout");
+    setGeneratingSections(new Set());
+    setCompletedSections(new Set());
 
     try {
       // Step 1: Generate layout structure only
@@ -244,10 +252,20 @@ export function EditorView({ postId }: EditorViewProps) {
         metaDescription: layoutResult.excerpt || "",
       });
 
+      // Close dialog after layout is ready
+      setShowGenerateDialog(false);
+      setGeneratePrompt("");
+
+      // Transition to sections phase
+      setGenerationPhase("sections");
+
       // Step 2: Generate content for each section progressively
       const sections = [];
       for (const layoutSection of layoutResult.layout) {
         try {
+          // Mark this section as generating
+          setGeneratingSections(prev => new Set([...prev, layoutSection.id]));
+
           const sectionResult = await apiClient.generateSection({
             prompt: layoutSection.description,
             layoutType: layoutSection.type,
@@ -255,19 +273,34 @@ export function EditorView({ postId }: EditorViewProps) {
           });
 
           sections.push(sectionResult.section);
+
           // Update sections progressively so user sees them appear
           updateField("sections", [...sections]);
+
+          // Mark section as completed
+          setGeneratingSections(prev => {
+            const next = new Set(prev);
+            next.delete(layoutSection.id);
+            return next;
+          });
+          setCompletedSections(prev => new Set([...prev, layoutSection.id]));
         } catch (sectionErr: any) {
           console.error(`Error generating section ${layoutSection.id}:`, sectionErr);
+          // Remove from generating set even if failed
+          setGeneratingSections(prev => {
+            const next = new Set(prev);
+            next.delete(layoutSection.id);
+            return next;
+          });
           // Continue with other sections even if one fails
         }
       }
 
-      setShowGenerateDialog(false);
-      setGeneratePrompt("");
+      setGenerationPhase("idle");
     } catch (err: any) {
       console.error("Error generating blog post:", err);
       setGenerationError(err.message || "Failed to generate blog post. Please try again.");
+      setGenerationPhase("idle");
     } finally {
       setIsGenerating(false);
     }
@@ -504,6 +537,37 @@ export function EditorView({ postId }: EditorViewProps) {
           </CardWrapper>
 
           {/* BlogBuilder */}
+          {/* AI Generation Progress */}
+          {generationPhase !== "idle" && (
+            <CardWrapper Card={Card}>
+              <div className="p-6">
+                <div className="space-y-4">
+                  {generationPhase === "layout" && (
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#000' }}></div>
+                      <span style={{ color: colors?.text || '#000' }}>Generating blog structure...</span>
+                    </div>
+                  )}
+                  {generationPhase === "sections" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: colors?.primary || '#000', color: colors?.buttonPrimaryText || '#fff' }}>
+                          ✓
+                        </div>
+                        <span style={{ color: colors?.text || '#000' }}>Layout ready! Generating content...</span>
+                      </div>
+                      {generatingSections.size > 0 && (
+                        <div className="ml-8 text-sm" style={{ color: colors?.textMuted || '#666' }}>
+                          Generating {generatingSections.size} section{generatingSections.size > 1 ? 's' : ''}...
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardWrapper>
+          )}
+
           {BlogBuilder && (
             <CardWrapper Card={Card}>
               <div className="p-6">

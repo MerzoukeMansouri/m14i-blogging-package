@@ -1,6 +1,7 @@
 /**
  * AI Content Generator Service
  * Handles AI-powered blog content generation using Claude API
+ * Now with TOON-optimized prompts (70-80% token reduction)
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -19,6 +20,13 @@ import type {
   ImproveContentResponse,
   AIGenerationConfig,
 } from "../../types/aiGeneration";
+import {
+  generateLayoutPrompt,
+  generateSectionPrompt,
+  generateCompletePrompt,
+  generateSEOPrompt,
+  generateImprovePrompt,
+} from "./ai-prompts-toon";
 
 /**
  * Helper: Strip markdown code blocks from JSON response
@@ -60,116 +68,23 @@ export class AIContentGenerator {
   /**
    * Generate layout structure only (Step 1)
    * Returns title, excerpt, and section structure without content
+   * Now using TOON-optimized prompts with multilingual support
    */
   async generateLayout(
     request: GenerateLayoutRequest
   ): Promise<GenerateLayoutResponse> {
-    const systemPrompt = `You are an expert blog content strategist. Generate a blog post layout structure.
+    const systemPrompt = generateLayoutPrompt({
+      length: request.length,
+      layoutPreference: request.layoutPreference,
+      tone: request.tone,
+      additionalInstructions: request.additionalInstructions,
+      language: request.language || "en",
+    });
 
-⚠️ CRITICAL: YOUR RESPONSE MUST BE 100% VALID JSON ⚠️
-
-JSON FORMATTING RULES - ZERO TOLERANCE FOR ERRORS:
-1. Response starts with { and ends with } - NOTHING ELSE
-2. NO markdown code blocks (no \`\`\`json or \`\`\`)
-3. NO explanatory text before or after the JSON
-4. ALL quotes inside strings MUST be escaped: use \\" not "
-5. NO literal line breaks in strings - use \\n instead
-6. NO trailing commas after the last item in arrays or objects
-7. ALL object keys must be in "double quotes"
-8. Close EVERY bracket and brace you open
-
-RESPONSE STRUCTURE:
-{
-  "title": "Blog post title",
-  "slug": "url-friendly-slug",
-  "excerpt": "Brief summary (150-200 chars)",
-  "layout": [
-    {
-      "id": "section-1",
-      "type": "hero" | "two-column" | "three-column" | "full-width" | "sidebar-left" | "sidebar-right",
-      "description": "What this section should contain"
-    }
-  ],
-  "category": "suggested category",
-  "tags": ["tag1", "tag2"]
-}
-
-🎨 AVAILABLE LAYOUT TYPES & BEST USE CASES:
-
-**hero** - Impact maximal, perfect for introduction
-→ Use for: Opening section with strong visual hook
-→ Visual: Large image/video + bold headline + short intro text
-→ Creates: Immediate engagement, sets the tone
-
-**two-column** - Équilibre texte/visuel, professional & scannable
-→ Use for: Main content sections, comparisons, before/after
-→ Visual: Text on one side, image/media on other (alternating sides for variety)
-→ Creates: Visual breathing room, easy scanning
-
-**three-column** - Présentation de features/bénéfices/étapes
-→ Use for: Lists of benefits, features, steps, tips
-→ Visual: Icon/image + title + description in each column
-→ Creates: Organized, structured information display
-
-**full-width** - Emphase narrative, storytelling
-→ Use for: Important messages, quotes, conclusions, transitions
-→ Visual: Centered text with full-bleed background or focused content
-→ Creates: Dramatic pauses, emphasis on key points
-
-**sidebar-left/right** - Contexte additionnel, ressources
-→ Use for: Sections needing supporting info, resources, callouts
-→ Visual: Main content + sidebar with related tips/links/stats
-→ Creates: Depth without cluttering main flow
-
-🎯 VISUAL DESIGN PRINCIPLES (MANDATORY):
-
-1. **VARIETY IS KEY**: NEVER use same layout twice in a row
-   ✅ Good: hero → two-column → three-column → two-column (different side)
-   ❌ Bad: two-column → two-column → two-column
-
-2. **VISUAL RHYTHM**: Alternate between dense & spacious layouts
-   - Start strong (hero)
-   - Alternate complexity (simple → complex → simple)
-   - End with impact (full-width conclusion or two-column with CTA)
-
-3. **ASYMMETRY**: For two-column, alternate image/text sides
-   Example: [text|image] → [image|text] → [text|image]
-
-4. **HIERARCHY**: Each section must have a clear visual purpose
-   - Opening: hero (impact)
-   - Body: mix of two-column (depth) + three-column (structure)
-   - Closing: full-width or sidebar (action/resources)
-
-5. **STORYTELLING FLOW**:
-   - Section 1: Hook (hero with compelling visual)
-   - Section 2-3: Educate (two-column for explanation)
-   - Section 4: Organize (three-column for key points)
-   - Section 5: Convert (full-width CTA or sidebar with resources)
-
-📐 LAYOUT COMPOSITION EXAMPLES:
-
-**Short Post (3 sections)**:
-hero → two-column → full-width
-
-**Medium Post (4 sections)**:
-hero → two-column (text|image) → three-column → two-column (image|text)
-
-**Long Post (5 sections)**:
-hero → two-column (text|image) → three-column → two-column (image|text) → sidebar-right
-
-📏 BLOG LENGTH BEST PRACTICES (2025):
-- Target total: 1,500-2,500 words for optimal SEO and engagement
-- Short: ~1,000 words (2-3 sections)
-- Medium: ~1,500-2,000 words (3-4 sections)
-- Long: ~2,000-2,500 words (4-5 sections)
-- NEVER exceed 2,500 words - quality over quantity
-
-${request.length === 'short' ? 'Generate 2-3 sections for ~1,000 words total. Use varied layouts (hero + two-column + full-width).' : request.length === 'long' ? 'Generate 4-5 sections for ~2,000-2,500 words total. Create visual rhythm: hero → two-column → three-column → two-column (alternate side) → full-width.' : 'Generate 3-4 sections for ~1,500-2,000 words total. Mix layouts dynamically: hero → two-column → three-column → two-column (opposite side).'}
-${request.layoutPreference ? `Prefer these layouts: ${request.layoutPreference.join(', ')}` : ''}
-${request.tone ? `Tone: ${request.tone}` : ''}
-${request.additionalInstructions ? `Additional: ${request.additionalInstructions}` : ''}`;
-
-    const userPrompt = `Generate blog post layout for: ${request.prompt}`;
+    const lang = request.language || "en";
+    const userPrompt = lang === "fr"
+      ? `Générer la structure du blog pour : ${request.prompt}`
+      : `Generate blog post layout for: ${request.prompt}`;
 
     const message = await this.anthropic.messages.create({
       model: this.config.model,
@@ -206,12 +121,16 @@ ${request.additionalInstructions ? `Additional: ${request.additionalInstructions
 
   /**
    * Generate a complete blog post from a prompt
+   * Now with multilingual support
    */
   async generateCompleteBlogPost(
     request: GenerateCompleteBlogRequest
   ): Promise<GenerateCompleteBlogResponse> {
     const systemPrompt = this.buildCompleteBlogPrompt(request);
-    const userPrompt = `Generate a complete blog post about: ${request.prompt}`;
+    const lang = request.language || "en";
+    const userPrompt = lang === "fr"
+      ? `Générer un article de blog complet sur : ${request.prompt}`
+      : `Generate a complete blog post about: ${request.prompt}`;
 
     const message = await this.anthropic.messages.create({
       model: this.config.model,
@@ -267,12 +186,16 @@ ${request.additionalInstructions ? `Additional: ${request.additionalInstructions
   /**
    * Generate a complete blog post with streaming (faster perceived performance)
    * Returns an async generator that yields text chunks
+   * Now with multilingual support
    */
   async *generateCompleteBlogPostStream(
     request: GenerateCompleteBlogRequest
   ): AsyncGenerator<string, void, undefined> {
     const systemPrompt = this.buildCompleteBlogPrompt(request);
-    const userPrompt = `Generate a complete blog post about: ${request.prompt}`;
+    const lang = request.language || "en";
+    const userPrompt = lang === "fr"
+      ? `Générer un article de blog complet sur : ${request.prompt}`
+      : `Generate a complete blog post about: ${request.prompt}`;
 
     const stream = await this.anthropic.messages.stream({
       model: this.config.model,
@@ -306,8 +229,23 @@ ${request.additionalInstructions ? `Additional: ${request.additionalInstructions
   /**
    * Build the comprehensive prompt for blog post generation
    * Extracted for reuse between streaming and non-streaming methods
+   * Now using TOON-optimized prompts with multilingual support
    */
   private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest): string {
+    return generateCompletePrompt({
+      tone: request.tone,
+      length: request.length,
+      layoutPreference: request.layoutPreference,
+      additionalInstructions: request.additionalInstructions,
+      language: request.language || "en",
+    });
+  }
+
+  /**
+   * Build the OLD verbose prompt for blog post generation (DEPRECATED - kept for reference)
+   * @deprecated Use buildCompleteBlogPrompt() which uses TOON format
+   */
+  private buildCompleteBlogPromptOLD(request: GenerateCompleteBlogRequest): string {
     return `You are an expert blog content writer specializing in creating elegant, visually engaging blog posts with sophisticated layouts.
 
 ⚠️ CRITICAL: YOUR RESPONSE MUST BE 100% VALID JSON ⚠️
@@ -611,66 +549,21 @@ RESPOND ONLY WITH VALID JSON NOW:`;
 
   /**
    * Generate a single section with specific layout
+   * Now using TOON-optimized prompts with multilingual support
    */
   async generateSection(
     request: GenerateSectionRequest
   ): Promise<GenerateSectionResponse> {
-    const systemPrompt = `You are an expert content writer. Generate a single blog section with the specified layout.
+    const systemPrompt = generateSectionPrompt(
+      request.layoutType,
+      request.context,
+      request.language || "en"
+    );
 
-IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
-
-The section must have this structure:
-{
-  "section": {
-    "id": "unique-id",
-    "type": "${request.layoutType}",
-    "columns": [...]
-  }
-}
-
-Layout "${request.layoutType}" requires:
-${this.getLayoutColumnRequirements(request.layoutType)}
-
-Each column is an array of content blocks. Available block types:
-- text: { id: string, type: "text", content: string (markdown supported) }
-- image: { id: string, type: "image", src: string, alt: string, caption?: string }
-- video: { id: string, type: "video", url: string, caption?: string }
-- quote: { id: string, type: "quote", content: string, author?: string, role?: string }
-- carousel: { id: string, type: "carousel", slides: [{src, alt, caption}], autoPlay?: boolean, aspectRatio?: "16/9" }
-- pdf: { id: string, type: "pdf", url: string, title?: string, description?: string, displayMode?: "both" }
-
-For media blocks (image/video/carousel/pdf), use placeholder URLs like "https://placeholder.example/descriptive-name.jpg"
-
-✍️ 2025 WRITING BEST PRACTICES - MANDATORY:
-
-**Length & Structure:**
-- Each section: 250-500 words MAX (concise and focused)
-- Paragraphs: 2-3 sentences only (never more than 4 lines)
-- Use H2/H3 headings every 150-200 words for scannability
-- Front-load key information - no lengthy introductions
-
-**Readability (Critical):**
-- Short sentences: 15-20 words average
-- Active voice only (avoid passive constructions)
-- Transition words: "However", "Therefore", "In fact", "Most importantly"
-- Break up text with bullet points and lists
-- ONE idea per paragraph
-
-**Formatting:**
-- Use **bold** for key terms and important points
-- Bullet lists for 3+ related items
-- Numbered lists for sequential steps
-- Include at least one visual element per section (image, quote, or video)
-
-**Engagement:**
-- Start with a hook or compelling statement
-- Use concrete examples instead of abstract concepts
-- Address reader directly ("you", "your")
-- End sections with clear takeaways or transitions
-
-${request.context ? `Context from the rest of the post: ${request.context}` : ""}`;
-
-    const userPrompt = `Generate a section about: ${request.prompt}`;
+    const lang = request.language || "en";
+    const userPrompt = lang === "fr"
+      ? `Générer une section sur : ${request.prompt}`
+      : `Generate a section about: ${request.prompt}`;
 
     const message = await this.anthropic.messages.create({
       model: this.config.model,
@@ -697,38 +590,19 @@ ${request.context ? `Context from the rest of the post: ${request.context}` : ""
 
   /**
    * Generate SEO metadata for a blog post
+   * Now using TOON-optimized prompts
    */
-  async generateSEO(request: GenerateSEORequest): Promise<GenerateSEOResponse> {
-    const systemPrompt = `You are an SEO expert. Generate comprehensive SEO metadata for a blog post.
+  async generateSEO(request: GenerateSEORequest & { language?: "en" | "fr" }): Promise<GenerateSEOResponse> {
+    const lang = request.language || "en";
+    const systemPrompt = generateSEOPrompt(lang);
 
-IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
-
-Generate SEO metadata with this structure:
-{
-  "seo_metadata": {
-    "description": "SEO-optimized meta description (150-160 characters)",
-    "keywords": ["keyword1", "keyword2", ...],
-    "robots": "index, follow",
-    "openGraph": {
-      "title": "Engaging Open Graph title",
-      "description": "Compelling OG description"
-    },
-    "twitter": {
-      "card": "summary_large_image",
-      "title": "Twitter-optimized title",
-      "description": "Twitter-optimized description"
-    }
-  },
-  "tags": ["tag1", "tag2", "tag3"]
-}
-
-Focus on:
-- Clear, compelling descriptions that encourage clicks
-- Relevant keywords that match search intent
-- Optimized titles for social sharing
-- 3-5 highly relevant tags`;
-
-    const userPrompt = `Generate SEO metadata for a blog post:
+    const userPrompt = lang === "fr"
+      ? `Générer métadonnées SEO pour article :
+Titre: ${request.title}
+${request.excerpt ? `Extrait: ${request.excerpt}` : ""}
+${request.category ? `Catégorie: ${request.category}` : ""}
+${request.tags ? `Tags existants: ${request.tags.join(", ")}` : ""}`
+      : `Generate SEO metadata for a blog post:
 Title: ${request.title}
 ${request.excerpt ? `Excerpt: ${request.excerpt}` : ""}
 ${request.category ? `Category: ${request.category}` : ""}
@@ -759,40 +633,21 @@ ${request.tags ? `Existing tags: ${request.tags.join(", ")}` : ""}`;
 
   /**
    * Improve existing content based on instruction
+   * Now using TOON-optimized prompts with multilingual support
    */
   async improveContent(
-    request: ImproveContentRequest
+    request: ImproveContentRequest & { language?: "en" | "fr" }
   ): Promise<ImproveContentResponse> {
-    const instructions = {
-      expand:
-        "Expand this content with more details, examples, and explanations. Make it more comprehensive and informative.",
-      shorten:
-        "Make this content more concise while preserving all key points. Remove redundancy and focus on clarity.",
-      rewrite:
-        "Rewrite this content to make it more engaging and better structured while maintaining the same meaning.",
-      "add-examples":
-        "Add relevant, practical examples to illustrate the concepts in this content.",
-      "improve-clarity":
-        "Improve the clarity and readability of this content. Make complex ideas easier to understand.",
-      "make-engaging":
-        "Make this content more engaging and compelling. Add hooks, improve flow, and make it more interesting to read.",
-    };
+    const lang = request.language || "en";
+    const systemPrompt = generateImprovePrompt(
+      request.instruction,
+      request.additionalContext,
+      lang
+    );
 
-    const systemPrompt = `You are an expert content editor. Your task is to improve the given content based on the instruction.
-
-IMPORTANT: You must respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON structure.
-
-Instruction: ${instructions[request.instruction]}
-
-${request.additionalContext ? `Additional context: ${request.additionalContext}` : ""}
-
-Return the result in this format:
-{
-  "content": "The improved content here (markdown supported)",
-  "changes": "Brief explanation of what was changed"
-}`;
-
-    const userPrompt = `Original content:\n\n${request.content}`;
+    const userPrompt = lang === "fr"
+      ? `Contenu original:\n\n${request.content}`
+      : `Original content:\n\n${request.content}`;
 
     const message = await this.anthropic.messages.create({
       model: this.config.model,

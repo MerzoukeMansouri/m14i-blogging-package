@@ -18,6 +18,8 @@ export interface GenerateCompleteBlogRequest {
   tone?: string;
   /** Optional: Desired length (short, medium, long) */
   length?: "short" | "medium" | "long";
+  /** Optional: Language for the generated content (default: "en") */
+  language?: "en" | "fr";
   /** Optional: Additional instructions for the AI */
   additionalInstructions?: string;
 }
@@ -65,6 +67,8 @@ export interface GenerateLayoutRequest {
   tone?: string;
   /** Optional: Desired length (short, medium, long) */
   length?: "short" | "medium" | "long";
+  /** Optional: Language for the generated content (default: "en") */
+  language?: "en" | "fr";
   /** Optional: Additional instructions */
   additionalInstructions?: string;
 }
@@ -99,6 +103,8 @@ export interface GenerateSectionRequest {
   prompt: string;
   /** The layout type to use for this section */
   layoutType: LayoutType;
+  /** Optional: Language for the generated content (default: "en") */
+  language?: "en" | "fr";
   /** Optional: Context from the rest of the blog post */
   context?: string;
 }

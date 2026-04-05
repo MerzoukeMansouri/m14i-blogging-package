@@ -1,6 +1,6 @@
 {
   "name": "m14i-blogging",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "type": "module",
   "description": "Drag & drop blog builder with customizable layouts and content blocks for React and Next.js",
   "main": "./dist/index.cjs",
@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.mjs",
+      "require": "./dist/client/index.cjs"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",

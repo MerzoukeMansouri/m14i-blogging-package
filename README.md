@@ -10,6 +10,18 @@ A powerful, customizable drag & drop blog builder for React applications with ri
 - **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
 - **Storybook Documentation**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
 
+## ⭐ What's New in v0.3.0
+
+Major improvements to make integration **10x easier**:
+
+- **🚀 Pre-built Data Access Layer** - Complete CRUD operations with `createBlogClient()` - no more writing database queries!
+- **🎨 BlogBuilder with Defaults** - Use `BlogBuilderWithDefaults` - no shadcn/ui setup required!
+- **⚡ Ready-to-use API Routes** - Copy-paste Next.js API route handlers - instant backend!
+- **📦 Complete TypeScript Types** - Full database types exported for type safety
+- **📚 Comprehensive Documentation** - Step-by-step integration guide with examples
+
+**Migration from v0.2.x:** All breaking changes are opt-in - existing code works unchanged!
+
 ## What is m14i-blogging?
 
 m14i-blogging is a complete blog content management solution that provides:
@@ -17,6 +29,8 @@ m14i-blogging is a complete blog content management solution that provides:
 - **Visual Editor** - Drag & drop interface to build blog posts without code
 - **Flexible Layouts** - Multiple column and grid layouts to structure your content
 - **Rich Content Blocks** - Text (Markdown), images, videos, carousels, quotes, and PDFs
+- **Pre-built Data Layer** - Complete CRUD operations with zero boilerplate
+- **Ready-to-use API Routes** - Copy-paste Next.js handlers for instant backend
 - **Automatic SEO** - Built-in meta tags, Open Graph, Twitter Cards, and JSON-LD structured data
 - **Full Customization** - Theme with CSS variables, className props, or presets
 - **Next.js Integration** - Works seamlessly with both App Router and Pages Router
@@ -85,7 +99,62 @@ That's it! Modern package managers will handle peer dependencies automatically.
 - Peer dependencies explanation
 - Troubleshooting common issues
 
-## Quick Start
+## 🚀 Quick Start (New Way!)
+
+### The Easiest Way - Complete Blog in 3 Steps
+
+**Step 1:** Set up the data layer (one file)
+
+```typescript
+// lib/blog-client.ts
+import { createClient } from "@/lib/supabase/server";
+import { createBlogClient } from "m14i-blogging/client";
+
+export async function getBlogClient() {
+  const supabase = await createClient();
+  return createBlogClient(supabase);
+}
+```
+
+**Step 2:** Add ready-to-use API routes
+
+```typescript
+// app/api/blog/posts/route.ts
+import { createListPostsHandler } from 'm14i-blogging/server';
+import { getBlogClient } from '@/lib/blog-client';
+
+export const GET = createListPostsHandler(getBlogClient);
+```
+
+**Step 3:** Use BlogBuilder with zero setup
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { BlogBuilderWithDefaults } from 'm14i-blogging';
+
+export default function EditorPage() {
+  const [sections, setSections] = useState([]);
+
+  return (
+    <BlogBuilderWithDefaults
+      sections={sections}
+      onChange={setSections}
+    />
+  );
+}
+```
+
+**That's it!** You now have:
+- ✅ Full CRUD operations via `getBlogClient()`
+- ✅ RESTful API endpoints
+- ✅ Drag & drop editor with UI components included
+- ✅ Zero boilerplate database queries
+
+📖 **See [Integration Guide](./docs/INTEGRATION_GUIDE.md)** for complete examples with authentication, all API routes, and public pages.
+
+## Quick Start (Classic Way)
 
 ### Basic Usage
 

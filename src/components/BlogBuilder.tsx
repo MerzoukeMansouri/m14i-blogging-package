@@ -18,7 +18,7 @@ import { mergeConfig } from "../config/defaults";
 // Button, Card, CardContent, CardHeader
 // Install with: npx shadcn@latest add button card
 
-interface BlogBuilderProps {
+export interface BlogBuilderProps {
   sections: LayoutSection[];
   onChange: (sections: LayoutSection[]) => void;
   config?: BlogBuilderConfig;

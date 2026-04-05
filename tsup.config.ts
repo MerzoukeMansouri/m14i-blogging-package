@@ -31,6 +31,24 @@ export default defineConfig([
     ],
     injectStyle: false, // Don't inject CSS, we'll provide it separately
   },
+  // Client data access layer bundle
+  {
+    entry: {
+      'client/index': 'src/client/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    outExtension({ format }) {
+      return {
+        js: format === 'esm' ? '.mjs' : '.cjs',
+      };
+    },
+    external: [
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+    ],
+  },
   // Server utilities bundle
   {
     entry: {

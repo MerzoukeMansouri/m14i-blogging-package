@@ -3,6 +3,7 @@ import "./styles.css";
 
 // Components
 export { BlogBuilder } from "./components/BlogBuilder";
+export { BlogBuilderWithDefaults } from "./components/BlogBuilderWithDefaults";
 export { BlogPreview } from "./components/BlogPreview";
 export { ContentBlockRenderer } from "./components/ContentBlockRenderer";
 export { ContentBlockInlineEditor } from "./components/ContentBlockInlineEditor";
@@ -31,6 +32,7 @@ export type {
   CallbacksConfig,
   BlogBuilderConfig,
 } from "./types";
+export type { BlogBuilderProps } from "./components/BlogBuilder";
 
 // Theme Types
 export type {
@@ -110,3 +112,26 @@ export {
 
 // Config
 export { DEFAULT_LAYOUTS, DEFAULT_BLOCKS, DEFAULT_CONFIG, mergeConfig } from "./config/defaults";
+
+// Database Types
+export type {
+  BlogPostStatus,
+  BlogPostRow,
+  BlogPostInsert,
+  BlogPostUpdate,
+  BlogPostWithAuthor,
+  BlogMediaType,
+  BlogMediaRow,
+  BlogMediaInsert,
+  BlogMediaUpdate,
+  BlogFilterParams,
+  BlogPostListResponse,
+  BlogStats,
+  BlogCategory,
+  BlogTag,
+  BlogMedia,
+} from "./types/database";
+
+// Client - Supabase Data Access Layer
+export { createBlogClient } from "./client/supabase";
+export type { BlogClient, BlogClientConfig, SupabaseClient } from "./client/supabase";

@@ -46,6 +46,21 @@ export {
   publishScheduledPosts,
 } from './routes/scheduled';
 
+// Export ready-to-use API route handlers
+export {
+  createListPostsHandler,
+  createCreatePostHandler,
+  createGetPostBySlugHandler,
+  createUpdatePostHandler,
+  createDeletePostHandler,
+  createPublishPostHandler,
+  createSearchPostsHandler,
+  createMediaHandlers,
+  createStatsHandler,
+  isAdmin,
+  parseFilterParams,
+} from './api-routes';
+
 // Export SEO utilities
 export {
   // Sitemap

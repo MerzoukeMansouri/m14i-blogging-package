@@ -1,0 +1,151 @@
+/**
+ * AI Prompts - Compact Format (40-60% token reduction)
+ * Token-optimized prompts using concise text instead of verbose explanations
+ */
+
+const LANG = {
+  en: {
+    expert: "Expert blog strategist",
+    writer: "Expert content writer",
+    seo: "SEO expert",
+    editor: "Expert content editor",
+    respond: "RESPOND ONLY VALID JSON",
+  },
+  fr: {
+    expert: "Expert stratégie contenu blog",
+    writer: "Rédacteur expert",
+    seo: "Expert SEO",
+    editor: "Éditeur contenu expert",
+    respond: "RÉPONDRE UNIQUEMENT JSON VALIDE",
+  },
+};
+
+export function generateLayoutPrompt(req: {
+  length?: string;
+  layoutPreference?: string[];
+  tone?: string;
+  additionalInstructions?: string;
+  language?: "en" | "fr";
+}): string {
+  const lang = req.language || "en";
+  const l = LANG[lang];
+
+  return `${l.expert}. Generate blog layout.
+
+CRITICAL: 100% VALID JSON { } NO \`\`\` escape " NO trailing commas
+
+Response: {title,slug,excerpt:"150-200c",layout:[{id,type:"hero|two-column|three-column|full-width|sidebar-left|sidebar-right",description}],category,tags:[]}
+
+Layouts: hero(intro+img), two-column(text|img alt), three-column(features), full-width(narrative), sidebar(context)
+Rules: NEVER repeat layout, alternate dense/spacious, two-col alternate sides
+Composition short(2-3):hero→two-col→full, medium(3-4):hero→two-col→three-col→two-col, long(4-5):hero→two-col→three-col→two-col→sidebar
+Words: 1,500-2,500 total, short~1k, medium~1.5-2k, long~2-2.5k, MAX 2.5k
+
+${req.length ? `Len:${req.length}` : ""}${req.layoutPreference?.length ? ` Pref:${req.layoutPreference}` : ""}${req.tone ? ` Tone:${req.tone}` : ""}${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}`;
+}
+
+export function generateSectionPrompt(
+  layoutType: string,
+  context?: string,
+  language?: "en" | "fr"
+): string {
+  const lang = language || "en";
+  const l = LANG[lang];
+
+  const colReq = lang === "fr"
+    ? {"1-column":"1col pleine","2-columns":"2col égales","3-columns":"3col égales","2-columns-wide-left":"2col gauche+large 66/33","2-columns-wide-right":"2col droite+large 33/66"}[layoutType]
+    : {"1-column":"1col full","2-columns":"2col equal","3-columns":"3col equal","2-columns-wide-left":"2col left wider 66/33","2-columns-wide-right":"2col right wider 33/66"}[layoutType];
+
+  return `${l.writer}. Generate section ${layoutType}.
+
+JSON: {section:{id,type:"${layoutType}",columns:[[blocks]]}}
+${layoutType}: ${colReq}
+
+Blocks: text{id,type:"text",content:"md"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides:[{src,alt,caption}]}, pdf{id,type:"pdf",url,title,description}
+Placeholder URLs: https://placeholder.example/name.jpg
+
+2025 ${lang === "fr" ? "rédaction" : "writing"}: 250-500w MAX, paragraphs 2-3 ${lang === "fr" ? "phrases" : "sentences"}, H2/H3 ${lang === "fr" ? "chaque" : "every"} 150-200w, ${lang === "fr" ? "voix active" : "active voice"}, sentences 15-20w, ${lang === "fr" ? "accroche+exemples+tutoyer" : "hook+examples+direct"}
+
+${context ? `Context:${context}` : ""}`;
+}
+
+export function generateCompletePrompt(req: {
+  tone?: string;
+  length?: string;
+  layoutPreference?: string[];
+  additionalInstructions?: string;
+  language?: "en" | "fr";
+}): string {
+  const lang = req.language || "en";
+  const l = LANG[lang];
+
+  return `${lang === "fr" ? "Rédacteur expert blog élégant" : "Expert elegant blog writer"}.
+
+CRITICAL: 100% VALID JSON { } start/end ONLY, NO \`\`\`, escape ", newlines \\n, NO trailing commas
+
+Philosophy: scannable (headings+short paragraphs), engaging (hook+interest), actionable (value+takeaways), visual (hierarchy+breathing), elegant (professional+warm)
+
+Layouts: 1-column(intro/conclusion), 2-columns(comparisons), 2-columns-wide-left(content+tip 66/33), 2-columns-wide-right(icon+detail 33/66), 3-columns(features), grid-4-even(4 items 2x2)
+
+Opening: hook(question/stat)+value+context, 2-3 para MAX, consider hero img
+Body: mix 2/3-col rhythm, 1 topic+2-4 points, H2/H3 liberally, examples+data, visuals strategic
+Closing: 3-5 takeaways, clear CTA, forward-looking
+
+Markdown: **bold** ${lang === "fr" ? "termes clés" : "key terms"}, *italic* ${lang === "fr" ? "emphase" : "emphasis"}, \`code\` ${lang === "fr" ? "technique" : "technical"}, lists ${lang === "fr" ? "scannables" : "scannable"}, ## structure
+
+Blocks: text{id,type:"text",content:"md"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides,autoPlay,aspectRatio}, pdf{id,type:"pdf",url,title,description,displayMode}
+
+Response: {title,slug,excerpt:"150-160c",sections:[{id,type,columns:[[blocks]]}],seo_metadata:{description:"<160c",keywords:[],robots:"index, follow",openGraph:{title,description},twitter:{card:"summary_large_image",title,description}},category,tags:[]}
+
+CRITICAL: escape ", use \\n, unique ids, match columns count to layout type, NO trailing commas, start { end }
+
+${req.tone ? `Tone:${req.tone}` : `Tone:${lang === "fr" ? "Pro+accessible, autoritaire+conversationnel" : "Pro yet approachable, authoritative yet conversational"}`}
+${req.length ? `Len:${req.length}` : `Len:${lang === "fr" ? "moyen 5-7 sect 800-1200 mots" : "medium 5-7 sect 800-1200 words"}`}
+${req.layoutPreference?.length ? `Layouts:${req.layoutPreference}` : `Layouts:${lang === "fr" ? "variés 2-col 3-col grilles" : "varied 2-col 3-col grids"}`}
+${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}
+
+Checklist: { }? Escaped "? \\n? NO commas? "keys"? NO \`\`\`? Closed brackets?`;
+}
+
+export function generateSEOPrompt(language?: "en" | "fr"): string {
+  const lang = language || "en";
+  const l = LANG[lang];
+
+  return `${l.seo}. Generate SEO metadata.
+
+JSON: {seo_metadata:{description:"150-160c SEO",keywords:[],robots:"index, follow",openGraph:{title:"OG engaging",description:"OG compelling"},twitter:{card:"summary_large_image",title:"Twitter optimized",description:"Twitter desc"}},tags:["t1","t2","t3"]}
+
+Focus: ${lang === "fr" ? "descriptions claires incitant clic, keywords intent recherche, titres optimisés partage, 3-5 tags pertinents" : "clear compelling descriptions encouraging clicks, keywords matching search intent, optimized titles for sharing, 3-5 highly relevant tags"}`;
+}
+
+export function generateImprovePrompt(
+  instruction: string,
+  additionalContext?: string,
+  language?: "en" | "fr"
+): string {
+  const lang = language || "en";
+  const l = LANG[lang];
+
+  const instructions = lang === "fr" ? {
+    expand: "Développer: + détails, exemples, explications. Complet+informatif.",
+    shorten: "Conciser: préserver points clés, éliminer redondance, clarté.",
+    rewrite: "Réécrire: + engageant, mieux structuré, même sens.",
+    "add-examples": "Ajouter exemples pertinents+pratiques illustrer concepts.",
+    "improve-clarity": "Améliorer clarté+lisibilité. Idées complexes → faciles.",
+    "make-engaging": "Rendre + engageant+captivant. Accroches, flow, intéressant.",
+  } : {
+    expand: "Expand: +details, examples, explanations. Comprehensive+informative.",
+    shorten: "Concise: preserve key points, remove redundancy, clarity.",
+    rewrite: "Rewrite: +engaging, better structured, same meaning.",
+    "add-examples": "Add relevant practical examples illustrating concepts.",
+    "improve-clarity": "Improve clarity+readability. Complex ideas → easier.",
+    "make-engaging": "Make +engaging+compelling. Hooks, flow, interesting.",
+  };
+
+  return `${l.editor}. Improve content.
+
+JSON: {content:"improved (md supported)",changes:"brief explanation"}
+
+Instruction: ${instructions[instruction as keyof typeof instructions]}
+${additionalContext ? `Context: ${additionalContext}` : ""}`;
+}

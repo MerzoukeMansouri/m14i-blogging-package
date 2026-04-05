@@ -1,9 +1,8 @@
 /**
- * AI Prompts in TOON Format
+ * AI Prompts - Compact Format
  * Token-optimized prompts for blog generation with multilingual support
+ * Using concise text format instead of TOON (TOON is for data, not prompts)
  */
-
-import { encode } from "@toon-format/toon";
 
 /** Language-specific strings */
 const LANG = {
@@ -45,7 +44,41 @@ export function generateLayoutPrompt(
   const lang = request.language || "en";
   const l = LANG[lang];
 
-  return encode({
+  return `${l.expert}. ${lang === "fr" ? "Générer structure article" : "Generate blog layout"}.
+
+CRITICAL: 100% VALID JSON. Start {, end }, NO markdown blocks, escape quotes \\", newlines \\n, NO trailing commas.
+
+Response: {title:"str",slug:"url-slug",excerpt:"150-200chars",layout:[{id:"section-1",type:"hero|two-column|three-column|full-width|sidebar-left|sidebar-right",description:"content"}],category:"cat",tags:["t1","t2"]}
+
+Layouts:
+- hero: ${lang === "fr" ? "intro forte, img large+headline" : "strong intro, large img+headline"}
+- two-column: ${lang === "fr" ? "contenu principal, text|img alterné" : "main content, text|img alternating"}
+- three-column: ${lang === "fr" ? "features/bénéfices, icon+title+desc" : "features/benefits, icon+title+desc"}
+- full-width: ${lang === "fr" ? "emphase narrative, centered" : "narrative emphasis, centered"}
+- sidebar: ${lang === "fr" ? "contexte additionnel, main+sidebar" : "additional context, main+sidebar"}
+
+Design rules (MANDATORY):
+1. VARIETY: NEVER same layout 2x
+2. RHYTHM: alternate dense/spacious
+3. ASYMMETRY: two-col alternate sides
+4. STORY: hook→educate→organize→convert
+
+Composition:
+- short: hero→two-col→full-width (2-3 sect)
+- medium: hero→two-col(text|img)→three-col→two-col(img|text) (3-4 sect)
+- long: hero→two-col→three-col→two-col→sidebar (4-5 sect)
+
+Word counts:
+- target: 1,500-2,500
+- short: ~1,000 (2-3 sect)
+- medium: ~1,500-2,000 (3-4 sect)
+- long: ~2,000-2,500 (4-5 sect)
+- MAX: 2,500 (quality>quantity)
+
+${request.length ? `Length: ${request.length}` : ""}
+${request.layoutPreference?.length ? `Prefer: ${request.layoutPreference.join(",")}` : ""}
+${request.tone ? `Tone: ${request.tone}` : ""}
+${request.additionalInstructions ? `Extra: ${request.additionalInstructions}` : ""}`;
     role: l.expert,
     task: lang === "fr" ? "Générer structure article blog" : "Generate blog post layout structure",
     critical: "100% VALID JSON",
@@ -113,7 +146,28 @@ export function generateSectionPrompt(
   const lang = language || "en";
   const l = LANG[lang];
 
-  return encode({
+  return `${l.writer}. ${lang === "fr" ? "Générer section avec layout" : "Generate section with layout"} ${layoutType}.
+
+JSON ONLY. Response: {section:{id:"unique",type:"${layoutType}",columns:[...]}}
+
+Layout ${layoutType}: ${getLayoutColumnRequirements(layoutType, lang)}
+
+Blocks: text{id,type:"text",content:"markdown"}, image{id,type:"image",src,alt,caption?}, video{id,type:"video",url,caption?}, quote{id,type:"quote",content,author?,role?}, carousel{id,type:"carousel",slides:[{src,alt,caption}],autoPlay?,aspectRatio?}, pdf{id,type:"pdf",url,title?,description?,displayMode?}
+
+Media: use placeholder URLs https://placeholder.example/name.jpg
+
+2025 writing (MANDATORY):
+- Length: ${lang === "fr" ? "250-500 mots MAX/section" : "250-500 words MAX/section"}
+- Paragraphs: ${lang === "fr" ? "2-3 phrases (max 4 lignes)" : "2-3 sentences (max 4 lines)"}
+- Headings: H2/H3 ${lang === "fr" ? "chaque" : "every"} 150-200 ${lang === "fr" ? "mots" : "words"}
+- Front-load ${lang === "fr" ? "info clé" : "key info"}
+- Sentences: 15-20 ${lang === "fr" ? "mots moy" : "words avg"}
+- Voice: ${lang === "fr" ? "active uniquement" : "active only"}
+- Transitions: ${lang === "fr" ? "Cependant, Par conséquent, En fait" : "However, Therefore, In fact"}
+- Format: **bold** ${lang === "fr" ? "termes clés" : "key terms"}, bullets ${lang === "fr" ? "3+ items" : "3+ items"}, ${lang === "fr" ? "listes numérotées étapes" : "numbered lists steps"}, ${lang === "fr" ? "1 visuel/section" : "1 visual/section"}
+- Engagement: ${lang === "fr" ? "accroche forte, exemples concrets, tutoyer (vous), points clés clairs" : "strong hook, concrete examples, address directly (you), clear takeaways"}
+
+${context ? `Context: ${context}` : ""}`;
     role: l.writer,
     task: lang === "fr" ? "Générer section blog avec layout spécifique" : "Generate single blog section with specified layout",
     json_only: true,

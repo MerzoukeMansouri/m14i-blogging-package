@@ -14,6 +14,13 @@ All notable changes to this project will be documented in this file. See [Conven
 ### ✨ Features
 
 * add French language support and TOON-optimized prompts ([8a55c2d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/8a55c2d05b6eb0339cb173d43601912b0974a8e0))
+* trigger release for French + TOON features ([0a11512](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/0a115125937bf2445e17a9f0118e273be99c517e))
+
+## [0.15.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.14.0...v0.15.0) (2026-04-05)
+
+### ✨ Features
+
+* add French language support and TOON-optimized prompts ([8a55c2d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/8a55c2d05b6eb0339cb173d43601912b0974a8e0))
 
 ## [0.14.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.13.1...v0.14.0) (2026-04-05)
 

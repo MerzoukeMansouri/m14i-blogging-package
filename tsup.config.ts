@@ -1,40 +1,64 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
-  entry: {
-    index: 'src/index.ts',
-    'server/index': 'src/server/index.ts',
-    styles: 'src/styles.css',
+export default defineConfig([
+  // Main components bundle
+  {
+    entry: {
+      index: 'src/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    clean: true,
+    treeshake: true,
+    splitting: false,
+    minify: false,
+    outExtension({ format }) {
+      return {
+        js: format === 'esm' ? '.mjs' : '.cjs',
+      };
+    },
+    external: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      '@hello-pangea/dnd',
+      'lucide-react',
+      'react-markdown',
+      'remark-gfm',
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+    ],
+    injectStyle: false, // Don't inject CSS, we'll provide it separately
   },
-  format: ['cjs', 'esm'],
-  dts: true,
-  sourcemap: true,
-  clean: true,
-  treeshake: true,
-  splitting: false,
-  minify: false,
-  external: [
-    'react',
-    'react-dom',
-    'react/jsx-runtime',
-    '@hello-pangea/dnd',
-    'lucide-react',
-    'react-markdown',
-    'remark-gfm',
-    '@supabase/supabase-js',
-    '@supabase/ssr',
-  ],
-  // Inject CSS imports into the bundle for automatic inclusion
-  injectStyle: true,
-  // Also output CSS as separate file for manual import
-  loader: {
-    '.css': 'local-css',
+  // Server utilities bundle
+  {
+    entry: {
+      'server/index': 'src/server/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    outExtension({ format }) {
+      return {
+        js: format === 'esm' ? '.mjs' : '.cjs',
+      };
+    },
+    external: [
+      'react',
+      'react-dom',
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+    ],
   },
-  esbuildOptions(options) {
-    // Ensure CSS is bundled correctly
-    options.loader = {
-      ...options.loader,
-      '.css': 'css',
-    };
+  // CSS bundle - copy as index.css for the styles export
+  {
+    entry: {
+      index: 'src/styles.css',
+    },
+    outDir: 'dist',
+    loader: {
+      '.css': 'copy',
+    },
   },
-});
+]);

@@ -1,6 +1,51 @@
 # m14i-blogging
 
-Drag & drop blog builder with customizable layouts and content blocks for React applications.
+A powerful, customizable drag & drop blog builder for React applications with rich content blocks, flexible layouts, and automatic SEO optimization.
+
+[![npm version](https://img.shields.io/npm/v/m14i-blogging.svg)](https://www.npmjs.com/package/m14i-blogging)
+[![Storybook](https://img.shields.io/badge/Storybook-Live-ff4785?logo=storybook)](https://merzoukemansouri.github.io/m14i-blogging-package)
+
+## Links
+
+- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
+- **Storybook Documentation**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+
+## What is m14i-blogging?
+
+m14i-blogging is a complete blog content management solution that provides:
+
+- **Visual Editor** - Drag & drop interface to build blog posts without code
+- **Flexible Layouts** - Multiple column and grid layouts to structure your content
+- **Rich Content Blocks** - Text (Markdown), images, videos, carousels, quotes, and PDFs
+- **Automatic SEO** - Built-in meta tags, Open Graph, Twitter Cards, and JSON-LD structured data
+- **Full Customization** - Theme with CSS variables, className props, or presets
+- **Next.js Integration** - Works seamlessly with both App Router and Pages Router
+- **TypeScript First** - Fully typed for excellent developer experience
+
+## How It Works
+
+The package consists of two main components:
+
+1. **BlogBuilder** - An interactive editor where users can:
+   - Choose layout types (1-column, 2-columns, grids, etc.)
+   - Drag content blocks into layout columns
+   - Edit content inline with a rich editor
+   - Reorder and remove sections
+   - Save structured JSON data
+
+2. **BlogPreview** - A read-only renderer that:
+   - Displays the saved blog post data
+   - Renders all content blocks with proper styling
+   - Shows reading time estimates
+   - Provides SEO metadata automatically
+
+The data flows like this:
+```
+User creates content in BlogBuilder
+  → Saves as JSON (LayoutSection[])
+  → Store in your database
+  → Render with BlogPreview for visitors
+```
 
 ## Installation
 
@@ -77,38 +122,113 @@ npx shadcn@latest add label input textarea select button card
 
 ## Quick Start
 
-```tsx
-import { BlogBuilder } from 'm14i-blogging'
-import type { LayoutSection } from 'm14i-blogging'
+### Basic Usage
 
-function MyEditor() {
-  const [sections, setSections] = useState<LayoutSection[]>([])
+**1. Create an Editor Page**
+
+```tsx
+'use client'; // For Next.js App Router
+
+import { useState } from 'react';
+import { BlogBuilder } from 'm14i-blogging';
+import type { LayoutSection } from 'm14i-blogging';
+
+export default function EditorPage() {
+  const [sections, setSections] = useState<LayoutSection[]>([]);
+
+  const handleSave = async () => {
+    // Save sections to your database
+    await fetch('/api/posts', {
+      method: 'POST',
+      body: JSON.stringify({ sections }),
+    });
+  };
 
   return (
-    <BlogBuilder
-      sections={sections}
-      onChange={setSections}
-    />
-  )
+    <div>
+      <BlogBuilder sections={sections} onChange={setSections} />
+      <button onClick={handleSave}>Save Post</button>
+    </div>
+  );
 }
 ```
 
-## Configuration
+**2. Display the Blog Post**
+
+```tsx
+import { BlogPreview } from 'm14i-blogging';
+import type { LayoutSection } from 'm14i-blogging';
+
+export default function BlogPost({ sections }: { sections: LayoutSection[] }) {
+  return (
+    <BlogPreview
+      title="My Amazing Blog Post"
+      sections={sections}
+      showReadingTime={true}
+    />
+  );
+}
+```
+
+**That's it!** You now have a fully functional blog editor and viewer.
+
+### How Content is Structured
+
+The library uses a simple JSON structure:
+
+```typescript
+// A blog post is an array of sections
+const sections: LayoutSection[] = [
+  {
+    id: 'section-1',
+    layout: '2-columns',      // Choose your layout
+    columns: [
+      [
+        // Column 1 blocks
+        {
+          id: 'block-1',
+          type: 'text',
+          content: '# Hello World\n\nThis is **markdown** content!'
+        }
+      ],
+      [
+        // Column 2 blocks
+        {
+          id: 'block-2',
+          type: 'image',
+          src: 'https://example.com/image.jpg',
+          alt: 'Example image'
+        }
+      ]
+    ]
+  }
+];
+```
+
+This structure makes it easy to:
+- Store in any database (JSON field)
+- Version control
+- Transform or migrate
+- Share between applications
+
+## Advanced Configuration
+
+The `BlogBuilder` component accepts an optional `config` prop for deep customization:
 
 ```tsx
 <BlogBuilder
   sections={sections}
   onChange={setSections}
   config={{
-    // Customize available layouts
+    // Limit available layouts
     layouts: [
-      { type: '1-column', label: 'Une colonne', icon: LayoutGrid },
-      { type: '2-columns', label: 'Deux colonnes', icon: Columns }
+      { type: '1-column', label: 'Single Column', icon: LayoutGrid },
+      { type: '2-columns', label: 'Two Columns', icon: Columns }
     ],
 
-    // Customize available blocks
+    // Limit available content blocks
     blocks: [
-      { type: 'text', label: 'Texte', icon: Type },
+      { type: 'text', label: 'Text', icon: Type },
       { type: 'image', label: 'Image', icon: ImageIcon }
     ],
 
@@ -121,21 +241,29 @@ function MyEditor() {
       }
     },
 
-    // Callbacks
+    // Event callbacks
     callbacks: {
-      onChange: (sections) => console.log('Changed:', sections),
-      onSave: (sections) => console.log('Saved:', sections)
+      onChange: (sections) => {
+        console.log('Content changed:', sections);
+        // Auto-save, validation, etc.
+      },
+      onSave: (sections) => {
+        console.log('Save requested:', sections);
+        // Trigger your save logic
+      }
     },
 
-    // UI options
+    // UI customization
     ui: {
-      showPreviewToggle: true,
-      compactMode: false,
-      sidebarWidth: '320px'
+      showPreviewToggle: true,  // Toggle between edit/preview
+      compactMode: false,        // Compact sidebar
+      sidebarWidth: '320px'      // Custom sidebar width
     }
   }}
 />
 ```
+
+**All config options are optional** - the library provides sensible defaults.
 
 ## Customization & Styling
 
@@ -549,6 +677,19 @@ import {
 } from 'm14i-blogging'
 ```
 
+## Live Examples
+
+Explore interactive examples and all components in our Storybook:
+
+**[View Storybook →](https://merzoukemansouri.github.io/m14i-blogging-package)**
+
+The Storybook includes:
+- All layout types with live previews
+- Every content block type with examples
+- Theme customization playground
+- SEO metadata examples
+- Integration code snippets
+
 ## Documentation
 
 📚 **Complete documentation is available in the [docs](./docs/) folder:**
@@ -558,6 +699,93 @@ import {
 - **[Styling Guide](./docs/STYLING.md)** - Complete customization reference
 - **[SEO Guide](./docs/SEO_GUIDE.md)** - Comprehensive SEO documentation
 - **[Gallery Layouts](./docs/GALLERY_LAYOUTS.md)** - Grid layout examples and usage
+
+## Real-World Usage Example
+
+Here's a complete example of how to use this package in a Next.js application:
+
+```tsx
+// app/admin/editor/page.tsx (Admin editor)
+'use client';
+
+import { useState } from 'react';
+import { BlogBuilder } from 'm14i-blogging';
+import type { LayoutSection } from 'm14i-blogging';
+
+export default function AdminEditor() {
+  const [sections, setSections] = useState<LayoutSection[]>([]);
+  const [title, setTitle] = useState('');
+
+  const handlePublish = async () => {
+    await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        sections,
+        publishedDate: new Date().toISOString(),
+      }),
+    });
+  };
+
+  return (
+    <div className="container mx-auto p-8">
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Post title..."
+        className="text-4xl font-bold mb-8 w-full"
+      />
+      <BlogBuilder sections={sections} onChange={setSections} />
+      <button onClick={handlePublish}>Publish Post</button>
+    </div>
+  );
+}
+
+// app/blog/[slug]/page.tsx (Public blog post)
+import { BlogPreview, BlogSEO, generateBlogMetadata } from 'm14i-blogging';
+import type { BlogPost, SEOConfig } from 'm14i-blogging';
+
+const seoConfig: SEOConfig = {
+  siteUrl: 'https://yourblog.com',
+  siteName: 'Your Blog',
+  defaultAuthor: { name: 'Your Name' },
+};
+
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug);
+  return generateBlogMetadata(post, seoConfig);
+}
+
+export default async function BlogPostPage({ params }) {
+  const post = await getPost(params.slug);
+
+  return (
+    <>
+      <BlogSEO post={post} config={seoConfig} />
+      <article className="container mx-auto px-4 py-8">
+        <BlogPreview
+          title={post.title}
+          sections={post.sections}
+          showReadingTime={true}
+          date={post.publishedDate}
+        />
+      </article>
+    </>
+  );
+}
+
+async function getPost(slug: string): Promise<BlogPost> {
+  // Fetch from your database
+  const res = await fetch(`https://api.yourblog.com/posts/${slug}`);
+  return res.json();
+}
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

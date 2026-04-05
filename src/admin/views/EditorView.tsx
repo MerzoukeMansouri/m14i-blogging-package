@@ -603,25 +603,25 @@ export function EditorView({ postId }: EditorViewProps) {
 
       {/* AI Generation Dialog */}
       {showGenerateDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0A192F] border border-[#B87333]/20 rounded-none shadow-2xl max-w-md w-full p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-[#B87333]/20 pb-4">
+              <h2 className="text-xl font-['Playfair_Display'] text-[#F2F5F7]">
                 {generateAction === "complete" && "Generate Full Blog Post"}
                 {generateAction === "section" && "Generate Section"}
                 {generateAction === "seo" && "Generate SEO Metadata"}
               </h2>
               <button
                 onClick={() => setShowGenerateDialog(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[#F2F5F7]/50 hover:text-[#B87333] transition-colors"
                 disabled={isGenerating}
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
+            <div className="space-y-5">
+              <p className="text-sm text-[#F2F5F7]/70 leading-relaxed">
                 {generateAction === "complete" &&
                   "Describe the topic or theme for your blog post. The AI will generate a complete post with title, sections, and SEO metadata."}
                 {generateAction === "section" &&
@@ -632,7 +632,7 @@ export function EditorView({ postId }: EditorViewProps) {
 
               {generateAction !== "seo" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-sm font-medium text-[#F2F5F7] font-['Inter']">
                     {generateAction === "complete" ? "Topic or Prompt" : "Section Topic"}
                   </label>
                   <textarea
@@ -644,7 +644,7 @@ export function EditorView({ postId }: EditorViewProps) {
                         : "e.g., Benefits of server-side rendering"
                     }
                     rows={3}
-                    className="w-full px-3 py-2 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-3 bg-[#0A192F] border border-[#B87333]/30 text-[#F2F5F7] placeholder:text-[#F2F5F7]/30 resize-none focus:outline-none focus:border-[#B87333] transition-colors font-['Inter']"
                     disabled={isGenerating}
                   />
                 </div>
@@ -652,11 +652,11 @@ export function EditorView({ postId }: EditorViewProps) {
 
               {generateAction === "section" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Layout Type</label>
+                  <label className="text-sm font-medium text-[#F2F5F7] font-['Inter']">Layout Type</label>
                   <select
                     value={selectedLayoutType}
                     onChange={(e) => setSelectedLayoutType(e.target.value as LayoutType)}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-3 bg-[#0A192F] border border-[#B87333]/30 text-[#F2F5F7] focus:outline-none focus:border-[#B87333] transition-colors font-['Inter']"
                     disabled={isGenerating}
                   >
                     <option value="1-column">1 Column</option>
@@ -673,16 +673,16 @@ export function EditorView({ postId }: EditorViewProps) {
               )}
 
               {generationError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-sm text-red-600">{generationError}</p>
+                <div className="p-4 bg-red-900/20 border border-red-500/30">
+                  <p className="text-sm text-red-300">{generationError}</p>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-3 justify-end pt-4 border-t border-[#B87333]/20">
               <button
                 onClick={() => setShowGenerateDialog(false)}
-                className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                className="px-6 py-2.5 border border-[#F2F5F7]/20 text-[#F2F5F7] hover:border-[#B87333]/50 hover:text-[#B87333] transition-all font-['Inter']"
                 disabled={isGenerating}
               >
                 Cancel
@@ -690,11 +690,11 @@ export function EditorView({ postId }: EditorViewProps) {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || (generateAction !== "seo" && !generatePrompt.trim())}
-                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-[#B87333] text-[#0A192F] hover:bg-[#B87333]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-['Inter'] font-medium"
               >
                 {isGenerating ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#0A192F]"></span>
                     Generating...
                   </span>
                 ) : (

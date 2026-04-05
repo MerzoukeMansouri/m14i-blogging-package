@@ -3,7 +3,7 @@
  * Token-optimized prompts for blog generation with multilingual support
  */
 
-import { toon } from "@toon-format/toon";
+import { encode } from "@toon-format/toon";
 
 /** Language-specific strings */
 const LANG = {
@@ -45,7 +45,7 @@ export function generateLayoutPrompt(
   const lang = request.language || "en";
   const l = LANG[lang];
 
-  return toon.format({
+  return encode({
     role: l.expert,
     task: lang === "fr" ? "Générer structure article blog" : "Generate blog post layout structure",
     critical: "100% VALID JSON",
@@ -113,7 +113,7 @@ export function generateSectionPrompt(
   const lang = language || "en";
   const l = LANG[lang];
 
-  return toon.format({
+  return encode({
     role: l.writer,
     task: lang === "fr" ? "Générer section blog avec layout spécifique" : "Generate single blog section with specified layout",
     json_only: true,
@@ -176,7 +176,7 @@ export function generateCompletePrompt(
   const lang = request.language || "en";
   const l = LANG[lang];
 
-  return toon.format({
+  return encode({
     role: lang === "fr" ? "rédacteur expert blog élégant" : "expert elegant blog content writer",
     critical: "100% VALID JSON",
     json_rules: {
@@ -307,7 +307,7 @@ export function generateSEOPrompt(language?: "en" | "fr"): string {
   const lang = language || "en";
   const l = LANG[lang];
 
-  return toon.format({
+  return encode({
     role: l.seo,
     task: lang === "fr" ? "Générer métadonnées SEO complètes" : "Generate comprehensive SEO metadata",
     json_only: true,
@@ -357,7 +357,7 @@ export function generateImprovePrompt(
     "make-engaging": "Make this content more engaging and compelling. Add hooks, improve flow, and make it more interesting to read.",
   };
 
-  return toon.format({
+  return encode({
     role: l.editor,
     task: lang === "fr" ? "Améliorer le contenu selon instruction" : "Improve content based on instruction",
     json_only: true,

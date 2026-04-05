@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.3...v0.16.4) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* add detailed error logging to AI section generation ([0c41ff4](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/0c41ff4a4e4f919ad888564869f86e47768ffcfc))
+
 ## [0.16.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.2...v0.16.3) (2026-04-05)
 
 ### 🐛 Bug Fixes

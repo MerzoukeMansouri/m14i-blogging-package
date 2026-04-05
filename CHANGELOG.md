@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.2...v0.16.3) (2026-04-05)
+
+### 🐛 Bug Fixes
+
+* extract JSON from response ignoring trailing text ([939ab6a](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/939ab6a0890dd877bff3bf0c87136f64b7cc0b8d))
+
 ## [0.16.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.1...v0.16.2) (2026-04-05)
 
 ### 🐛 Bug Fixes

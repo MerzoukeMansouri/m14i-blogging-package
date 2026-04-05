@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.8.0...v0.9.0) (2026-04-05)
+
+### ✨ Features
+
+* implement two-step UI flow for progressive blog generation ([150b31c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/150b31c19b5f1e6d363b16c3eb8ed6683edc5f00))
+
 ## [0.8.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.7.3...v0.8.0) (2026-04-05)
 
 ### ✨ Features

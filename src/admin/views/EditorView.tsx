@@ -15,7 +15,7 @@ import { TagDialog } from "../components/TagDialog";
 import { buildPath } from "../utils/router";
 import { BlogAdminAPIClient } from "../api/client";
 import type { BlogPostRow, BlogPostInsert } from "../../types/database";
-import type { LayoutType } from "../../types/layouts";
+import type { LayoutType, LayoutSection } from "../../types/layouts";
 
 export interface EditorViewProps {
   postId?: string;

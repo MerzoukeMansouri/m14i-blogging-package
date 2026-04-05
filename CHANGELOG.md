@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.1.5...v0.2.0) (2026-04-05)
+
+### ✨ Features
+
+* add content block editors for text, image, video, and quote ([8233355](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/8233355fbad89cc0cab04654c208606086c56610))
+
+### 📚 Documentation
+
+* simplify installation guide and move details to separate docs file ([44f9821](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/44f9821ba1a5d0e8fe329794b150a819ea0978b5))
+
+### ♻️ Code Refactoring
+
+* **BlogBuilder:** simplify imports and component structure ([e65cfef](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/e65cfef868b20c01e3eff27e289f7a92da33c679))
+
 ## [0.1.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.1.4...v0.1.5) (2026-04-05)
 
 ### 📚 Documentation

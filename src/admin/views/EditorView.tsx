@@ -253,12 +253,12 @@ export function EditorView({ postId }: EditorViewProps) {
       });
 
       // Create placeholder sections with loading state
-      const placeholderSections = layoutResult.layout.map((layoutSection: any) => ({
+      const placeholderSections: LayoutSection[] = layoutResult.layout.map((layoutSection: any) => ({
         id: layoutSection.id,
         type: layoutSection.type,
         columns: [[{
           id: `loading-${layoutSection.id}`,
-          type: "text",
+          type: "text" as const,
           content: `## 🔄 Generating content...\n\n*${layoutSection.description}*\n\nPlease wait while AI creates this section...`
         }]]
       }));

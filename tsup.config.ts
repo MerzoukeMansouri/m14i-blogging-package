@@ -78,6 +78,17 @@ export default defineConfig([
     outExtension: getOutputExtension,
     external: commonExternals,
   },
+  // Public interface bundle
+  {
+    entry: {
+      'public/index': 'src/public/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    outExtension: getOutputExtension,
+    external: commonExternals,
+  },
   // CSS bundle - copy as index.css for the styles export
   {
     entry: {

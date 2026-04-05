@@ -27,6 +27,11 @@
       "import": "./dist/admin/index.mjs",
       "require": "./dist/admin/index.cjs"
     },
+    "./public": {
+      "types": "./dist/public/index.d.ts",
+      "import": "./dist/public/index.mjs",
+      "require": "./dist/public/index.cjs"
+    },
     "./styles": "./dist/index.css",
     "./package.json": "./package.json"
   },

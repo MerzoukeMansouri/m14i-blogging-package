@@ -252,7 +252,23 @@ export function EditorView({ postId }: EditorViewProps) {
         metaDescription: layoutResult.excerpt || "",
       });
 
-      // Transition to sections phase (keep dialog open to show progress)
+      // Create placeholder sections with loading state
+      const placeholderSections = layoutResult.layout.map((layoutSection: any) => ({
+        id: layoutSection.id,
+        type: layoutSection.type,
+        columns: [[{
+          id: `loading-${layoutSection.id}`,
+          type: "text",
+          content: `## 🔄 Generating content...\n\n*${layoutSection.description}*\n\nPlease wait while AI creates this section...`
+        }]]
+      }));
+
+      // Update with placeholder sections immediately so user sees the layout
+      updateField("sections", placeholderSections);
+
+      // Close dialog and show the layout with loading sections
+      setShowGenerateDialog(false);
+      setGeneratePrompt("");
       setGenerationPhase("sections");
 
       // Step 2: Generate content for each section progressively
@@ -292,10 +308,8 @@ export function EditorView({ postId }: EditorViewProps) {
         }
       }
 
-      // All sections generated successfully - close dialog
+      // All sections generated successfully
       setGenerationPhase("idle");
-      setShowGenerateDialog(false);
-      setGeneratePrompt("");
     } catch (err: any) {
       console.error("Error generating blog post:", err);
       setGenerationError(err.message || "Failed to generate blog post. Please try again.");
@@ -537,37 +551,6 @@ export function EditorView({ postId }: EditorViewProps) {
           </CardWrapper>
 
           {/* BlogBuilder */}
-          {/* AI Generation Progress */}
-          {generationPhase !== "idle" && (
-            <CardWrapper Card={Card}>
-              <div className="p-6">
-                <div className="space-y-4">
-                  {generationPhase === "layout" && (
-                    <div className="flex items-center gap-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#000' }}></div>
-                      <span style={{ color: colors?.text || '#000' }}>Generating blog structure...</span>
-                    </div>
-                  )}
-                  {generationPhase === "sections" && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: colors?.primary || '#000', color: colors?.buttonPrimaryText || '#fff' }}>
-                          ✓
-                        </div>
-                        <span style={{ color: colors?.text || '#000' }}>Layout ready! Generating content...</span>
-                      </div>
-                      {generatingSections.size > 0 && (
-                        <div className="ml-8 text-sm" style={{ color: colors?.textMuted || '#666' }}>
-                          Generating {generatingSections.size} section{generatingSections.size > 1 ? 's' : ''}...
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardWrapper>
-          )}
-
           {BlogBuilder && (
             <CardWrapper Card={Card}>
               <div className="p-6">
@@ -829,40 +812,18 @@ export function EditorView({ postId }: EditorViewProps) {
                 </div>
               )}
 
-              {/* Generation Progress in Dialog */}
-              {isGenerating && generateAction === "complete" && (
+              {/* Generation Progress in Dialog - Only for layout phase */}
+              {isGenerating && generateAction === "complete" && generationPhase === "layout" && (
                 <div className="p-4 border rounded" style={{
                   backgroundColor: colors?.background || '#0A192F',
                   borderColor: colors?.border || 'rgba(184, 115, 51, 0.2)',
                 }}>
-                  {generationPhase === "layout" && (
-                    <div className="flex items-center gap-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#B87333' }}></div>
-                      <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
-                        Generating blog structure...
-                      </span>
-                    </div>
-                  )}
-                  {generationPhase === "sections" && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-full h-5 w-5 flex items-center justify-center text-xs" style={{
-                          backgroundColor: colors?.primary || '#B87333',
-                          color: colors?.buttonPrimaryText || '#0A192F'
-                        }}>
-                          ✓
-                        </div>
-                        <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
-                          Layout ready! Generating content...
-                        </span>
-                      </div>
-                      {generatingSections.size > 0 && (
-                        <div className="ml-8 text-xs" style={{ color: colors?.textMuted || 'rgba(242, 245, 247, 0.7)' }}>
-                          {generatingSections.size} section{generatingSections.size > 1 ? 's' : ''} remaining...
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#B87333' }}></div>
+                    <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
+                      Generating blog structure...
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

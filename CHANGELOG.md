@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.9.0...v0.10.0) (2026-04-05)
+
+### ✨ Features
+
+* add live progress indicators for progressive blog generation ([a3b173e](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/a3b173e4aed2e29ca5b395091bd4782b1ebafe87))
+
 ## [0.9.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.8.0...v0.9.0) (2026-04-05)
 
 ### ✨ Features

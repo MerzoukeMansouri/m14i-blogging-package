@@ -14,6 +14,7 @@ A powerful, customizable drag & drop blog builder for React applications with ri
 
 Major improvements to make integration **10x easier**:
 
+- **🤖 Claude Code Skill** - Automated setup assistant - just ask "setup m14i-blogging"!
 - **🚀 Pre-built Data Access Layer** - Complete CRUD operations with `createBlogClient()` - no more writing database queries!
 - **🎨 BlogBuilder with Defaults** - Use `BlogBuilderWithDefaults` - no shadcn/ui setup required!
 - **⚡ Ready-to-use API Routes** - Copy-paste Next.js API route handlers - instant backend!

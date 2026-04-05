@@ -1,0 +1,45 @@
+{
+  "name": "m14i-blogging-setup",
+  "version": "1.0.0",
+  "description": "Complete setup assistant for integrating m14i-blogging into Next.js applications",
+  "author": "M14I",
+  "tags": ["nextjs", "blog", "supabase", "cms", "setup", "integration"],
+  "type": "assistant",
+  "triggers": [
+    "setup m14i-blogging",
+    "install m14i-blogging",
+    "integrate blog",
+    "add blog to my app",
+    "configure m14i-blogging",
+    "help with blog setup"
+  ],
+  "capabilities": [
+    "Package installation guidance",
+    "Database migration setup",
+    "Data layer configuration",
+    "API routes creation",
+    "UI component integration",
+    "Authentication setup",
+    "Troubleshooting common issues",
+    "Best practices recommendations"
+  ],
+  "requirements": {
+    "nextjs": ">=13.0.0",
+    "supabase": ">=2.0.0",
+    "typescript": "recommended",
+    "tailwindcss": "required"
+  },
+  "estimatedTime": "30-60 minutes",
+  "difficulty": "beginner-friendly",
+  "documentation": [
+    "docs/INTEGRATION_GUIDE.md",
+    "docs/WHATS_NEW.md",
+    "README.md"
+  ],
+  "examples": {
+    "with-design-system": "For apps with shadcn/ui",
+    "without-design-system": "For quick prototypes",
+    "custom-auth": "For custom authentication systems",
+    "multilingual": "For multi-language blogs"
+  }
+}

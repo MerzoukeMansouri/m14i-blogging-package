@@ -138,6 +138,7 @@ export interface BlogAdminComponents {
     variant?: string;
     size?: string;
     className?: string;
+    type?: "button" | "submit" | "reset";
     onClick?: () => void;
     disabled?: boolean;
     children: ReactNode;

@@ -31,10 +31,10 @@ export function TaxonomySelector({
   const { categories, tags, loading } = useTaxonomy();
   const [tagSearchQuery, setTagSearchQuery] = useState("");
 
-  const Select = components.Select;
-  const Badge = components.Badge;
-  const Button = components.Button;
-  const Input = components.Input;
+  const Select = components?.Select;
+  const Badge = components?.Badge;
+  const Button = components?.Button;
+  const Input = components?.Input;
 
   // Filter tags based on search
   const filteredTags = tags.filter((tag) =>
@@ -57,7 +57,7 @@ export function TaxonomySelector({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{labels.category}</label>
-            {onCreateCategory && (
+            {onCreateCategory && Button && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -105,7 +105,7 @@ export function TaxonomySelector({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{labels.tags}</label>
-            {onCreateTag && (
+            {onCreateTag && Button && (
               <Button
                 variant="ghost"
                 size="sm"

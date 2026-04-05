@@ -34,9 +34,9 @@ export function CategoryDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const Dialog = components.Dialog;
-  const Input = components.Input;
-  const Button = components.Button;
+  const Dialog = components?.Dialog;
+  const Input = components?.Input;
+  const Button = components?.Button;
 
   // Generate slug from name
   const handleNameChange = (name: string) => {

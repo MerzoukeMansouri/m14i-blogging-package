@@ -115,6 +115,7 @@ export interface BlogComponents {
     variant?: string;
     size?: string;
     className?: string;
+    type?: "button" | "submit" | "reset";
     onClick?: () => void;
     disabled?: boolean;
     children: ReactNode;
@@ -225,6 +226,11 @@ export interface BlogProps {
   onCategoryClick?: (category: string) => void;
   onTagClick?: (tag: string) => void;
   onSearch?: (query: string) => void;
+
+  /**
+   * Custom navigation function (for Storybook/testing)
+   */
+  navigate?: (path: string) => void;
 }
 
 // ============================================================================

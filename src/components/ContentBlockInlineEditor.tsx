@@ -63,7 +63,7 @@ export function ContentBlockInlineEditor({
   return (
     <EditorComponent
       block={block as any}
-      onChange={onChange}
+      onChange={onChange as any}
       components={components}
       onImprove={onImprove}
     />

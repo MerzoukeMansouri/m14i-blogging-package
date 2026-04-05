@@ -36,11 +36,22 @@ CRITICAL: 100% VALID JSON { } NO \`\`\` escape " NO trailing commas
 
 Response: {title,slug,excerpt:"150-200c",layout:[{id,type,description}],category,tags:[]}
 
-Available types: "1-column", "2-columns", "3-columns", "2-columns-wide-left", "2-columns-wide-right", "grid-2x2", "grid-3x3", "grid-2x3", "grid-4-even"
+Layout types & usage:
+• "1-column": Hero intro, long narrative, conclusion, single focused message, full-width content
+• "2-columns": Text+image side-by-side, comparison tables, before/after, pros/cons, balanced content
+• "3-columns": Feature lists, step-by-step guides, benefits showcase, icon+text cards, equal importance items
+• "2-columns-wide-left": Main content (66%) + sidebar tip/note (33%), article+related, content+CTA
+• "2-columns-wide-right": Icon/visual (33%) + detailed explanation (66%), diagram+description
+• "grid-2x2": 4 equal items (case studies, team members, products, categories)
+• "grid-3x3": 9 items (portfolio, gallery, features matrix, comprehensive showcase)
+• "grid-2x3": 6 items (services, benefits, steps, moderate showcase)
+• "grid-4-even": 4 prominent items (key features, main offerings, core values)
 
-Layouts usage: 1-column(intro/narrative), 2-columns(comparison/text+img), 3-columns(features/steps), 2-columns-wide-left(content+sidebar 66/33), 2-columns-wide-right(icon+detail 33/66), grid-2x2(4 items), grid-3x3(9 items), grid-2x3(6 items), grid-4-even(4 items)
-Rules: NEVER repeat layout, alternate dense/spacious, vary column widths
-Composition short(2-3):1-column→2-columns→3-columns, medium(3-4):1-column→2-columns→3-columns→2-columns-wide-left, long(4-5):1-column→2-columns→grid-2x2→3-columns→2-columns-wide-left
+Rules: NEVER repeat same type, alternate dense(grids/3-col) with spacious(1-col/2-col), vary widths for rhythm
+Composition examples:
+• short(2-3): 1-column→2-columns→3-columns
+• medium(3-4): 1-column→2-columns→3-columns→2-columns-wide-left
+• long(4-5): 1-column→2-columns→grid-2x2→3-columns→2-columns-wide-left
 Words: 1,500-2,500 total, short~1k, medium~1.5-2k, long~2-2.5k, MAX 2.5k
 
 ${req.length ? `Len:${req.length}` : ""}${req.layoutPreference?.length ? ` Pref:${req.layoutPreference}` : ""}${req.tone ? ` Tone:${req.tone}` : ""}${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}`;

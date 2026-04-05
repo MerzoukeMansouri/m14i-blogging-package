@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.7...v0.3.0) (2026-04-05)
+
+### ✨ Features
+
+* add generateSlug utility for URL-friendly slug generation ([32d4200](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/32d4200ceddb0913c0dd41dfb6d41cf83641ae69))
+
 ## [0.2.7](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.2.6...v0.2.7) (2026-04-05)
 
 ### 🐛 Bug Fixes

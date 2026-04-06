@@ -96,10 +96,10 @@
     }
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0",
-    "@toon-format/toon": "^2.1.0"
+    "@anthropic-ai/sdk": "^0.82.0"
   },
   "devDependencies": {
+    "@toon-format/toon": "^2.1.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",

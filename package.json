@@ -96,7 +96,6 @@
     }
   },
   "dependencies": {
-    "@toon-format/toon": "^2.1.0",
     "@anthropic-ai/sdk": "^0.82.0"
   },
   "devDependencies": {

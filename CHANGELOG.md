@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.18.2...v0.19.0) (2026-04-06)
+
+### ✨ Features
+
+* add visual overlay with spinner during section generation ([aee507a](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/aee507ad46bcfa6c71725f8c4d936179b98ee588)), closes [#B87333](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues/B87333)
+
 ## [0.18.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.18.1...v0.18.2) (2026-04-06)
 
 ### 🐛 Bug Fixes

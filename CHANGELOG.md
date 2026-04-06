@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.17.0...v0.18.0) (2026-04-06)
+
+### ✨ Features
+
+* drastically reduce text length for more visual content ([1366dfd](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/1366dfd7cf6cb65b06cedc3ffbc9774d098668dc))
+
 ## [0.17.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.4...v0.17.0) (2026-04-06)
 
 ### ✨ Features

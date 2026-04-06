@@ -96,7 +96,8 @@
     }
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0"
+    "@anthropic-ai/sdk": "^0.82.0",
+    "@toon-format/toon": "^2.1.0"
   },
   "devDependencies": {
     "@hello-pangea/dnd": "^18.0.1",

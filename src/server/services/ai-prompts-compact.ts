@@ -94,7 +94,14 @@ ${layoutType}: ${colReq}
 Blocks: text{id,type:"text",content:"markdown with escaped quotes"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides:[{src,alt,caption}]}, pdf{id,type:"pdf",url,title,description}
 Placeholder URLs: https://placeholder.example/name.jpg
 
-Content rules: 250-500w MAX, paragraphs 2-3 ${lang === "fr" ? "phrases" : "sentences"}, H2/H3 ${lang === "fr" ? "chaque" : "every"} 150-200w
+VISUAL FIRST RULES:
+- 1-column: ALWAYS include 1 image + text (100-150w max, short paragraphs)
+- 2-columns: Col1 = short text (80-120w), Col2 = image OR quote (NEVER text+text)
+- 3-columns: 3 short cards (50-80w each) with emoji at start
+- Grids: Very short (30-50w per cell) with emoji/icons
+- Paragraphs: MAX 2-3 ${lang === "fr" ? "phrases courtes" : "short sentences"}
+- ${lang === "fr" ? "Préférer listes à puces aux longs paragraphes" : "Prefer bullet lists over long paragraphs"}
+- H2/H3 ${lang === "fr" ? "tous les" : "every"} 100w
 
 ${context ? `Context:${context}` : ""}
 
@@ -115,13 +122,15 @@ export function generateCompletePrompt(req: {
 
 CRITICAL: 100% VALID JSON { } start/end ONLY, NO \`\`\`, escape ", newlines \\n, NO trailing commas
 
-Philosophy: scannable (headings+short paragraphs), engaging (hook+interest), actionable (value+takeaways), visual (hierarchy+breathing), elegant (professional+warm)
+Philosophy: ${lang === "fr" ? "VISUEL d'abord - scannable (titres+paragraphes courts), engageant (accroche), actionable (valeur), respire (images/quotes/emojis)" : "VISUAL first - scannable (headings+short paragraphs), engaging (hook), actionable (value), breathing (images/quotes/emojis)"}
 
-Layouts: 1-column(intro/conclusion), 2-columns(comparisons), 2-columns-wide-left(content+tip 66/33), 2-columns-wide-right(icon+detail 33/66), 3-columns(features), grid-4-even(4 items 2x2)
+Layouts: 1-column(intro/conclusion+images), 2-columns(text+quote/image), 2-columns-wide-left(content+tip 66/33), 2-columns-wide-right(icon+detail 33/66), 3-columns(features), grid-4-even(4 items 2x2)
 
-Opening: hook(question/stat)+value+context, 2-3 para MAX, consider hero img
-Body: mix 2/3-col rhythm, 1 topic+2-4 points, H2/H3 liberally, examples+data, visuals strategic
-Closing: 3-5 takeaways, clear CTA, forward-looking
+Opening: ${lang === "fr" ? "Image hero + accroche courte (100-150w MAX), 2-3 para courts" : "Hero image + short hook (100-150w MAX), 2-3 short para"}
+Body: ${lang === "fr" ? "Mixer 2/3-col, 1 topic+points, H2/H3 100w, listes à puces, images/quotes TOUJOURS dans 2-col" : "Mix 2/3-col, 1 topic+points, H2/H3 100w, bullet lists, images/quotes ALWAYS in 2-col"}
+Closing: ${lang === "fr" ? "3-5 points clés, CTA clair, concis" : "3-5 key points, clear CTA, concise"}
+
+Content: ${lang === "fr" ? "Paragraphes 2-3 phrases MAX, listes à puces préférées, texte 80-120w par colonne" : "Paragraphs 2-3 sentences MAX, bullet lists preferred, text 80-120w per column"}
 
 Markdown: **bold** ${lang === "fr" ? "termes clés" : "key terms"}, *italic* ${lang === "fr" ? "emphase" : "emphasis"}, \`code\` ${lang === "fr" ? "technique" : "technical"}, lists ${lang === "fr" ? "scannables" : "scannable"}, ## structure
 

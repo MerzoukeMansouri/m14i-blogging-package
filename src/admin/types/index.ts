@@ -193,6 +193,7 @@ export interface BlogAdminComponents {
   BlogBuilder?: ComponentType<{
     sections: LayoutSection[];
     onChange: (sections: LayoutSection[]) => void;
+    generatingSections?: Set<string>;
   }>;
 }
 

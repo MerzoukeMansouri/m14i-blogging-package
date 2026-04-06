@@ -553,29 +553,12 @@ export function EditorView({ postId }: EditorViewProps) {
           {/* BlogBuilder */}
           {BlogBuilder && (
             <CardWrapper Card={Card}>
-              <div className="p-6 relative">
+              <div className="p-6">
                 <BlogBuilder
                   sections={state.sections}
                   onChange={(sections: any) => updateField("sections", sections)}
+                  generatingSections={generatingSections}
                 />
-
-                {/* Overlay with spinner for sections being generated */}
-                {generatingSections.size > 0 && (
-                  <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
-                    <div className="text-center">
-                      <div
-                        className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-t-transparent mb-4"
-                        style={{ borderColor: colors?.primary || '#B87333', borderTopColor: 'transparent' }}
-                      ></div>
-                      <p className="text-xl font-semibold" style={{ color: colors?.text || '#F2F5F7' }}>
-                        Génération en cours...
-                      </p>
-                      <p className="text-sm mt-2" style={{ color: colors?.textMuted || 'rgba(242, 245, 247, 0.7)' }}>
-                        Section {state.sections.length - generatingSections.size + 1}/{state.sections.length}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             </CardWrapper>
           )}

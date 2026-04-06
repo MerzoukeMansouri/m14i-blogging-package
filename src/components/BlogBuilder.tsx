@@ -22,6 +22,8 @@ export interface BlogBuilderProps {
   sections: LayoutSection[];
   onChange: (sections: LayoutSection[]) => void;
   config?: BlogBuilderConfig;
+  // Optional set of section IDs currently being generated (for loading overlay)
+  generatingSections?: Set<string>;
   // shadcn/ui components passed as props
   components: {
     Button: React.ComponentType<{
@@ -49,7 +51,7 @@ export interface BlogBuilderProps {
   onImproveContent?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;
 }
 
-export function BlogBuilder({ sections, onChange, config: userConfig, components, onImproveContent }: BlogBuilderProps) {
+export function BlogBuilder({ sections, onChange, config: userConfig, components, onImproveContent, generatingSections }: BlogBuilderProps) {
   const config = mergeConfig(userConfig);
   const { Button, Card, CardContent, CardHeader } = components;
 
@@ -243,7 +245,21 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                       {...provided.draggableProps}
                       className={snapshot.isDragging ? "opacity-50" : ""}
                     >
-                      <Card>
+                      <Card className="relative">
+                        {/* Overlay with spinner for this section if generating */}
+                        {generatingSections?.has(section.id) && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+                            <div className="text-center">
+                              <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#B87333] border-t-transparent mb-4"></div>
+                              <p className="text-xl font-semibold text-white">
+                                Génération en cours...
+                              </p>
+                              <p className="text-sm mt-2 text-white/70">
+                                Section {sectionIndex + 1}/{sections.length}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">

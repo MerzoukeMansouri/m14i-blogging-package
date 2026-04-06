@@ -139,7 +139,6 @@
     "vitest": "^4.1.2"
   },
   "dependencies": {
-    "@toon-format/toon": "^2.1.0",
-    "m14i-blogging": "0.16.3"
+    "@toon-format/toon": "^2.1.0"
   }
 }

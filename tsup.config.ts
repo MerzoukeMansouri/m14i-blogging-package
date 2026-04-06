@@ -68,6 +68,8 @@ export default defineConfig([
       'next',
       'next/server',
       'next/navigation',
+      '@anthropic-ai/sdk',
+      '@toon-format/toon',
     ],
   },
   // Admin interface bundle

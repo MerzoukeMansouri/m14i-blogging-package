@@ -245,22 +245,23 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                       {...provided.draggableProps}
                       className={snapshot.isDragging ? "opacity-50" : ""}
                     >
-                      <Card className="relative">
-                        {/* Overlay with spinner for this section if generating */}
-                        {generatingSections?.has(section.id) && (
-                          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
-                            <div className="text-center">
-                              <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#B87333] border-t-transparent mb-4"></div>
-                              <p className="text-xl font-semibold text-white">
-                                Génération en cours...
-                              </p>
-                              <p className="text-sm mt-2 text-white/70">
-                                Section {sectionIndex + 1}/{sections.length}
-                              </p>
+                      <div className="relative overflow-hidden rounded-lg">
+                        <Card>
+                          {/* Overlay with spinner for this section if generating */}
+                          {generatingSections?.has(section.id) && (
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+                              <div className="text-center">
+                                <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#B87333] border-t-transparent mb-4"></div>
+                                <p className="text-xl font-semibold text-white">
+                                  Génération en cours...
+                                </p>
+                                <p className="text-sm mt-2 text-white/70">
+                                  Section {sectionIndex + 1}/{sections.length}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        <CardHeader className="pb-3">
+                          )}
+                          <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {/* Drag Handle for Section */}
@@ -394,7 +395,8 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                             ))}
                           </div>
                         </CardContent>
-                      </Card>
+                        </Card>
+                      </div>
                     </div>
                   )}
                 </Draggable>

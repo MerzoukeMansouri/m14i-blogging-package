@@ -253,13 +253,13 @@ export function EditorView({ postId }: EditorViewProps) {
       });
 
       // Create placeholder sections with loading state
-      const placeholderSections: LayoutSection[] = layoutResult.layout.map((layoutSection: any) => ({
+      const placeholderSections: LayoutSection[] = layoutResult.layout.map((layoutSection: any, index: number) => ({
         id: layoutSection.id,
         type: layoutSection.type,
         columns: [[{
           id: `loading-${layoutSection.id}`,
           type: "text" as const,
-          content: `## 🔄 Generating content...\n\n*${layoutSection.description}*\n\nPlease wait while AI creates this section...`
+          content: `## ⏳ Section ${index + 1}/${layoutResult.layout.length} - En cours de génération...\n\n**${layoutSection.type.toUpperCase()}**\n\n*${layoutSection.description}*\n\n---\n\n🔄 L'IA génère ce contenu... Patientez quelques secondes.`
         }]]
       }));
 
@@ -272,8 +272,8 @@ export function EditorView({ postId }: EditorViewProps) {
       setGenerationPhase("sections");
 
       // Step 2: Generate content for each section progressively
-      const sections = [];
-      for (const layoutSection of layoutResult.layout) {
+      for (let i = 0; i < layoutResult.layout.length; i++) {
+        const layoutSection = layoutResult.layout[i];
         try {
           // Mark this section as generating
           setGeneratingSections(prev => new Set([...prev, layoutSection.id]));
@@ -284,10 +284,10 @@ export function EditorView({ postId }: EditorViewProps) {
             context: `${layoutResult.title} - ${layoutResult.excerpt}`,
           });
 
-          sections.push(sectionResult.section);
-
-          // Update sections progressively so user sees them appear
-          updateField("sections", [...sections]);
+          // Update ONLY this section, keeping all others (placeholders or completed)
+          const updatedSections = [...state.sections];
+          updatedSections[i] = sectionResult.section;
+          updateField("sections", updatedSections);
 
           // Mark section as completed
           setGeneratingSections(prev => {

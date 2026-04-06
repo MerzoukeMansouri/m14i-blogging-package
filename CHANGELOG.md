@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.19.0...v1.0.0) (2026-04-06)
+
+### ⚠ BREAKING CHANGES
+
+* - UX IMPROVEMENT:
+- Move overlay from global BlogBuilder level to individual section level
+- Each section gets its own overlay with spinner when generating
+- Add generatingSections prop to BlogBuilder component
+- Update BlogAdminComponents type to include generatingSections
+
+VISUAL BEHAVIOR:
+- Overlay appears ONLY on the section being generated
+- Other sections remain fully visible and interactive
+- Clearer visual feedback showing exactly which section is generating
+- Section counter shows "Section X/Y" on the generating section
+
+USER EXPERIENCE:
+- User sees the entire layout structure
+- Only the section in progress has an overlay
+- Can see completed sections while others generate
+- Less obtrusive, more focused feedback
+
+### ✨ Features
+
+* individual section overlay instead of global overlay ([f9be8c2](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/f9be8c2888755b39f150e173da8e0840dd48d03e))
+
+### 🐛 Bug Fixes
+
+* externalize @anthropic-ai/sdk and @toon-format/toon in server bundle ([273badb](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/273badb4586135547680f85ecdb5e319a9fe572c))
+* isolate overlay to section card with overflow-hidden wrapper ([68e3a43](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/68e3a433035fc846391ef9a4877fab83a398028c))
+* locking pnpm ([3108783](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/31087837a65d826e08062032157ecc2cc6f3f054))
+
 ## [0.19.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.18.2...v0.19.0) (2026-04-06)
 
 ### ✨ Features

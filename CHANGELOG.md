@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.4...v0.17.0) (2026-04-06)
+
+### ✨ Features
+
+* improve layout generation with proven Storybook patterns ([1eb6c67](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/1eb6c678be99228dc0f69b7e82f1e702680d7e86))
+
 ## [0.16.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.16.3...v0.16.4) (2026-04-05)
 
 ### 🐛 Bug Fixes

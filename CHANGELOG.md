@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.18.1...v0.18.2) (2026-04-06)
+
+### 🐛 Bug Fixes
+
+* keep layout visible with spinners during section generation ([94c7d8c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/94c7d8c02c45ee6f33270d81a54c4af61718fd91))
+
 ## [0.18.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.18.0...v0.18.1) (2026-04-06)
 
 ### 🐛 Bug Fixes

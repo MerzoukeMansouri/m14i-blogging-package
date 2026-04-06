@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.1...v1.0.2) (2026-04-06)
+
+### 🐛 Bug Fixes
+
+* bundle @toon-format/toon instead of externalizing ([4c42fab](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4c42fabadfaa96c47e0445bab794f946cea1f601))
+
 ## [1.0.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.0...v1.0.1) (2026-04-06)
 
 ### 🐛 Bug Fixes

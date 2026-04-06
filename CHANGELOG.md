@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.0...v1.0.1) (2026-04-06)
+
+### 🐛 Bug Fixes
+
+* add missing @toon-format/toon dependency ([837e8d9](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/837e8d9ff779b9b0090a85cc193c263eb99c09e7))
+
 ## [1.0.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v0.19.0...v1.0.0) (2026-04-06)
 
 ### ⚠ BREAKING CHANGES

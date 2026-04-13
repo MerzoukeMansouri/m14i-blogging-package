@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.2...v1.1.0) (2026-04-13)
+
+### ✨ Features
+
+* add chart blocks and richer markdown rendering ([433c657](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/433c657edeb203074642eba33b2b47a24d06ee60))
+* refine ai layout rules and builder layout options ([510df31](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/510df31dd1f4e009472f8fc67718a94a934aa6aa))
+
+### 🐛 Bug Fixes
+
+* harden admin preview and builder generation flow ([15097d7](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/15097d7aea90e5981c9f3f284df481de424ad547))
+* support blog schema and normalize taxonomy responses ([7aaf650](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/7aaf65061fe9c6605967e40ff7aba49ec13ded2f))
+* upgrade next to patched security release ([d1e5051](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/d1e505177c895789ef3051e39708d45e88c40ff3))
+
+### 📚 Documentation
+
+* refresh installation and supabase integration guides ([fcd2694](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/fcd269426bfe90eda9f11639f3d58a22207deca2))
+
 ## [1.0.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.1...v1.0.2) (2026-04-06)
 
 ### 🐛 Bug Fixes

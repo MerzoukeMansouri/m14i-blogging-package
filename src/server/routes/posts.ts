@@ -16,6 +16,7 @@ import {
   successResponse,
   checkAuth,
 } from '../utils';
+import { generateSlug } from '../../utils/seo-analysis';
 
 // Re-export blog API functions from examples (will be moved to src/server/api)
 // For now, users need to provide these or we include them in the package
@@ -511,14 +512,6 @@ export function createPostBySlugRoute(config: RouteConfig) {
 }
 
 // Helper functions (these would ideally be imported from adapters)
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 200);
-}
-
 function validateSlug(slug: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }

@@ -45,7 +45,8 @@ export function useTags(): UseTagsReturn {
           throw new Error(`Failed to fetch tags: ${response.statusText}`);
         }
 
-        result = await response.json();
+        const data = await response.json();
+        result = Array.isArray(data) ? data : (data.tags ?? []);
       }
 
       setTags(result || []);

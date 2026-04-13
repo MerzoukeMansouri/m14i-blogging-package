@@ -45,7 +45,8 @@ export function useCategories(): UseCategoriesReturn {
           throw new Error(`Failed to fetch categories: ${response.statusText}`);
         }
 
-        result = await response.json();
+        const data = await response.json();
+        result = Array.isArray(data) ? data : (data.categories ?? []);
       }
 
       setCategories(result || []);

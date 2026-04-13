@@ -45,6 +45,15 @@ export interface SupabaseClient {
     delete(): any;
     upsert(data: any): any;
   };
+  schema(name: string): {
+    from(table: string): {
+      select(query: string, options?: { count?: string }): any;
+      insert(data: any): any;
+      update(data: any): any;
+      delete(): any;
+      upsert(data: any): any;
+    };
+  };
   rpc(functionName: string, params?: any): any;
 }
 
@@ -69,13 +78,20 @@ export interface BlogClientConfig {
    * Users table name for author joins (default: "users")
    */
   usersTable?: string;
+  /**
+   * PostgreSQL schema to use (e.g. "blog"). When set, queries use
+   * supabase.schema(name).from(table) instead of supabase.from(table).
+   * Required when posts/media live in a non-public schema.
+   */
+  schema?: string;
 }
 
-const DEFAULT_CONFIG: Required<BlogClientConfig> = {
+const DEFAULT_CONFIG: Required<Omit<BlogClientConfig, "schema">> & Pick<BlogClientConfig, "schema"> = {
   postsTable: "blog_posts",
   mediaTable: "blog_media",
   includeAuthor: true,
   usersTable: "users",
+  schema: undefined,
 };
 
 // ============================================================================
@@ -90,6 +106,7 @@ export function createBlogClient(
   config: BlogClientConfig = {}
 ) {
   const cfg = { ...DEFAULT_CONFIG, ...config };
+  const db = cfg.schema ? supabase.schema(cfg.schema) : supabase;
 
   return {
     /**
@@ -116,8 +133,8 @@ export function createBlogClient(
         const from = (page - 1) * pageSize;
         const to = from + pageSize - 1;
 
-        let query = supabase
-          .from(cfg.postsTable)
+        let query = db
+                  .from(cfg.postsTable)
           .select(
             cfg.includeAuthor
               ? `
@@ -167,8 +184,8 @@ export function createBlogClient(
        * Get a single post by slug
        */
       async getBySlug(slug: string): Promise<BlogPostWithAuthor | null> {
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .select(
             cfg.includeAuthor
               ? `
@@ -195,8 +212,8 @@ export function createBlogClient(
        * Get a single post by ID
        */
       async getById(id: string): Promise<BlogPostRow | null> {
-        const { data, error} = await supabase
-          .from(cfg.postsTable)
+        const { data, error} = await db
+                  .from(cfg.postsTable)
           .select("*")
           .eq("id", id)
           .single();
@@ -215,8 +232,8 @@ export function createBlogClient(
        * Create a new blog post
        */
       async create(post: BlogPostInsert): Promise<BlogPostRow> {
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .insert(post)
           .select()
           .single();
@@ -235,8 +252,8 @@ export function createBlogClient(
         id: string,
         updates: BlogPostUpdate
       ): Promise<BlogPostRow> {
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .update(updates)
           .eq("id", id)
           .select()
@@ -253,8 +270,8 @@ export function createBlogClient(
        * Delete a blog post
        */
       async delete(id: string): Promise<void> {
-        const { error } = await supabase
-          .from(cfg.postsTable)
+        const { error } = await db
+                  .from(cfg.postsTable)
           .delete()
           .eq("id", id);
 
@@ -334,8 +351,8 @@ export function createBlogClient(
         const post = await this.getById(postId);
         if (!post) return [];
 
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .select("*")
           .eq("status", "published")
           .neq("id", postId)
@@ -361,8 +378,8 @@ export function createBlogClient(
         type?: string,
         limit: number = 50
       ): Promise<BlogMediaRow[]> {
-        let query = supabase
-          .from(cfg.mediaTable)
+        let query = db
+                  .from(cfg.mediaTable)
           .select("*")
           .order("uploaded_at", { ascending: false })
           .limit(limit);
@@ -384,8 +401,8 @@ export function createBlogClient(
        * Create new media record
        */
       async create(media: BlogMediaInsert): Promise<BlogMediaRow> {
-        const { data, error } = await supabase
-          .from(cfg.mediaTable)
+        const { data, error } = await db
+                  .from(cfg.mediaTable)
           .insert(media)
           .select()
           .single();
@@ -401,8 +418,8 @@ export function createBlogClient(
        * Update media record
        */
       async update(id: string, updates: BlogMediaUpdate): Promise<BlogMediaRow> {
-        const { data, error } = await supabase
-          .from(cfg.mediaTable)
+        const { data, error } = await db
+                  .from(cfg.mediaTable)
           .update(updates)
           .eq("id", id)
           .select()
@@ -419,8 +436,8 @@ export function createBlogClient(
        * Delete media record
        */
       async delete(id: string): Promise<void> {
-        const { error } = await supabase
-          .from(cfg.mediaTable)
+        const { error } = await db
+                  .from(cfg.mediaTable)
           .delete()
           .eq("id", id);
 
@@ -438,8 +455,8 @@ export function createBlogClient(
        * Get blog statistics
        */
       async getStats(): Promise<BlogStats> {
-        const { data: posts, error } = await supabase
-          .from(cfg.postsTable)
+        const { data: posts, error } = await db
+                  .from(cfg.postsTable)
           .select("status, category, tags");
 
         if (error) {
@@ -477,8 +494,8 @@ export function createBlogClient(
        * Get all categories with post counts
        */
       async getCategories(): Promise<BlogCategory[]> {
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .select("category")
           .eq("status", "published")
           .not("category", "is", null);
@@ -505,8 +522,8 @@ export function createBlogClient(
        * Get all tags with post counts
        */
       async getTags(): Promise<BlogTag[]> {
-        const { data, error } = await supabase
-          .from(cfg.postsTable)
+        const { data, error } = await db
+                  .from(cfg.postsTable)
           .select("tags")
           .eq("status", "published");
 

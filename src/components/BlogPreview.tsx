@@ -83,11 +83,11 @@ export function BlogPreview({
         </div>
       ) : (
         <article className={classNames?.article || "space-y-8"}>
-          {sections.map((section) => (
+          {sections.filter(Boolean).map((section) => (
             <section key={section.id} className={classNames?.section || "mb-8"}>
               <div className={`grid gap-6 ${getLayoutClasses(section.type)}`}>
-                {section.columns.map((column, columnIndex) => (
-                  <div key={columnIndex} className={classNames?.column || "space-y-4 min-w-0 overflow-hidden"}>
+                {(section.columns || []).map((column, columnIndex) => (
+                  <div key={columnIndex} className={classNames?.column || "flex flex-col justify-center space-y-4 min-w-0 overflow-hidden"}>
                     {column.length === 0 ? (
                       <div className="text-muted-foreground text-sm italic">
                         Colonne vide

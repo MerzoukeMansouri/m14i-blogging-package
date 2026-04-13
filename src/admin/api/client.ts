@@ -340,16 +340,6 @@ export class BlogAdminAPIClient {
   }
 
   /**
-   * Generate a complete blog post from a prompt using AI
-   * @deprecated Use generateLayout() + generateSection() for better control
-   */
-  async generateBlogPost(
-    request: GenerateCompleteBlogRequest
-  ): Promise<GenerateCompleteBlogResponse> {
-    return this.makeAIGenerationRequest<GenerateCompleteBlogResponse>("complete", request);
-  }
-
-  /**
    * Generate a single section with specific layout using AI
    */
   async generateSection(

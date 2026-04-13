@@ -59,6 +59,7 @@ export function countWordsInSections(sections: LayoutSection[]): number {
   let totalWords = 0;
 
   for (const section of sections) {
+    if (!section?.columns) continue;
     for (const column of section.columns) {
       for (const block of column) {
         if (block.type === 'text') {
@@ -156,6 +157,7 @@ export function generateExcerptFromSections(
 
   // Collect text from all blocks
   for (const section of sections) {
+    if (!section?.columns) continue;
     for (const column of section.columns) {
       for (const block of column) {
         if (block.type === 'text') {
@@ -196,6 +198,7 @@ export function extractHeadingsFromSections(sections: LayoutSection[]): Array<{ 
   const allHeadings: Array<{ level: number; text: string }> = [];
 
   for (const section of sections) {
+    if (!section?.columns) continue;
     for (const column of section.columns) {
       for (const block of column) {
         if (block.type === 'text') {
@@ -223,6 +226,7 @@ export function countBlocksByType(sections: LayoutSection[]): Record<string, num
   };
 
   for (const section of sections) {
+    if (!section?.columns) continue;
     for (const column of section.columns) {
       for (const block of column) {
         counts[block.type]++;

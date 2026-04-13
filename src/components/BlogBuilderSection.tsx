@@ -58,7 +58,7 @@ export function BlogBuilderSection({
       </CardHeader>
       <CardContent>
         <div className={`grid gap-4 ${getLayoutClasses(section.type)}`}>
-          {section.columns.map((column, columnIndex) => (
+          {(section.columns || []).map((column, columnIndex) => (
             <BlogBuilderColumn
               key={`column-${sectionIndex}-${columnIndex}`}
               column={column}
@@ -97,7 +97,7 @@ function BlogBuilderColumn({
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 ${
+          className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 flex flex-col justify-center ${
             snapshot.isDraggingOver ? "border-primary bg-accent" : "border-muted"
           }`}
         >
@@ -106,7 +106,7 @@ function BlogBuilderColumn({
               Glissez un bloc ici
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 w-full max-w-xl mx-auto">
               {column.map((block, blockIndex) => (
                 <Draggable key={block.id} draggableId={block.id} index={blockIndex}>
                   {(provided) => (

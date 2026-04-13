@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
 import { usePosts } from "../hooks/usePosts";
+import { createEmptyColumns } from "../../utils";
 import { usePostEditor } from "../hooks/usePostEditor";
 import { TaxonomySelector } from "../components/TaxonomySelector";
 import { CategoryDialog } from "../components/CategoryDialog";
@@ -126,6 +127,7 @@ export function EditorView({ postId }: EditorViewProps) {
   const [generatePrompt, setGeneratePrompt] = useState("");
   const [generateAction, setGenerateAction] = useState<"complete" | "section" | "seo">("complete");
   const [selectedLayoutType, setSelectedLayoutType] = useState<LayoutType>("1-column");
+  const [generateLanguage, setGenerateLanguage] = useState<"en" | "fr">("en");
 
   // Progressive generation state
   const [generationPhase, setGenerationPhase] = useState<"idle" | "layout" | "sections">("idle");
@@ -137,6 +139,7 @@ export function EditorView({ postId }: EditorViewProps) {
     isDirty,
     isSaving,
     updateField,
+    updateSectionAtIndex,
     updateSEO,
     openPreview,
     preparePostData,
@@ -148,6 +151,10 @@ export function EditorView({ postId }: EditorViewProps) {
   const Input = components?.Input;
   const Card = components?.Card;
   const BlogBuilder = components?.BlogBuilder;
+  const totalSections = state.sections.length;
+  const generatingSectionCount = generatingSections.size;
+  const completedSectionCount = completedSections.size;
+  const isFullPostGenerating = isGenerating && generateAction === "complete";
 
   // Load existing post if editing
   useEffect(() => {
@@ -239,6 +246,7 @@ export function EditorView({ postId }: EditorViewProps) {
         prompt: generatePrompt,
         length: "medium",
         tone: "professional",
+        language: generateLanguage,
       });
 
       // Update basic fields immediately
@@ -252,19 +260,18 @@ export function EditorView({ postId }: EditorViewProps) {
         metaDescription: layoutResult.excerpt || "",
       });
 
-      // Create placeholder sections with loading state
-      const placeholderSections: LayoutSection[] = layoutResult.layout.map((layoutSection: any, index: number) => ({
-        id: layoutSection.id,
+      // Create placeholder sections with correct column count per layout type
+      const placeholderSections: LayoutSection[] = layoutResult.layout.map((layoutSection: any) => ({
+        id: String(layoutSection.id),
         type: layoutSection.type,
-        columns: [[{
-          id: `loading-${layoutSection.id}`,
-          type: "text" as const,
-          content: `## Section ${index + 1}: ${layoutSection.type}\n\n*${layoutSection.description}*`
-        }]]
+        columns: createEmptyColumns(layoutSection.type),
       }));
 
-      // Update with placeholder sections immediately so user sees the layout
+      // Update with placeholder sections immediately so user sees the full layout
       updateField("sections", placeholderSections);
+
+      // Mark ALL sections as generating upfront (spinners on every section)
+      setGeneratingSections(new Set(layoutResult.layout.map((s: any) => String(s.id))));
 
       // Close dialog and show the layout with loading sections
       setShowGenerateDialog(false);
@@ -274,37 +281,30 @@ export function EditorView({ postId }: EditorViewProps) {
       // Step 2: Generate content for each section progressively
       for (let i = 0; i < layoutResult.layout.length; i++) {
         const layoutSection = layoutResult.layout[i];
+        const sectionId = String(layoutSection.id);
         try {
-          // Mark this section as generating
-          setGeneratingSections(prev => new Set([...prev, layoutSection.id]));
-
           const sectionResult = await apiClient.generateSection({
             prompt: layoutSection.description,
             layoutType: layoutSection.type,
             context: `${layoutResult.title} - ${layoutResult.excerpt}`,
+            language: generateLanguage,
           });
 
-          // Update ONLY this section, keeping all others (placeholders or completed)
-          const updatedSections = [...state.sections];
-          updatedSections[i] = sectionResult.section;
-          updateField("sections", updatedSections);
+          updateSectionAtIndex(i, sectionResult.section);
 
-          // Mark section as completed
           setGeneratingSections(prev => {
             const next = new Set(prev);
-            next.delete(layoutSection.id);
+            next.delete(sectionId);
             return next;
           });
-          setCompletedSections(prev => new Set([...prev, layoutSection.id]));
+          setCompletedSections(prev => new Set([...prev, sectionId]));
         } catch (sectionErr: any) {
-          console.error(`Error generating section ${layoutSection.id}:`, sectionErr);
-          // Remove from generating set even if failed
+          console.error(`Error generating section ${sectionId}:`, sectionErr);
           setGeneratingSections(prev => {
             const next = new Set(prev);
-            next.delete(layoutSection.id);
+            next.delete(sectionId);
             return next;
           });
-          // Continue with other sections even if one fails
         }
       }
 
@@ -334,6 +334,7 @@ export function EditorView({ postId }: EditorViewProps) {
         prompt: generatePrompt,
         layoutType: selectedLayoutType,
         context: state.title,
+        language: generateLanguage,
       });
 
       // Add new section to existing sections
@@ -550,6 +551,26 @@ export function EditorView({ postId }: EditorViewProps) {
             </div>
           </CardWrapper>
 
+          {isFullPostGenerating && generationPhase !== "idle" && (
+            <CardWrapper Card={Card} fallbackClassName="border rounded-lg p-4 bg-background">
+              <div className="p-4 flex items-start gap-4">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mt-0.5"></div>
+                <div className="space-y-1">
+                  <p className="font-medium">
+                    {generationPhase === "layout"
+                      ? "Generating blog layout..."
+                      : "Generating section content..."}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {generationPhase === "layout"
+                      ? "Creating the full structure before filling each section."
+                      : `${completedSectionCount}/${totalSections} sections filled, ${generatingSectionCount} still generating.`}
+                  </p>
+                </div>
+              </div>
+            </CardWrapper>
+          )}
+
           {/* BlogBuilder */}
           {BlogBuilder && (
             <CardWrapper Card={Card}>
@@ -756,7 +777,42 @@ export function EditorView({ postId }: EditorViewProps) {
                     onFocus={(e) => e.currentTarget.style.borderColor = colors?.accent || colors?.primary || '#B87333'}
                     onBlur={(e) => e.currentTarget.style.borderColor = colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'}
                     disabled={isGenerating}
-                  />
+                   />
+                </div>
+              )}
+
+              {generateAction !== "seo" && (
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-medium font-['Inter']"
+                    style={{ color: colors?.text || '#F2F5F7' }}
+                  >
+                    Language
+                  </label>
+                  <div className="flex gap-2">
+                    {(["en", "fr"] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => setGenerateLanguage(lang)}
+                        disabled={isGenerating}
+                        className="px-4 py-2 text-sm font-medium transition-all font-['Inter'] border"
+                        style={{
+                          backgroundColor: generateLanguage === lang
+                            ? (colors?.buttonPrimary || colors?.accent || colors?.primary || '#B87333')
+                            : 'transparent',
+                          color: generateLanguage === lang
+                            ? (colors?.buttonPrimaryText || colors?.background || '#0A192F')
+                            : (colors?.text || '#F2F5F7'),
+                          borderColor: generateLanguage === lang
+                            ? (colors?.accent || colors?.primary || '#B87333')
+                            : (colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'),
+                        }}
+                      >
+                        {lang === "en" ? "🇬🇧 English" : "🇫🇷 Français"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -785,13 +841,10 @@ export function EditorView({ postId }: EditorViewProps) {
                   >
                     <option value="1-column">1 Column</option>
                     <option value="2-columns">2 Columns (Equal)</option>
-                    <option value="3-columns">3 Columns</option>
-                    <option value="2-columns-wide-left">2 Columns (Wide Left)</option>
-                    <option value="2-columns-wide-right">2 Columns (Wide Right)</option>
-                    <option value="grid-2x2">Grid 2x2</option>
-                    <option value="grid-3x3">Grid 3x3</option>
-                    <option value="grid-2x3">Grid 2x3</option>
-                    <option value="grid-4-even">Grid 4 (Even)</option>
+                      <option value="3-columns">3 Columns</option>
+                      <option value="2-columns-wide-left">2 Columns (Wide Left)</option>
+                      <option value="2-columns-wide-right">2 Columns (Wide Right)</option>
+                      <option value="grid-2x2">Grid 2x2</option>
                   </select>
                 </div>
               )}

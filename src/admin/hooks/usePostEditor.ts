@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
 import { savePreviewData, clearPreviewData } from "../utils/storage";
+import { sanitizeSections } from "../utils/sanitize";
 import type { BlogPostRow, BlogPostInsert, BlogPostUpdate } from "../../types/database";
 import type { LayoutSection } from "../../types";
 
@@ -27,7 +28,7 @@ export interface PostEditorState {
 }
 
 export function usePostEditor(initialPost?: BlogPostRow) {
-  const { features, currentUser } = useBlogAdminContext();
+  const { features, currentUser, basePath } = useBlogAdminContext();
 
   // Editor state
   const [state, setState] = useState<PostEditorState>(() => ({
@@ -37,7 +38,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     featured_image: initialPost?.featured_image || "",
     category: initialPost?.category || "",
     tags: initialPost?.tags || [],
-    sections: initialPost?.sections || [],
+    sections: sanitizeSections(initialPost?.sections),
     status: initialPost?.status || "draft",
     seo_metadata: {
       metaTitle: (initialPost?.seo_metadata as any)?.metaTitle || "",
@@ -56,13 +57,51 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     field: K,
     value: PostEditorState[K]
   ) => {
-    setState((prev) => ({ ...prev, [field]: value }));
+    setState((prev) => ({
+      ...prev,
+      [field]: field === "sections" ? sanitizeSections(value) : value,
+    }));
     setIsDirty(true);
   }, []);
 
-  /**
-   * Update SEO metadata
-   */
+  const updateSectionAtIndex = useCallback((index: number, section: LayoutSection) => {
+    setState((prev) => {
+      const next = [...prev.sections];
+      const sanitizedSection = sanitizeSections([section])[0];
+      if (!sanitizedSection) {
+        return prev;
+      }
+      const existingSection = next[index];
+      next[index] = existingSection
+        ? {
+            ...sanitizedSection,
+            id: existingSection.id,
+          }
+        : sanitizedSection;
+      return { ...prev, sections: next };
+    });
+    setIsDirty(true);
+  }, []);
+
+  useEffect(() => {
+    if (!initialPost) return;
+
+    setState({
+      title: initialPost.title || "",
+      slug: initialPost.slug || "",
+      excerpt: initialPost.excerpt || "",
+      featured_image: initialPost.featured_image || "",
+      category: initialPost.category || "",
+      tags: initialPost.tags || [],
+      sections: sanitizeSections(initialPost.sections),
+      status: initialPost.status || "draft",
+      seo_metadata: {
+        metaTitle: (initialPost.seo_metadata as any)?.metaTitle || "",
+        metaDescription: (initialPost.seo_metadata as any)?.metaDescription || "",
+      },
+    });
+  }, [initialPost]);
+
   const updateSEO = useCallback((field: "metaTitle" | "metaDescription", value: string) => {
     setState((prev) => ({
       ...prev,
@@ -83,18 +122,18 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     const previewSlug = state.slug || "draft";
 
     // Save current state to sessionStorage
-    savePreviewData(previewSlug, {
-      title: state.title,
-      sections: state.sections,
-      excerpt: state.excerpt,
-      featured_image: state.featured_image,
-      category: state.category,
+      savePreviewData(previewSlug, {
+        title: state.title,
+        sections: sanitizeSections(state.sections),
+        excerpt: state.excerpt,
+        featured_image: state.featured_image,
+        category: state.category,
       tags: state.tags,
     });
 
     // Open preview in new tab
-    window.open(`/admin/preview/blog/${previewSlug}`, "_blank");
-  }, [state, features.preview]);
+    window.open(`${basePath}/preview/${previewSlug}`, "_blank");
+  }, [state, features.preview, basePath]);
 
   /**
    * Auto-save to sessionStorage
@@ -112,7 +151,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
       const key = state.slug || "draft";
       savePreviewData(key, {
         title: state.title,
-        sections: state.sections,
+        sections: sanitizeSections(state.sections),
         excerpt: state.excerpt,
         featured_image: state.featured_image,
         category: state.category,
@@ -136,7 +175,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
       slug: state.slug,
       excerpt: state.excerpt || null,
       featured_image: state.featured_image || null,
-      sections: state.sections,
+      sections: sanitizeSections(state.sections),
       category: state.category || null,
       tags: state.tags,
       status: state.status,
@@ -178,6 +217,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     isDirty,
     isSaving,
     updateField,
+    updateSectionAtIndex,
     updateSEO,
     openPreview,
     preparePostData,

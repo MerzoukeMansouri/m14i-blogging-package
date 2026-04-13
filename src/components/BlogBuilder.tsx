@@ -70,9 +70,9 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
 
   const deleteBlock = (sectionIndex: number, columnIndex: number, blockIndex: number) => {
     const newSections = [...sections];
-    newSections[sectionIndex].columns[columnIndex] = newSections[sectionIndex].columns[
-      columnIndex
-    ].filter((_, i) => i !== blockIndex);
+    const section = newSections[sectionIndex];
+    if (!section?.columns?.[columnIndex]) return;
+    section.columns[columnIndex] = section.columns[columnIndex].filter((_, i) => i !== blockIndex);
     onChange(newSections);
   };
 
@@ -83,7 +83,9 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
     updatedBlock: ContentBlock
   ) => {
     const newSections = [...sections];
-    newSections[sectionIndex].columns[columnIndex][blockIndex] = updatedBlock;
+    const section = newSections[sectionIndex];
+    if (!section?.columns?.[columnIndex]) return;
+    section.columns[columnIndex][blockIndex] = updatedBlock;
     onChange(newSections);
   };
 
@@ -105,7 +107,9 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
       const [, sectionIndex, columnIndex] = destination.droppableId.split("-");
 
       const newSections = [...sections];
-      const targetColumn = newSections[parseInt(sectionIndex)].columns[parseInt(columnIndex)];
+      const section = newSections[parseInt(sectionIndex)];
+      if (!section?.columns?.[parseInt(columnIndex)]) return;
+      const targetColumn = section.columns[parseInt(columnIndex)];
       targetColumn.splice(destination.index, 0, createDefaultBlock(blockType));
       onChange(newSections);
       return;
@@ -125,14 +129,73 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
     const [, destSectionIdx, destColumnIdx] = destination.droppableId.split("-");
 
     const newSections = [...sections];
-    const sourceColumn = newSections[parseInt(sourceSectionIdx)].columns[parseInt(sourceColumnIdx)];
-    const destColumn = newSections[parseInt(destSectionIdx)].columns[parseInt(destColumnIdx)];
+    const sourceSection = newSections[parseInt(sourceSectionIdx)];
+    const destSection = newSections[parseInt(destSectionIdx)];
+    if (!sourceSection?.columns?.[parseInt(sourceColumnIdx)] || !destSection?.columns?.[parseInt(destColumnIdx)]) return;
+    const sourceColumn = sourceSection.columns[parseInt(sourceColumnIdx)];
+    const destColumn = destSection.columns[parseInt(destColumnIdx)];
 
     const [movedBlock] = sourceColumn.splice(source.index, 1);
     destColumn.splice(destination.index, 0, movedBlock);
 
     onChange(newSections);
   };
+
+  const renderGeneratingSection = (section: LayoutSection, sectionIndex: number): React.ReactElement => (
+    <div className="relative overflow-hidden rounded-lg">
+      <Card className="border-primary/30 bg-card/95">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {getLayoutLabel(section.type)}
+              </span>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                Generating
+              </span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 px-6 py-12 text-center">
+            <svg
+              className="mx-auto mb-4"
+              width="64"
+              height="64"
+              viewBox="0 0 50 50"
+              aria-hidden="true"
+              style={{ animation: "spin 1s linear infinite" }}
+            >
+              <circle
+                cx="25"
+                cy="25"
+                r="20"
+                fill="none"
+                stroke="rgba(184,115,51,0.2)"
+                strokeWidth="4"
+              />
+              <path
+                d="M25 5a20 20 0 0 1 20 20"
+                fill="none"
+                stroke="#B87333"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+            </svg>
+            <p className="text-lg font-semibold text-foreground">
+              Génération en cours...
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Section {sectionIndex + 1}/{sections.length}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The layout is ready. Content blocks will appear here automatically.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
@@ -237,36 +300,23 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                   </div>
                 ) : (
             <div className="space-y-4 max-w-6xl mx-auto pb-20">
-              {sections.map((section, sectionIndex) => (
+              {sections.filter(Boolean).map((section, sectionIndex) => (
                 <Draggable key={section.id} draggableId={section.id} index={sectionIndex}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
+                      {...provided.dragHandleProps}
                       className={snapshot.isDragging ? "opacity-50" : ""}
                     >
-                      <div className="relative overflow-hidden rounded-lg">
+                      {generatingSections?.has(section.id) ? renderGeneratingSection(section, sectionIndex) : (
+                        <div className="relative overflow-hidden rounded-lg">
                         <Card>
-                          {/* Overlay with spinner for this section if generating */}
-                          {generatingSections?.has(section.id) && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
-                              <div className="text-center">
-                                <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#B87333] border-t-transparent mb-4"></div>
-                                <p className="text-xl font-semibold text-white">
-                                  Génération en cours...
-                                </p>
-                                <p className="text-sm mt-2 text-white/70">
-                                  Section {sectionIndex + 1}/{sections.length}
-                                </p>
-                              </div>
-                            </div>
-                          )}
                           <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {/* Drag Handle for Section */}
                               <div
-                                {...provided.dragHandleProps}
                                 className="cursor-grab active:cursor-grabbing opacity-50 hover:opacity-100 transition-opacity"
                               >
                                 <svg
@@ -292,7 +342,7 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                         </CardHeader>
                         <CardContent>
                           <div className={`grid gap-4 ${getLayoutClasses(section.type)}`}>
-                            {section.columns.map((column, columnIndex) => (
+                            {(section.columns || []).map((column, columnIndex) => (
                               <Droppable
                                 key={`column-${sectionIndex}-${columnIndex}`}
                                 droppableId={`column-${sectionIndex}-${columnIndex}`}
@@ -302,7 +352,7 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                                   <div
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
-                                    className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 ${
+                                    className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 flex flex-col justify-center ${
                                       snapshot.isDraggingOver ? "border-primary bg-accent" : "border-muted"
                                     }`}
                                   >
@@ -311,7 +361,7 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                                         Glissez un bloc ici
                                       </div>
                                     ) : (
-                                      <div className="space-y-3">
+                                      <div className="space-y-3 w-full max-w-xl mx-auto">
                                         {column.map((block, blockIndex) => (
                                           <Draggable
                                             key={block.id}
@@ -397,6 +447,7 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
                         </CardContent>
                         </Card>
                       </div>
+                      )}
                     </div>
                   )}
                 </Draggable>
@@ -412,4 +463,3 @@ export function BlogBuilder({ sections, onChange, config: userConfig, components
     </DragDropContext>
   );
 }
-

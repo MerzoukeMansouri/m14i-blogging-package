@@ -65,6 +65,7 @@ export function calculateReadingTime(sections: LayoutSection[]): number {
   let totalWords = 0;
 
   sections.forEach((section) => {
+    if (!section?.columns) return;
     section.columns.forEach((column) => {
       column.forEach((block) => {
         if (block.type === "text" && block.content) {
@@ -121,6 +122,7 @@ export function getPostExcerpt(post: BlogPostRow, maxLength: number = 150): stri
 
   // Generate excerpt from first text block
   for (const section of post.sections) {
+    if (!section?.columns) continue;
     for (const column of section.columns) {
       for (const block of column) {
         if (block.type === "text" && block.content) {

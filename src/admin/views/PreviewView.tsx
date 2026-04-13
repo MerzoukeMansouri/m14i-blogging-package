@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
 import { loadPreviewData } from "../utils/storage";
+import { sanitizeSections } from "../utils/sanitize";
 import { BlogPreview } from "../../components/BlogPreview";
 import type { PreviewData } from "../types";
 
@@ -28,7 +29,10 @@ export function PreviewView({ slug }: PreviewViewProps) {
         const storedData = loadPreviewData(slug);
 
         if (storedData) {
-          setPreviewData(storedData);
+          setPreviewData({
+            ...storedData,
+            sections: sanitizeSections(storedData.sections),
+          });
           setLoading(false);
           return;
         }
@@ -38,7 +42,7 @@ export function PreviewView({ slug }: PreviewViewProps) {
           const post = await apiClient.getPostBySlug(slug);
           setPreviewData({
             title: post.title,
-            sections: post.sections,
+            sections: sanitizeSections(post.sections),
             excerpt: post.excerpt || undefined,
             featured_image: post.featured_image || undefined,
             category: post.category || undefined,

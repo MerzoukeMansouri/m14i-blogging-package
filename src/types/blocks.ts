@@ -1,5 +1,5 @@
 // Content block types - each block has a unique type identifier
-export type ContentBlockType = "text" | "image" | "video" | "quote" | "pdf" | "carousel";
+export type ContentBlockType = "text" | "image" | "video" | "quote" | "pdf" | "carousel" | "chart";
 
 // Base interface for all blocks
 interface BaseBlock {
@@ -69,5 +69,24 @@ export interface PDFBlock extends BaseBlock {
   height?: string; // Custom height for embed, default "600px"
 }
 
+// Chart data point
+export interface ChartDataPoint {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+// Chart content block
+export interface ChartBlock extends BaseBlock {
+  type: "chart";
+  chartType: "bar" | "line" | "area" | "pie";
+  title?: string;
+  data: ChartDataPoint[];
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+  caption?: string;
+  height?: number;
+}
+
 // Union type for all content blocks
-export type ContentBlock = TextBlock | ImageBlock | VideoBlock | QuoteBlock | PDFBlock | CarouselBlock;
+export type ContentBlock = TextBlock | ImageBlock | VideoBlock | QuoteBlock | PDFBlock | CarouselBlock | ChartBlock;

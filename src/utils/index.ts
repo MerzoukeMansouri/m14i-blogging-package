@@ -76,6 +76,20 @@ export function createDefaultBlock(type: ContentBlockType): ContentBlock {
       return { id, type, content: DEFAULT_CONTENT_PLACEHOLDERS.quote };
     case "pdf":
       return { id, type, url: "", displayMode: DEFAULT_PDF_SETTINGS.displayMode };
+    case "chart":
+      return {
+        id,
+        type,
+        chartType: "bar",
+        title: "Chart Title",
+        data: [
+          { label: "A", value: 40 },
+          { label: "B", value: 70 },
+          { label: "C", value: 55 },
+          { label: "D", value: 90 },
+        ],
+        height: 300,
+      };
     default:
       throw new Error(`Unknown block type: ${type}`);
   }

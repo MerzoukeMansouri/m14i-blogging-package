@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ContentBlock } from "../types";
+import {
+  BarChart, Bar,
+  LineChart, Line,
+  AreaChart, Area,
+  PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer,
+} from "recharts";
+import type { ContentBlock, ChartBlock } from "../types";
 
 interface ContentBlockRendererProps {
   block: ContentBlock;
@@ -35,6 +43,8 @@ interface ContentBlockRendererProps {
     carouselArrow?: string;
     carouselDot?: string;
     carouselDotActive?: string;
+    chart?: string;
+    chartCaption?: string;
   };
 }
 
@@ -46,7 +56,7 @@ export function ContentBlockRenderer({
   switch (block.type) {
     case "text":
       return (
-        <div className={classNames?.text || "prose prose-sm max-w-none break-words"}>
+        <div className={classNames?.text || "blog-prose prose prose-sm max-w-none break-words"}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {block.content}
           </ReactMarkdown>
@@ -154,6 +164,9 @@ export function ContentBlockRenderer({
 
     case "carousel":
       return <CarouselRenderer block={block} ImageComponent={ImageComponent} classNames={classNames} />;
+
+    case "chart":
+      return <ChartRenderer block={block} classNames={classNames} />;
 
     case "quote":
       return (
@@ -312,6 +325,105 @@ export function ContentBlockRenderer({
     default:
       return null;
   }
+}
+
+const CHART_COLORS = [
+  "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+  "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6",
+];
+
+interface ChartRendererProps {
+  block: ChartBlock;
+  classNames?: ContentBlockRendererProps["classNames"];
+}
+
+function ChartRenderer({ block, classNames }: ChartRendererProps) {
+  const { chartType, title, data, xAxisLabel, yAxisLabel, caption, height = 300 } = block;
+
+  if (!data || data.length === 0) {
+    return (
+      <div className={classNames?.chart || "my-4"}>
+        <EmptyState message="Aucune donnée" />
+      </div>
+    );
+  }
+
+  const seriesName = yAxisLabel || title || "value";
+  const rechartsData = data.map((d: { label: string; value: number }) => ({ name: d.label, [seriesName]: d.value }));
+
+  const renderPieLabel = ({ name, percent }: { name?: string; percent?: number }) =>
+    `${name ?? ""} ${((percent ?? 0) * 100).toFixed(0)}%`;
+
+  return (
+    <div className={classNames?.chart || "my-4"}>
+      {title && (
+        <p className="text-sm font-semibold mb-2 text-foreground">{title}</p>
+      )}
+      <ResponsiveContainer width="100%" height={height}>
+        {chartType === "pie" ? (
+          <PieChart>
+            <Pie
+              data={rechartsData}
+              dataKey={seriesName}
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius="70%"
+              label={renderPieLabel}
+            >
+              {rechartsData.map((_: unknown, i: number) => (
+                <Cell key={i} fill={data[i]?.color || CHART_COLORS[i % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        ) : chartType === "line" ? (
+          <LineChart data={rechartsData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--blog-border))" />
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined} />
+            <YAxis tick={{ fontSize: 12 }} label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey={seriesName} stroke={CHART_COLORS[0]} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+          </LineChart>
+        ) : chartType === "area" ? (
+          <AreaChart data={rechartsData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={CHART_COLORS[0]} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={CHART_COLORS[0]} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--blog-border))" />
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined} />
+            <YAxis tick={{ fontSize: 12 }} label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />
+            <Tooltip />
+            <Legend />
+            <Area type="monotone" dataKey={seriesName} stroke={CHART_COLORS[0]} fill="url(#chartAreaGradient)" strokeWidth={2} />
+          </AreaChart>
+        ) : (
+          <BarChart data={rechartsData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--blog-border))" />
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined} />
+            <YAxis tick={{ fontSize: 12 }} label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey={seriesName} radius={[4, 4, 0, 0]}>
+              {rechartsData.map((_: unknown, i: number) => (
+                <Cell key={i} fill={data[i]?.color || CHART_COLORS[i % CHART_COLORS.length]} />
+              ))}
+            </Bar>
+          </BarChart>
+        )}
+      </ResponsiveContainer>
+      {caption && (
+        <p className={classNames?.chartCaption || "text-xs text-muted-foreground mt-2 italic text-center"}>
+          {caption}
+        </p>
+      )}
+    </div>
+  );
 }
 
 // Carousel Component

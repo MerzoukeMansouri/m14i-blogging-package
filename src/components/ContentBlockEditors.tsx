@@ -7,7 +7,9 @@ import type {
   VideoBlock,
   QuoteBlock,
   PDFBlock,
-  CarouselBlock
+  CarouselBlock,
+  ChartBlock,
+  ChartDataPoint,
 } from "../types";
 
 interface EditorComponents {
@@ -562,6 +564,158 @@ export function CarouselEditor({ block, onChange, components }: CarouselEditorPr
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface ChartEditorProps {
+  block: ChartBlock;
+  onChange: (block: ChartBlock) => void;
+  components: EditorComponents;
+}
+
+export function ChartEditor({ block, onChange, components }: ChartEditorProps): React.ReactElement {
+  const { Label, Input, Button, PlusIcon, XIcon, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = components;
+
+  const updateDataPoint = (index: number, field: keyof ChartDataPoint, value: string | number) => {
+    const updated = block.data.map((d, i) =>
+      i === index ? { ...d, [field]: field === "value" ? Number(value) : value } : d
+    );
+    onChange({ ...block, data: updated });
+  };
+
+  const addDataPoint = () => {
+    onChange({ ...block, data: [...block.data, { label: `Item ${block.data.length + 1}`, value: 0 }] });
+  };
+
+  const removeDataPoint = (index: number) => {
+    onChange({ ...block, data: block.data.filter((_, i) => i !== index) });
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Titre</Label>
+        <Input
+          value={block.title || ""}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, title: e.target.value })}
+          placeholder="Titre du graphique"
+          className="text-sm h-8 mt-1"
+        />
+      </div>
+
+      <div>
+        <Label className="text-xs text-muted-foreground">Type de graphique</Label>
+        <Select
+          value={block.chartType}
+          onValueChange={(value: string) => onChange({ ...block, chartType: value as ChartBlock["chartType"] })}
+        >
+          <SelectTrigger className="text-sm h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="bar">Barres</SelectItem>
+            <SelectItem value="line">Lignes</SelectItem>
+            <SelectItem value="area">Aires</SelectItem>
+            <SelectItem value="pie">Camembert</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label className="text-xs text-muted-foreground">Axe X (label)</Label>
+          <Input
+            value={block.xAxisLabel || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, xAxisLabel: e.target.value })}
+            placeholder="ex: Mois"
+            className="text-sm h-8 mt-1"
+          />
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">Axe Y (label)</Label>
+          <Input
+            value={block.yAxisLabel || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, yAxisLabel: e.target.value })}
+            placeholder="ex: Ventes"
+            className="text-sm h-8 mt-1"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-xs text-muted-foreground">Hauteur (px)</Label>
+        <Input
+          type="number"
+          value={block.height || 300}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, height: Number(e.target.value) })}
+          min={150}
+          max={600}
+          className="text-sm h-8 mt-1"
+        />
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label className="text-xs text-muted-foreground">Données</Label>
+          <Button type="button" variant="outline" size="sm" onClick={addDataPoint}>
+            <PlusIcon className="w-3 h-3 mr-1" />
+            Ajouter
+          </Button>
+        </div>
+
+        {block.data.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-3 border rounded">
+            Aucune donnée
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {block.data.map((point, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={point.label}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDataPoint(index, "label", e.target.value)}
+                  placeholder="Label"
+                  className="text-sm h-8 flex-1"
+                />
+                <Input
+                  type="number"
+                  value={point.value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDataPoint(index, "value", e.target.value)}
+                  placeholder="0"
+                  className="text-sm h-8 w-20"
+                />
+                <input
+                  type="color"
+                  value={point.color || "#6366f1"}
+                  onChange={(e) => updateDataPoint(index, "color", e.target.value)}
+                  className="h-8 w-8 rounded border cursor-pointer"
+                  title="Couleur"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeDataPoint(index)}
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive flex-shrink-0"
+                >
+                  <XIcon className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <Label className="text-xs text-muted-foreground">Légende / caption</Label>
+        <Input
+          value={block.caption || ""}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, caption: e.target.value })}
+          placeholder="Source: ..."
+          className="text-sm h-8 mt-1"
+        />
       </div>
     </div>
   );

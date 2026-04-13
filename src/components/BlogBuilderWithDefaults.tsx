@@ -46,8 +46,7 @@ function Button({
   className?: string;
   onClick?: () => void;
   children: React.ReactNode;
-  [key: string]: any;
-}) {
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">) {
   const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50";
 
   const variants: Record<string, string> = {
@@ -100,7 +99,7 @@ function Label({ className = "", children }: { className?: string; children: Rea
 }
 
 // Default Input component
-function Input({ className = "", ...props }: { className?: string; [key: string]: any }) {
+function Input({ className = "", ...props }: { className?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
@@ -110,7 +109,7 @@ function Input({ className = "", ...props }: { className?: string; [key: string]
 }
 
 // Default Textarea component
-function Textarea({ className = "", ...props }: { className?: string; [key: string]: any }) {
+function Textarea({ className = "", ...props }: { className?: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
@@ -119,39 +118,69 @@ function Textarea({ className = "", ...props }: { className?: string; [key: stri
   );
 }
 
-// Default Select components
-function Select({ children, ...props }: { children: React.ReactNode; [key: string]: any }) {
-  return <div className="relative" {...props}>{children}</div>;
+const SelectContext = React.createContext<{
+  value?: string;
+  onValueChange?: (v: string) => void;
+  open: boolean;
+  setOpen: (o: boolean) => void;
+}>({ open: false, setOpen: () => {} });
+
+function Select({
+  children,
+  value,
+  onValueChange,
+}: {
+  children: React.ReactNode;
+  value?: string;
+  onValueChange?: (v: string) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <SelectContext.Provider value={{ value, onValueChange, open, setOpen }}>
+      <div className="relative">{children}</div>
+    </SelectContext.Provider>
+  );
 }
 
-function SelectTrigger({ className = "", children, ...props }: { className?: string; children: React.ReactNode; [key: string]: any }) {
+function SelectTrigger({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  const { open, setOpen } = React.useContext(SelectContext);
   return (
     <button
-      className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      {...props}
+      type="button"
+      className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      onClick={() => setOpen(!open)}
     >
       {children}
+      <svg className="w-4 h-4 opacity-50" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+      </svg>
     </button>
   );
 }
 
-function SelectValue({ placeholder, ...props }: { placeholder?: string; [key: string]: any }) {
-  return <span {...props}>{placeholder}</span>;
+function SelectValue({ placeholder }: { placeholder?: string }) {
+  const { value } = React.useContext(SelectContext);
+  return <span>{value ?? placeholder}</span>;
 }
 
 function SelectContent({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  const { open } = React.useContext(SelectContext);
+  if (!open) return null;
   return (
-    <div className={`absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md ${className}`}>
+    <div className={`absolute z-50 mt-1 min-w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md ${className}`}>
       {children}
     </div>
   );
 }
 
-function SelectItem({ className = "", children, ...props }: { className?: string; children: React.ReactNode; [key: string]: any }) {
+function SelectItem({ className = "", value, children }: { className?: string; value: string; children: React.ReactNode }) {
+  const { onValueChange, setOpen, value: selected } = React.useContext(SelectContext);
   return (
     <div
-      className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground ${className}`}
-      {...props}
+      role="option"
+      aria-selected={selected === value}
+      className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground ${selected === value ? "bg-accent" : ""} ${className}`}
+      onClick={() => { onValueChange?.(value); setOpen(false); }}
     >
       {children}
     </div>
@@ -181,15 +210,12 @@ const defaultComponents = {
  * No need to pass shadcn/ui components - just works out of the box!
  */
 export function BlogBuilderWithDefaults({
-  sections,
-  onChange,
-  config,
-}: Omit<BlogBuilderProps, "components">) {
+  components: _components,
+  ...props
+}: BlogBuilderProps) {
   return (
     <BlogBuilder
-      sections={sections}
-      onChange={onChange}
-      config={config}
+      {...props}
       components={defaultComponents}
     />
   );

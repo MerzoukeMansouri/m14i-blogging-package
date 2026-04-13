@@ -1,6 +1,7 @@
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/preflight" layer(base);
 @import "tailwindcss/utilities" layer(utilities);
+@plugin "@tailwindcss/typography";
 
 /**
  * M14I Blogging - CSS Variables Theme System
@@ -145,4 +146,171 @@ body {
 
 .grid-cols-\[1fr_2fr\] {
   grid-template-columns: 1fr 2fr;
+}
+
+/* =========================================================
+   Blog Markdown / Prose Styles
+   Self-contained: works with or without @tailwindcss/typography
+   Applied via .blog-prose class on text block wrappers
+   ========================================================= */
+
+.blog-prose {
+  color: hsl(var(--blog-foreground));
+  font-size: var(--blog-font-size-base);
+  line-height: var(--blog-line-height-relaxed);
+  max-width: none;
+  overflow-wrap: break-word;
+  word-break: break-words;
+}
+
+/* Headings */
+.blog-prose h1,
+.blog-prose h2,
+.blog-prose h3,
+.blog-prose h4,
+.blog-prose h5,
+.blog-prose h6 {
+  color: hsl(var(--blog-foreground));
+  font-weight: var(--blog-font-weight-bold);
+  line-height: var(--blog-line-height-tight);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.blog-prose h1 { font-size: var(--blog-font-size-3xl); margin-top: 0; }
+.blog-prose h2 { font-size: var(--blog-font-size-2xl); }
+.blog-prose h3 { font-size: var(--blog-font-size-xl); }
+.blog-prose h4 { font-size: var(--blog-font-size-lg); }
+.blog-prose h5, .blog-prose h6 { font-size: var(--blog-font-size-base); }
+
+/* Paragraphs */
+.blog-prose p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.blog-prose p:last-child { margin-bottom: 0; }
+
+/* Links */
+.blog-prose a {
+  color: hsl(var(--blog-primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.blog-prose a:hover {
+  opacity: 0.8;
+}
+
+/* Strong / Em */
+.blog-prose strong {
+  font-weight: var(--blog-font-weight-bold);
+  color: hsl(var(--blog-foreground));
+}
+
+.blog-prose em {
+  font-style: italic;
+}
+
+/* Code */
+.blog-prose code {
+  font-family: var(--blog-font-family-mono);
+  font-size: 0.875em;
+  background: hsl(var(--blog-muted));
+  color: hsl(var(--blog-foreground));
+  padding: 0.15em 0.4em;
+  border-radius: var(--blog-radius-sm);
+  border: 1px solid hsl(var(--blog-border));
+}
+
+.blog-prose pre {
+  background: hsl(var(--blog-muted));
+  border: 1px solid hsl(var(--blog-border));
+  border-radius: var(--blog-radius-md);
+  padding: 1em 1.25em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.blog-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875em;
+  line-height: 1.7;
+}
+
+/* Blockquote */
+.blog-prose blockquote {
+  border-left: 4px solid hsl(var(--blog-primary));
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: hsl(var(--blog-muted-foreground));
+}
+
+/* Lists */
+.blog-prose ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.blog-prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.blog-prose li {
+  margin-bottom: 0.25em;
+  line-height: var(--blog-line-height-relaxed);
+}
+
+.blog-prose li > ul,
+.blog-prose li > ol {
+  margin: 0.25em 0;
+}
+
+/* Horizontal rule */
+.blog-prose hr {
+  border: none;
+  border-top: 1px solid hsl(var(--blog-border));
+  margin: 1.5em 0;
+}
+
+/* Tables */
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--blog-font-size-sm);
+  margin: 1em 0;
+}
+
+.blog-prose thead tr {
+  background: hsl(var(--blog-muted));
+}
+
+.blog-prose th,
+.blog-prose td {
+  padding: 0.5em 0.75em;
+  border: 1px solid hsl(var(--blog-border));
+  text-align: left;
+}
+
+.blog-prose th {
+  font-weight: var(--blog-font-weight-semibold);
+}
+
+/* Images inside prose */
+.blog-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--blog-radius-md);
+}
+
+/* Strike-through (GFM) */
+.blog-prose del {
+  text-decoration: line-through;
+  color: hsl(var(--blog-muted-foreground));
 }

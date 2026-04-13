@@ -12,6 +12,7 @@ import {
   QuoteEditor,
   PDFEditor,
   CarouselEditor,
+  ChartEditor,
 } from "./ContentBlockEditors";
 
 interface EditorComponents {
@@ -52,6 +53,7 @@ export function ContentBlockInlineEditor({
     quote: QuoteEditor,
     pdf: PDFEditor,
     carousel: CarouselEditor,
+    chart: ChartEditor,
   } as const;
 
   const EditorComponent = editorComponentMap[block.type as keyof typeof editorComponentMap] as any;

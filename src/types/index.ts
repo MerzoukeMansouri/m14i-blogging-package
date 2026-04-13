@@ -12,6 +12,8 @@ export type {
   CarouselSlide,
   PDFBlock,
   PDFDisplayMode,
+  ChartBlock,
+  ChartDataPoint,
   ContentBlock,
 } from "./blocks";
 

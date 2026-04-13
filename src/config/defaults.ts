@@ -6,22 +6,21 @@ import {
   Type,
   Image as ImageIcon,
   Video,
-  Grid3x3,
   Grid2x2,
   Quote,
   FileText,
   ImagePlay,
+  BarChart2,
 } from "lucide-react";
 import { DEFAULT_COLORS, DEFAULT_UI_SETTINGS } from "./constants";
 
 export const DEFAULT_LAYOUTS: LayoutConfig[] = [
   { type: "1-column", label: "1 Colonne", icon: LayoutGrid },
   { type: "2-columns", label: "2 Colonnes", icon: Columns },
+  { type: "2-columns-wide-left", label: "2 Colonnes (Large Gauche)", icon: Columns },
+  { type: "2-columns-wide-right", label: "2 Colonnes (Large Droite)", icon: Columns },
   { type: "3-columns", label: "3 Colonnes", icon: Columns3 },
   { type: "grid-2x2", label: "Grille 2×2", icon: Grid2x2 },
-  { type: "grid-3x3", label: "Grille 3×3", icon: Grid3x3 },
-  { type: "grid-2x3", label: "Grille 2×3", icon: Grid2x2 },
-  { type: "grid-4-even", label: "Grille 4 colonnes", icon: Columns3 },
 ];
 
 export const DEFAULT_BLOCKS: BlockConfig[] = [
@@ -31,6 +30,7 @@ export const DEFAULT_BLOCKS: BlockConfig[] = [
   { type: "carousel", label: "Carousel", icon: ImagePlay },
   { type: "quote", label: "Citation", icon: Quote },
   { type: "pdf", label: "PDF", icon: FileText },
+  { type: "chart", label: "Graphique", icon: BarChart2 },
 ];
 
 export const DEFAULT_CONFIG: Required<BlogBuilderConfig> = {

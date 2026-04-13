@@ -160,9 +160,6 @@ export function createGenerateSectionRoute(config: RouteConfig) {
         "2-columns-wide-left",
         "2-columns-wide-right",
         "grid-2x2",
-        "grid-3x3",
-        "grid-2x3",
-        "grid-4-even",
       ];
 
       if (!validLayouts.includes(body.layoutType)) {

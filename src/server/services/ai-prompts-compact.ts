@@ -1,6 +1,6 @@
 /**
- * AI Prompts - Compact Format (40-60% token reduction)
- * Token-optimized prompts using concise text instead of verbose explanations
+ * AI Prompts - Compact Format
+ * Stronger structure + specificity rules for cleaner long-form output.
  */
 
 const LANG = {
@@ -9,14 +9,12 @@ const LANG = {
     writer: "Expert content writer",
     seo: "SEO expert",
     editor: "Expert content editor",
-    respond: "RESPOND ONLY VALID JSON",
   },
   fr: {
     expert: "Expert stratégie contenu blog",
     writer: "Rédacteur expert",
     seo: "Expert SEO",
     editor: "Éditeur contenu expert",
-    respond: "RÉPONDRE UNIQUEMENT JSON VALIDE",
   },
 };
 
@@ -32,40 +30,119 @@ export function generateLayoutPrompt(req: {
 
   return `${l.expert}. ${lang === "fr" ? "Générer structure blog." : "Generate blog layout."}
 
-${lang === "fr" ? "CRITIQUE: JSON 100% VALIDE { } PAS de \`\`\` échapper \" PAS de virgules finales" : "CRITICAL: 100% VALID JSON { } NO \`\`\` escape \" NO trailing commas"}
+${lang === "fr" ? "CRITIQUE: Répondre avec UN SEUL objet JSON valide. Commencer par { finir par }. Pas de ``` ni texte autour." : "CRITICAL: Return ONE valid JSON object only. Start with { end with }. No ``` and no surrounding commentary."}
 
-${lang === "fr" ? "LANGUE: Tout le contenu (title, description, excerpt, category) DOIT être en FRANÇAIS - AUCUN mot anglais!" : "LANGUAGE: All content must be in English"}
+${lang === "fr" ? "LANGUE: tout le contenu doit être en FRANÇAIS." : "LANGUAGE: all content must be in English."}
 
-${lang === "fr" ? "Réponse: {title,slug,excerpt:\"150-200c\",layout:[{id,type,description}],category}" : "Response: {title,slug,excerpt:\"150-200c\",layout:[{id,type,description}],category}"}
+${lang === "fr" ? "Réponse: {title,slug,excerpt:\"150-200c\",layout:[{id,type,description}],category,tags:[2-5]}" : "Response: {title,slug,excerpt:\"150-200c\",layout:[{id,type,description}],category,tags:[2-5]}"}
 
-${lang === "fr" ? "PATTERNS PROUVÉS (utiliser ces structures):" : "PROVEN PATTERNS (use these successful structures):"}
-${lang === "fr" ? "• Article tech: 1-col(hero+image)→2-col(contenu+quote/image)→grid-2x3(6 features emoji)→1-col(conclusion)" : "• Tech article: 1-col(hero+image)→2-col(content+quote/image)→grid-2x3(6 features emoji)→1-col(conclusion)"}
-${lang === "fr" ? "• Portfolio: 1-col(hero)→grid-2x2(4 projets)→2-col(détails+visuel)→1-col(CTA)" : "• Portfolio: 1-col(hero)→grid-2x2(4 projects)→2-col(details+visual)→1-col(CTA)"}
-${lang === "fr" ? "• Guide: 1-col(intro)→3-col(3 étapes)→2-col-wide-left(détail+astuce)→grid-2x3(6 conseils)→1-col(prochaines étapes)" : "• Guide: 1-col(intro)→3-col(3 steps)→2-col-wide-left(detail+tip)→grid-2x3(6 tips)→1-col(next steps)"}
+${lang === "fr" ? "PATTERNS PROUVÉS:" : "PROVEN PATTERNS:"}
+${lang === "fr" ? "• Article: 1-column hero → 2-columns texte+quote/image → grid-2x2 points clés → 1-column conclusion" : "• Article: 1-column hero → 2-columns text+quote/image → grid-2x2 key points → 1-column conclusion"}
+${lang === "fr" ? "• Guide: 1-column intro → 3-columns étapes → 2-columns-wide-left détail+astuce → 1-column next steps" : "• Guide: 1-column intro → 3-columns steps → 2-columns-wide-left detail+tip → 1-column next steps"}
+${lang === "fr" ? "• Showcase: 1-column hero → grid-2x2 highlights → 2-columns-wide-right visuel+détail → 1-column CTA" : "• Showcase: 1-column hero → grid-2x2 highlights → 2-columns-wide-right visual+detail → 1-column CTA"}
 
-${lang === "fr" ? "Types de layout:" : "Layout types:"}
-${lang === "fr" ? "• 1-column: TOUJOURS commencer hero (image+intro), conclusion, contenu focalisé" : "• 1-column: ALWAYS start hero (image+intro), conclusion, focused content"}
-${lang === "fr" ? "• 2-columns: Texte+quote/image (PAS texte+texte), comparaisons, avant/après" : "• 2-columns: Text+quote/image (NOT text+text), comparisons, before/after"}
-${lang === "fr" ? "• 3-columns: Exactement 3 étapes/features/bénéfices égaux" : "• 3-columns: Exactly 3 equal steps/features/benefits"}
-${lang === "fr" ? "• 2-columns-wide-left: Principal(66%)+sidebar astuce/quote(33%)" : "• 2-columns-wide-left: Main(66%)+sidebar tip/quote(33%)"}
-${lang === "fr" ? "• 2-columns-wide-right: Visuel/icône(33%)+détail(66%)" : "• 2-columns-wide-right: Visual/icon(33%)+detail(66%)"}
-${lang === "fr" ? "• grid-2x2: 4 items égaux showcase" : "• grid-2x2: 4 equal showcase items"}
-${lang === "fr" ? "• grid-2x3: 6 cartes features (utiliser emoji)" : "• grid-2x3: 6 feature cards (use emoji)"}
-${lang === "fr" ? "• grid-3x3: 9 items galerie" : "• grid-3x3: 9 gallery items"}
-${lang === "fr" ? "• grid-4-even: 4 features proéminentes" : "• grid-4-even: 4 prominent features"}
+${lang === "fr" ? "TYPES (choisir selon l'intention éditoriale):" : "TYPES (choose based on editorial intent):"}
+• 1-column = hero opener, standalone narrative, closing conclusion with CTA
+• 2-columns = text (main argument) + image or quote (never text + text)
+• 2-columns-wide-left = deep explanation (wide left) + sidebar tip or stat (narrow right)
+• 2-columns-wide-right = visual anchor or stat (narrow left) + detailed steps (wide right)
+• 3-columns = exactly 3 parallel, genuinely different concepts or steps
+• grid-2x2 = 4 compact benefit/feature cards, each scannable in 5 seconds
 
 ${lang === "fr" ? "RÈGLES OBLIGATOIRES:" : "MANDATORY RULES:"}
-${lang === "fr" ? "1. COMMENCER avec 1-column hero (description doit mentionner image)" : "1. START with 1-column hero (description must mention image)"}
-${lang === "fr" ? "2. Utiliser grids pour features/bénéfices (description: mentionner emoji/icônes)" : "2. Use grids for features/benefits (description: mention emoji/icons)"}
-${lang === "fr" ? "3. 2-col = texte + quote/image (description doit spécifier)" : "3. 2-col = text + quote/image (description must specify)"}
-${lang === "fr" ? "4. FINIR avec 1-column conclusion" : "4. END with 1-column conclusion"}
-${lang === "fr" ? "5. JAMAIS répéter même type consécutivement" : "5. NEVER repeat same type consecutively"}
-${lang === "fr" ? "6. Alterner dense(grid/3-col) avec aéré(1-col/2-col)" : "6. Alternate dense(grid/3-col) with spacious(1-col/2-col)"}
+1. ${lang === "fr" ? "Commencer par un hero 1-column dont la description mentionne un visuel précis." : "Start with a 1-column hero whose description explicitly mentions a specific visual."}
+2. ${lang === "fr" ? "Finir par une conclusion 1-column." : "End with a 1-column conclusion."}
+3. ${lang === "fr" ? "Ne jamais répéter le même layout consécutivement." : "Never repeat the same layout consecutively."}
+4. ${lang === "fr" ? "Alterner sections denses (grid/3-col) et respirations (1-col/2-col)." : "Alternate dense sections (grid/3-col) and breathing sections (1-col/2-col)."}
+5. ${lang === "fr" ? "Chaque description doit promettre du vrai contenu utile, jamais une section vide ou décorative." : "Each description must promise real useful content, never an empty or decorative section."}
+6. ${lang === "fr" ? "Chaque description doit être concrète: sujet précis, angle éditorial, élément visuel distinct." : "Each description must be concrete: precise subject, editorial angle, distinct visual element."}
+7. ${lang === "fr" ? "Éviter le filler générique: magique, incroyable, transformation, essentiel, game-changing." : "Avoid generic filler: magical, incredible, transformation, essential, game-changing."}
+8. ${lang === "fr" ? "Tags: 2-5 tags précis et orientés recherche." : "Tags: 2-5 precise search-oriented tags."}
+9. ${lang === "fr" ? "Pour tout layout à 2 colonnes, exiger un mélange éditorial: une colonne texte principal + une colonne support visuel/quote/chart. Jamais texte + texte." : "For every 2-column layout, require an editorial mix: one main text column + one supporting visual/quote/chart column. Never text + text."}
 
-${lang === "fr" ? "Mots: court~3-4 sect 1k, moyen~5-6 sect 1.5-2k, long~6-7 sect 2-2.5k" : "Words: short~3-4 sect 1k, medium~5-6 sect 1.5-2k, long~6-7 sect 2-2.5k"}
+${lang === "fr" ? "Longueur: court 3-4 sections, moyen 5-6, long 6-7." : "Length: short 3-4 sections, medium 5-6, long 6-7."}
 
 ${req.length ? `Len:${req.length}` : ""}${req.layoutPreference?.length ? ` Pref:${req.layoutPreference}` : ""}${req.tone ? ` Tone:${req.tone}` : ""}${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}`;
 }
+
+const LAYOUT_STRATEGY = {
+  en: {
+    "1-column": {
+      columns: "1 column",
+      intent: "Hero intro OR standalone narrative OR data-driven section OR conclusion CTA. Full-width storytelling with one strong visual or chart.",
+      blocks: "For HERO/INTRO: MUST start with image (hero/banner) first, then text (hook paragraph + 2-3 short paras). For data-driven sections: chart (bar/line/area with real labeled data points, xAxisLabel, yAxisLabel, title, caption) + text commentary. For conclusion: text with bullet key-takeaways + concrete CTA sentence.",
+      forbidden: "Do not use quote or carousel here. No grid-like splitting of ideas. Hero sections MUST have an image block.",
+    },
+    "2-columns": {
+      columns: "2 columns (equal 50/50)",
+      intent: "Side-by-side contrast: substantive editorial text paired with a supporting visual, pull-quote, or data chart. Never two text blocks.",
+      blocks: "col1: text (2-4 paragraphs with ## heading, bullet list welcome). col2: image OR quote OR chart (bar/line/pie with 4-6 data points and meaningful title — choose one block type only). The two columns must use different block families.",
+      forbidden: "Never put text in both columns. Never put two images. Never use the same dominant block type in both columns. col2 must be exactly one non-text supporting block.",
+    },
+    "2-columns-wide-left": {
+      columns: "2 columns (66% left / 33% right)",
+      intent: "Main argument or deep-dive explanation on the left; sidebar tip, stat callout, chart, or supporting detail on the right.",
+      blocks: "col1 (wide): text with ## heading, 3-5 paragraphs or bullet breakdown. col2 (narrow): quote with specific author+role OR image OR chart (bar/pie with 3-5 data points and caption). Prefer a non-text supporting block to keep visual contrast.",
+      forbidden: "Right column must NOT be a full article. Keep it tight: 1 block max. Do not mirror the main text with another long text block.",
+    },
+    "2-columns-wide-right": {
+      columns: "2 columns (33% left / 66% right)",
+      intent: "Visual anchor, stat chart, or icon on the left; detailed explanation or step-by-step on the right.",
+      blocks: "col1 (narrow): image (portrait/square crop) OR chart (bar/pie with 4-6 data points, height:220) OR quote. col2 (wide): text with ## heading, 3-5 paragraphs or numbered steps.",
+      forbidden: "Left column must NOT be a full article. One block only: image, chart, or quote. Do not use text in both columns.",
+    },
+    "3-columns": {
+      columns: "3 columns (equal 33/33/33)",
+      intent: "Three distinct, parallel concepts: steps in a process, competing approaches, or complementary features. Each column is self-contained.",
+      blocks: "Each column: text with ### heading (2-4 words), 2-3 bullet points or 1 short paragraph. Optionally add one image per column above the text.",
+      forbidden: "Columns must NOT repeat the same argument with different wording. Each column must introduce a genuinely different idea.",
+    },
+    "grid-2x2": {
+      columns: "4 columns (2×2 grid)",
+      intent: "Four highlights, benefits, or use-cases presented as compact cards. Each cell is scannable in 5 seconds.",
+      blocks: "Each cell: text with ### heading (3-5 words) + 1-2 bullet points. Optionally one small image per cell.",
+      forbidden: "No paragraphs longer than 2 lines. No narrative flow between cells — each must stand alone.",
+    },
+  },
+  fr: {
+    "1-column": {
+      columns: "1 colonne",
+      intent: "Hero intro OU récit autonome OU section data-driven OU conclusion CTA. Storytelling pleine largeur avec un fort visuel ou graphique.",
+      blocks: "Pour HERO/INTRO: DOIT commencer par image (hero/bannière) en premier, puis texte (accroche + 2-3 courts paragraphes). Pour section data-driven: chart (bar/line/area avec données réelles étiquetées, xAxisLabel, yAxisLabel, title, caption) + texte de commentaire. Pour conclusion: texte avec points-clés bullet + phrase CTA concrète.",
+      forbidden: "Pas de quote ni carousel. Pas de découpage d'idées en grille. Les sections hero DOIVENT avoir un bloc image.",
+    },
+    "2-columns": {
+      columns: "2 colonnes (50/50 égal)",
+      intent: "Contraste côte à côte: texte éditorial substantiel + visuel, pull-quote ou graphique de données. Jamais deux blocs texte.",
+      blocks: "col1: texte (2-4 paragraphes avec ## titre, liste à puces bienvenue). col2: image OU quote OU chart (bar/line/pie avec 4-6 points de données et titre significatif — un seul type de bloc). Les deux colonnes doivent utiliser des familles de blocs différentes.",
+      forbidden: "Jamais texte dans les deux colonnes. Jamais deux images. Jamais le même type dominant dans les deux colonnes. col2 doit être exactement un bloc de support non-texte.",
+    },
+    "2-columns-wide-left": {
+      columns: "2 colonnes (66% gauche / 33% droite)",
+      intent: "Argument principal ou explication approfondie à gauche; astuce sidebar, stat, graphique ou détail complémentaire à droite.",
+      blocks: "col1 (large): texte avec ## titre, 3-5 paragraphes ou liste détaillée. col2 (étroite): quote avec auteur+rôle précis OU image OU chart (bar/pie avec 3-5 points de données et caption). Préférer un bloc de support non-texte pour garder un contraste visuel.",
+      forbidden: "Colonne droite pas un article complet. Maximum 1 bloc. Ne pas dupliquer le texte principal avec un autre long texte.",
+    },
+    "2-columns-wide-right": {
+      columns: "2 colonnes (33% gauche / 66% droite)",
+      intent: "Ancre visuelle, graphique stat ou icône à gauche; explication détaillée ou pas-à-pas à droite.",
+      blocks: "col1 (étroite): image (portrait/carré) OU chart (bar/pie avec 4-6 points de données, height:220) OU quote. col2 (large): texte avec ## titre, 3-5 paragraphes ou étapes numérotées.",
+      forbidden: "Colonne gauche pas un article complet. Un seul bloc: image, graphique ou quote. Ne pas utiliser du texte dans les deux colonnes.",
+    },
+    "3-columns": {
+      columns: "3 colonnes (33/33/33 égal)",
+      intent: "Trois concepts parallèles distincts: étapes, approches, fonctionnalités. Chaque colonne est autonome.",
+      blocks: "Chaque colonne: texte avec ### titre (2-4 mots), 2-3 bullet points ou 1 court paragraphe. Optionnellement une image par colonne.",
+      forbidden: "Les colonnes ne doivent PAS répéter le même argument. Chaque colonne = une idée genuinement différente.",
+    },
+    "grid-2x2": {
+      columns: "4 colonnes (grille 2×2)",
+      intent: "Quatre points forts, bénéfices ou cas d'usage présentés comme cartes compactes. Chaque cellule est lisible en 5 secondes.",
+      blocks: "Chaque cellule: texte avec ### titre (3-5 mots) + 1-2 bullet points. Optionnellement une petite image par cellule.",
+      forbidden: "Pas de paragraphes de plus de 2 lignes. Pas de flux narratif entre cellules.",
+    },
+  },
+};
 
 export function generateSectionPrompt(
   layoutType: string,
@@ -74,42 +151,56 @@ export function generateSectionPrompt(
 ): string {
   const lang = language || "en";
   const l = LANG[lang];
-
-  const colReq = lang === "fr"
-    ? {"1-column":"1col pleine","2-columns":"2col égales","3-columns":"3col égales","2-columns-wide-left":"2col gauche+large 66/33","2-columns-wide-right":"2col droite+large 33/66"}[layoutType]
-    : {"1-column":"1col full","2-columns":"2col equal","3-columns":"3col equal","2-columns-wide-left":"2col left wider 66/33","2-columns-wide-right":"2col right wider 33/66"}[layoutType];
+  const strategy = LAYOUT_STRATEGY[lang][layoutType as keyof typeof LAYOUT_STRATEGY["en"]] || {
+    columns: layoutType,
+    intent: lang === "fr" ? "Générer du contenu pertinent." : "Generate relevant content.",
+    blocks: lang === "fr" ? "Texte et images selon le contexte." : "Text and images as appropriate.",
+    forbidden: "",
+  };
 
   return `${l.writer}. ${lang === "fr" ? `Générer section ${layoutType}.` : `Generate section ${layoutType}.`}
 
-${lang === "fr" ? "LANGUE: Tout le contenu DOIT être en FRANÇAIS - AUCUN mot anglais dans content, caption, author!" : "LANGUAGE: All content must be in English"}
+${lang === "fr" ? "LANGUE: tout le contenu doit être en FRANÇAIS." : "LANGUAGE: all content must be in English."}
 
-${lang === "fr" ? "RÈGLES JSON CRITIQUES:" : "CRITICAL JSON RULES:"}
-${lang === "fr" ? "- SEULEMENT objet JSON valide" : "- ONLY valid JSON object"}
-${lang === "fr" ? "- COMMENCE avec { et TERMINE avec }" : "- START with { and END with }"}
-${lang === "fr" ? "- Échapper TOUTES les guillemets dans content avec \\\\\"" : "- Escape ALL quotes in content with \\\\\""}
-${lang === "fr" ? "- PAS de sauts de ligne dans strings (utiliser \\\\\\\\n)" : "- NO newlines in strings (use \\\\\\\\n)"}
-${lang === "fr" ? "- PAS de virgules finales" : "- NO trailing commas"}
-${lang === "fr" ? "- PAS de blocs markdown code" : "- NO markdown code blocks"}
-${lang === "fr" ? "- Tester validité JSON avant envoi" : "- Test JSON validity before responding"}
+${lang === "fr" ? "JSON CRITIQUE:" : "CRITICAL JSON:"}
+- ${lang === "fr" ? "Un seul objet JSON valide." : "One valid JSON object only."}
+- ${lang === "fr" ? "Commencer avec { finir avec }." : "Start with { end with }."}
+- ${lang === "fr" ? "Pas de ``` ni explication hors JSON." : "No ``` and no commentary outside JSON."}
+- ${lang === "fr" ? "Utiliser l'échappement JSON standard." : "Use standard JSON escaping."}
+- ${lang === "fr" ? "Utiliser \\n pour les retours de ligne markdown dans les strings JSON." : "Use \\n for markdown line breaks inside JSON strings."}
+- ${lang === "fr" ? "Pas de virgules finales." : "No trailing commas."}
 
-${lang === "fr" ? "Format réponse:" : "Response format:"} {section:{id,type:"${layoutType}",columns:[[blocks]]}}
-${layoutType}: ${colReq}
+${lang === "fr" ? "Format:" : "Format:"} {section:{id,type:"${layoutType}",columns:[[blocks]]}}
+${lang === "fr" ? "Colonnes requises:" : "Required columns:"} ${strategy.columns}
 
-Blocks: text{id,type:"text",content:"markdown ${lang === "fr" ? "avec guillemets échappés" : "with escaped quotes"}"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides:[{src,alt,caption}]}, pdf{id,type:"pdf",url,title,description}
-${lang === "fr" ? "URLs placeholder:" : "Placeholder URLs:"} https://placeholder.example/name.jpg
+${lang === "fr" ? "STRATÉGIE DE CONTENU pour ce layout:" : "CONTENT STRATEGY for this layout:"}
+${lang === "fr" ? "Intention:" : "Intent:"} ${strategy.intent}
+${lang === "fr" ? "Blocs attendus:" : "Expected blocks:"} ${strategy.blocks}
+${lang === "fr" ? "INTERDIT:" : "FORBIDDEN:"} ${strategy.forbidden}
 
-${lang === "fr" ? "RÈGLES VISUEL D'ABORD:" : "VISUAL FIRST RULES:"}
-${lang === "fr" ? "- 1-column: TOUJOURS inclure 1 image + texte (100-150 mots max, paragraphes courts)" : "- 1-column: ALWAYS include 1 image + text (100-150w max, short paragraphs)"}
-${lang === "fr" ? "- 2-columns: Col1 = texte court (80-120 mots), Col2 = image OU quote (JAMAIS texte+texte)" : "- 2-columns: Col1 = short text (80-120w), Col2 = image OR quote (NEVER text+text)"}
-${lang === "fr" ? "- 3-columns: 3 cartes courtes (50-80 mots chacune) avec emoji au début" : "- 3-columns: 3 short cards (50-80w each) with emoji at start"}
-${lang === "fr" ? "- Grids: Très court (30-50 mots par cellule) avec emoji/icônes" : "- Grids: Very short (30-50w per cell) with emoji/icons"}
-${lang === "fr" ? "- Paragraphes: MAX 2-3 phrases courtes" : "- Paragraphs: MAX 2-3 short sentences"}
-${lang === "fr" ? "- Préférer listes à puces aux longs paragraphes" : "- Prefer bullet lists over long paragraphs"}
-${lang === "fr" ? "- H2/H3 tous les 100 mots" : "- H2/H3 every 100w"}
+Blocks:
+- text{id,type:"text",content:"markdown"}
+- image{id,type:"image",src,alt,caption}
+- video{id,type:"video",url,caption}
+- quote{id,type:"quote",content,author,role}
+- carousel{id,type:"carousel",slides:[{src,alt,caption}]}
+- pdf{id,type:"pdf",url,title,description}
+- chart{id,type:"chart",chartType:"bar"|"line"|"area"|"pie",title:"descriptive title",data:[{label,value,color?}],xAxisLabel:"X axis label",yAxisLabel:"descriptive metric name used as legend (e.g. 'Adoption %' not 'value')",caption:"source note",height?}
+
+${lang === "fr" ? "Placeholder URLs: https://placeholder.example/name.jpg" : "Placeholder URLs: https://placeholder.example/name.jpg"}
+
+${lang === "fr" ? "RÈGLES DE QUALITÉ:" : "QUALITY RULES:"}
+1. ${lang === "fr" ? "CHAQUE colonne doit contenir au moins 1 block valide." : "EVERY column must contain at least 1 valid block."}
+2. ${lang === "fr" ? "Titres markdown (##/###) seuls sur leur ligne. Paragraphe après ligne vide." : "Markdown headings (##/###) alone on their own line. Paragraph after blank line."}
+3. ${lang === "fr" ? "Titres markdown: ne jamais couper un titre sur plusieurs lignes. Le titre complet doit tenir sur une seule ligne." : "Markdown headings: NEVER split a heading across multiple lines. The full heading text must be on ONE line."}
+4. ${lang === "fr" ? "Paragraphes: 2-3 phrases max. Préférer listes à puces pour les séries d'idées." : "Paragraphs: 2-3 sentences max. Prefer bullet lists for idea series."}
+5. ${lang === "fr" ? "Contenu concret: exemples nommés, chiffres, lieux, objets." : "Concrete content: named examples, numbers, places, objects."}
+5. ${lang === "fr" ? "Images: alt + caption uniques, spécifiques, visuels." : "Images: unique, specific, visual alt + caption."}
+6. ${lang === "fr" ? "Interdits: section vide, colonne vide, argument répété, cliché corporate." : "Forbidden: empty section, empty column, repeated argument, corporate cliché."}
 
 ${context ? `Context:${context}` : ""}
 
-${lang === "fr" ? "VÉRIFICATION FINALE: Vérifier que JSON est valide avant envoi!" : "FINAL CHECK: Verify JSON is valid before sending!"}`;
+${lang === "fr" ? "VÉRIFICATION FINALE: JSON valide, colonnes remplies, stratégie layout respectée, contenu concret." : "FINAL CHECK: valid JSON, all columns filled, layout strategy followed, concrete content."}`;
 }
 
 export function generateCompletePrompt(req: {
@@ -120,38 +211,53 @@ export function generateCompletePrompt(req: {
   language?: "en" | "fr";
 }): string {
   const lang = req.language || "en";
-  const l = LANG[lang];
 
   return `${lang === "fr" ? "Rédacteur expert blog élégant" : "Expert elegant blog writer"}.
 
-${lang === "fr" ? "LANGUE: Tout le contenu DOIT être en FRANÇAIS - AUCUN mot anglais dans title, content, captions, author!" : "LANGUAGE: All content must be in English"}
+${lang === "fr" ? "LANGUE: tout le contenu doit être en FRANÇAIS." : "LANGUAGE: all content must be in English."}
 
-${lang === "fr" ? "CRITIQUE: JSON 100% VALIDE { } début/fin SEULEMENT, PAS de \`\`\`, échapper \", sauts ligne \\n, PAS virgules finales" : "CRITICAL: 100% VALID JSON { } start/end ONLY, NO \`\`\`, escape \", newlines \\n, NO trailing commas"}
+${lang === "fr" ? "CRITIQUE: répondre avec UN SEUL objet JSON valide. Commencer par { finir par }. Pas de ``` ni texte hors JSON." : "CRITICAL: return ONE valid JSON object only. Start with { end with }. No ``` and no surrounding commentary."}
 
-${lang === "fr" ? "Philosophie: VISUEL d'abord - scannable (titres+paragraphes courts), engageant (accroche), actionable (valeur), respire (images/quotes/emojis)" : "Philosophy: VISUAL first - scannable (headings+short paragraphs), engaging (hook), actionable (value), breathing (images/quotes/emojis)"}
+${lang === "fr" ? "Utiliser l'échappement JSON standard. Utiliser \\n pour les retours de ligne markdown dans les strings JSON." : "Use standard JSON escaping. Use \\n for markdown line breaks inside JSON strings."}
 
-${lang === "fr" ? "Layouts: 1-column(intro/conclusion+images), 2-columns(texte+quote/image), 2-columns-wide-left(contenu+astuce 66/33), 2-columns-wide-right(icône+détail 33/66), 3-columns(features), grid-4-even(4 items 2x2)" : "Layouts: 1-column(intro/conclusion+images), 2-columns(text+quote/image), 2-columns-wide-left(content+tip 66/33), 2-columns-wide-right(icon+detail 33/66), 3-columns(features), grid-4-even(4 items 2x2)"}
+${lang === "fr" ? "Philosophie: visuel d'abord, scannable, utile, élégant, jamais creux." : "Philosophy: visual first, scannable, useful, elegant, never hollow."}
 
-${lang === "fr" ? "Ouverture: Image hero + accroche courte (100-150 mots MAX), 2-3 para courts" : "Opening: Hero image + short hook (100-150w MAX), 2-3 short para"}
-${lang === "fr" ? "Corps: Mixer 2/3-col, 1 sujet+points, H2/H3 100 mots, listes à puces, images/quotes TOUJOURS dans 2-col" : "Body: Mix 2/3-col, 1 topic+points, H2/H3 100w, bullet lists, images/quotes ALWAYS in 2-col"}
-${lang === "fr" ? "Fermeture: 3-5 points clés, CTA clair, concis" : "Closing: 3-5 key points, clear CTA, concise"}
+${lang === "fr" ? "SPÉCIFICITÉ OBLIGATOIRE: préférer exemples nommés, chiffres, objets, lieux, scènes visuelles. Bannir le filler marketing générique." : "MANDATORY SPECIFICITY: prefer named examples, numbers, objects, places, vivid visual scenes. Ban generic marketing filler."}
 
-${lang === "fr" ? "Contenu: Paragraphes 2-3 phrases MAX, listes à puces préférées, texte 80-120 mots par colonne" : "Content: Paragraphs 2-3 sentences MAX, bullet lists preferred, text 80-120w per column"}
+${lang === "fr" ? "QUALITÉ OBLIGATOIRE: chaque colonne doit contenir du vrai contenu, chaque section doit apporter un angle nouveau, chaque image doit être distincte." : "MANDATORY QUALITY: every column must contain real content, every section must add a new angle, every image must feel distinct."}
 
-Markdown: **bold** ${lang === "fr" ? "termes clés" : "key terms"}, *italic* ${lang === "fr" ? "emphase" : "emphasis"}, \`code\` ${lang === "fr" ? "technique" : "technical"}, lists ${lang === "fr" ? "scannables" : "scannable"}, ## structure
+${lang === "fr" ? "Layouts: 1-column(intro/conclusion/data+images/charts), 2-columns(texte+quote/image/chart), 2-columns-wide-left(contenu+astuce/chart), 2-columns-wide-right(chart/visuel+détail), 3-columns(features), grid-4-even(4 items)." : "Layouts: 1-column(intro/conclusion/data+images/charts), 2-columns(text+quote/image/chart), 2-columns-wide-left(content+tip/chart), 2-columns-wide-right(chart/visual+detail), 3-columns(features), grid-4-even(4 items)."}
 
-Blocks: text{id,type:"text",content:"md"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides,autoPlay,aspectRatio}, pdf{id,type:"pdf",url,title,description,displayMode}
+${lang === "fr" ? "GRAPHIQUES (chart): utiliser au moins 1 graphique par article quand le sujet comporte des données, tendances, comparaisons ou stats. Fournir des données réelles et plausibles (4-8 points). Types: bar=comparaison, line=tendance temporelle, area=évolution, pie=répartition." : "CHARTS: include at least 1 chart per article when the topic involves data, trends, comparisons, or stats. Use realistic plausible data (4-8 points). Types: bar=comparison, line=time trend, area=growth, pie=distribution. Always include title, data with labels+values, xAxisLabel, yAxisLabel (not for pie), caption."}
 
-${lang === "fr" ? "Réponse:" : "Response:"} {title,slug,excerpt:"150-160c",sections:[{id,type,columns:[[blocks]]}],seo_metadata:{description:"<160c",keywords:[],robots:"index, follow",openGraph:{title,description},twitter:{card:"summary_large_image",title,description}},category}
+${lang === "fr" ? "Ouverture: image hero + accroche courte, 100-150 mots max, 2-3 paragraphes courts." : "Opening: hero image + short hook, 100-150 words max, 2-3 short paragraphs."}
+${lang === "fr" ? "Corps: alterner 2/3-col et respirations 1-col; utiliser listes à puces, H2/H3 réguliers, visuels et graphiques intégrés intelligemment." : "Body: alternate 2/3-col with 1-col breathing space; use bullet lists, regular H2/H3 headings, purposeful visuals and charts."}
+${lang === "fr" ? "Fermeture: 3-5 points clés, CTA concret, pas de vague inspiration." : "Closing: 3-5 key points, concrete CTA, no vague inspiration."}
 
-${lang === "fr" ? "CRITIQUE: échapper \", utiliser \\n, ids uniques, colonnes correspondant au type layout, PAS virgules finales, début { fin }" : "CRITICAL: escape \", use \\n, unique ids, match columns count to layout type, NO trailing commas, start { end }"}
+${lang === "fr" ? "Titres markdown: 2-6 mots, seuls sur leur ligne. Le paragraphe commence après une ligne vide markdown. NE JAMAIS couper un titre sur plusieurs lignes — le titre entier sur une seule ligne." : "Markdown headings: 2-6 words, alone on their own line. Paragraphs start after a blank markdown line. NEVER split a heading across multiple lines — the full heading text on ONE line only."}
 
-${req.tone ? `Tone:${req.tone}` : `Tone:${lang === "fr" ? "Pro+accessible, autoritaire+conversationnel" : "Pro yet approachable, authoritative yet conversational"}`}
-${req.length ? `Len:${req.length}` : `Len:${lang === "fr" ? "moyen 5-7 sect 800-1200 mots" : "medium 5-7 sect 800-1200 words"}`}
-${req.layoutPreference?.length ? `Layouts:${req.layoutPreference}` : `Layouts:${lang === "fr" ? "variés 2-col 3-col grilles" : "varied 2-col 3-col grids"}`}
+${lang === "fr" ? "Paragraphes: 2-3 phrases max. Préférer listes à puces aux longs blocs." : "Paragraphs: 2-3 sentences max. Prefer bullet lists over long blocks."}
+
+${lang === "fr" ? "Images: alt+caption uniques, descriptifs, visuels; pas de répétition sunrise/sanctuary/transformative sauf exigence explicite." : "Images: alt+caption must be unique, descriptive, visual; avoid repeated sunrise/sanctuary/transformative language unless explicitly required."}
+
+${lang === "fr" ? "Interdits: colonne vide, section vide, répétition du même argument, cliché corporate, CTA vague." : "Forbidden: empty column, empty section, repeated argument, corporate cliché, vague CTA."}
+
+Markdown: **bold** ${lang === "fr" ? "termes clés" : "key terms"}, *italic* ${lang === "fr" ? "emphase" : "emphasis"}, \`code\` ${lang === "fr" ? "technique" : "technical"}, lists, ## structure
+
+Blocks: text{id,type:"text",content:"md"}, image{id,type:"image",src,alt,caption}, video{id,type:"video",url,caption}, quote{id,type:"quote",content,author,role}, carousel{id,type:"carousel",slides,autoPlay,aspectRatio}, pdf{id,type:"pdf",url,title,description,displayMode}, chart{id,type:"chart",chartType:"bar"|"line"|"area"|"pie",title:"descriptive title",data:[{label,value,color?}],xAxisLabel:"X axis label",yAxisLabel:"descriptive metric name (used as series legend — e.g. 'Adoption %' not 'value')",caption:"source/interpretation note",height?}
+
+${lang === "fr" ? "RÈGLE CHART: yAxisLabel devient le nom de la série dans la légende — toujours descriptif (ex: 'Taux d'adoption %', 'Temps (secondes)'), jamais 'value' ni 'data'. title et xAxisLabel obligatoires." : "CHART RULE: yAxisLabel becomes the series name in the legend — always descriptive (e.g. 'Adoption %', 'Time (seconds)'), never 'value' or 'data'. title and xAxisLabel are required."}
+
+${lang === "fr" ? "Réponse:" : "Response:"} {title,slug,excerpt:"150-160c",sections:[{id,type,columns:[[blocks]]}],seo_metadata:{description:"<160c",keywords:[],robots:"index, follow",openGraph:{title,description},twitter:{card:"summary_large_image",title,description}},category,tags}
+
+${lang === "fr" ? "CRITIQUE: ids uniques, nombre de colonnes conforme au layout, pas de virgules finales, JSON valide seulement." : "CRITICAL: unique ids, column count must match layout, no trailing commas, valid JSON only."}
+
+${req.tone ? `Tone:${req.tone}` : `Tone:${lang === "fr" ? "pro accessible, autoritaire mais conversationnel" : "professional, approachable, authoritative but conversational"}`}
+${req.length ? `Len:${req.length}` : `Len:${lang === "fr" ? "moyen 5-7 sections 800-1200 mots" : "medium 5-7 sections 800-1200 words"}`}
+${req.layoutPreference?.length ? `Layouts:${req.layoutPreference}` : `Layouts:${lang === "fr" ? "variés, sans répétition lourde" : "varied, without heavy repetition"}`}
 ${req.additionalInstructions ? ` ${req.additionalInstructions}` : ""}
 
-Checklist: { }? Escaped "? \\n? NO commas? "keys"? NO \`\`\`? Closed brackets?`;
+Checklist: { } only? valid JSON? headings on standalone lines? concrete details? no empty columns? no filler clichés?`;
 }
 
 export function generateSEOPrompt(language?: "en" | "fr"): string {

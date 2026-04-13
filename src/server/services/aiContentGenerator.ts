@@ -6,7 +6,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { LayoutSection, LayoutType } from "../../types/layouts";
-import type { ContentBlock, TextBlock, QuoteBlock } from "../../types/blocks";
+import type { ContentBlock, TextBlock } from "../../types/blocks";
 import type {
   GenerateCompleteBlogRequest,
   GenerateCompleteBlogResponse,
@@ -27,6 +27,193 @@ import {
   generateSEOPrompt,
   generateImprovePrompt,
 } from "./ai-prompts-compact";
+
+function getExpectedColumnCount(layoutType: LayoutType): number {
+  switch (layoutType) {
+    case "1-column":
+      return 1;
+    case "2-columns":
+    case "2-columns-wide-left":
+    case "2-columns-wide-right":
+      return 2;
+    case "3-columns":
+      return 3;
+    case "grid-2x2":
+    case "grid-4-even":
+      return 4;
+    case "grid-2x3":
+      return 6;
+    case "grid-3x3":
+      return 9;
+    default:
+      return 1;
+  }
+}
+
+function normalizeMarkdownContent(content: string): string {
+  return content
+    .replace(/\r\n/g, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/^```(?:markdown|md)?\s*/i, "")
+    .replace(/```$/i, "")
+    // Fix AI line-wrapping mid-word inside headings:
+    // e.g. "## Title Tex\n\nt\n\n" → "## Title Text\n\n"
+    .replace(/^(#{1,6} .+\S)\n\n([a-z0-9]\S*)\n\n/gm, (_, heading, fragment) => `${heading}${fragment}\n\n`)
+    // Normalize multiple blank lines
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function isMeaningfulText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function normalizeBlock(block: ContentBlock, fallbackId: string): ContentBlock | null {
+  const id = isMeaningfulText(block.id) ? block.id : fallbackId;
+
+  switch (block.type) {
+    case "text": {
+      const content = normalizeMarkdownContent(block.content);
+      if (!content) return null;
+      return { ...block, id, content };
+    }
+    case "image": {
+      if (!isMeaningfulText(block.src) || !isMeaningfulText(block.alt)) return null;
+      return {
+        ...block,
+        id,
+        src: block.src.trim(),
+        alt: block.alt.trim(),
+        caption: isMeaningfulText(block.caption) ? block.caption.trim() : undefined,
+      };
+    }
+    case "video": {
+      if (!isMeaningfulText(block.url)) return null;
+      return {
+        ...block,
+        id,
+        url: block.url.trim(),
+        caption: isMeaningfulText(block.caption) ? block.caption.trim() : undefined,
+      };
+    }
+    case "quote": {
+      const content = normalizeMarkdownContent(block.content);
+      if (!content) return null;
+      return {
+        ...block,
+        id,
+        content,
+        author: isMeaningfulText(block.author) ? block.author.trim() : undefined,
+        role: isMeaningfulText(block.role) ? block.role.trim() : undefined,
+      };
+    }
+    case "pdf": {
+      if (!isMeaningfulText(block.url)) return null;
+      return {
+        ...block,
+        id,
+        url: block.url.trim(),
+        title: isMeaningfulText(block.title) ? block.title.trim() : undefined,
+        description: isMeaningfulText(block.description) ? block.description.trim() : undefined,
+      };
+    }
+    case "carousel": {
+      const slides = Array.isArray(block.slides)
+        ? block.slides.filter((slide) => isMeaningfulText(slide?.src) && isMeaningfulText(slide?.alt)).map((slide) => ({
+            ...slide,
+            src: slide.src.trim(),
+            alt: slide.alt.trim(),
+            caption: isMeaningfulText(slide.caption) ? slide.caption.trim() : undefined,
+            title: isMeaningfulText(slide.title) ? slide.title.trim() : undefined,
+          }))
+        : [];
+
+      if (slides.length === 0) return null;
+      return { ...block, id, slides };
+    }
+    case "chart": {
+      if (!Array.isArray(block.data) || block.data.length === 0) return null;
+      const data = block.data
+        .filter((d) => isMeaningfulText(d?.label) && typeof d?.value === "number")
+        .map((d) => ({
+          label: d.label.trim(),
+          value: d.value,
+          color: isMeaningfulText(d.color) ? d.color.trim() : undefined,
+        }));
+      if (data.length === 0) return null;
+      return {
+        ...block,
+        id,
+        data,
+        chartType: (["bar", "line", "area", "pie"] as const).includes(block.chartType) ? block.chartType : "bar",
+        title: isMeaningfulText(block.title) ? block.title.trim() : undefined,
+        xAxisLabel: isMeaningfulText(block.xAxisLabel) ? block.xAxisLabel.trim() : undefined,
+        yAxisLabel: isMeaningfulText(block.yAxisLabel) ? block.yAxisLabel.trim() : undefined,
+        caption: isMeaningfulText(block.caption) ? block.caption.trim() : undefined,
+        height: typeof block.height === "number" ? block.height : 300,
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+function normalizeSection(section: LayoutSection, index: number): LayoutSection {
+  const expectedColumns = getExpectedColumnCount(section.type);
+  const sourceColumns = Array.isArray(section.columns) ? section.columns : [];
+
+  const normalizedColumns: ContentBlock[][] = Array.from({ length: expectedColumns }, (_, columnIndex) => {
+    const column = Array.isArray(sourceColumns[columnIndex]) ? sourceColumns[columnIndex] : [];
+    const normalizedBlocks = column
+      .map((block, blockIndex) => normalizeBlock(block, `${section.id || `section-${index + 1}`}-c${columnIndex + 1}-b${blockIndex + 1}`))
+      .filter((block): block is ContentBlock => block !== null);
+
+    if (normalizedBlocks.length > 0) {
+      return normalizedBlocks;
+    }
+
+    const fillerContent = section.type === "1-column"
+      ? "## Key takeaway\n\nAdd a concrete example, detail, or scene here instead of leaving the section empty."
+      : `### Point ${columnIndex + 1}\n\nAdd one specific detail, example, or visual note for this column.`;
+
+    const fallbackBlock: ContentBlock = {
+      id: `${section.id || `section-${index + 1}`}-c${columnIndex + 1}-fallback`,
+      type: "text",
+      content: fillerContent,
+    };
+
+    return [fallbackBlock];
+  });
+
+  const sectionId = isMeaningfulText(section.id) ? section.id : `section-${index + 1}`;
+
+  let finalColumns: ContentBlock[][] = normalizedColumns;
+
+  if (
+    ["2-columns", "2-columns-wide-left", "2-columns-wide-right"].includes(section.type) &&
+    normalizedColumns.length === 2 &&
+    normalizedColumns.every((column) => column.every((block) => block.type === "text"))
+  ) {
+    const supportingBlock: ContentBlock = {
+      id: `${sectionId}-c2-supporting-quote`,
+      type: "quote",
+      content: "A strong supporting quote, stat, or visual callout belongs here to create contrast with the main text column.",
+      author: "Editorial note",
+      role: "Layout fallback",
+    };
+    finalColumns = [normalizedColumns[0], [supportingBlock]];
+  }
+
+  return {
+    id: sectionId,
+    type: section.type,
+    columns: finalColumns,
+  };
+}
+
+function normalizeSections(sections: LayoutSection[]): LayoutSection[] {
+  return sections.map((section, index) => normalizeSection(section, index));
+}
 
 /**
  * Helper: Strip markdown code blocks and extract valid JSON from response
@@ -55,6 +242,43 @@ function stripMarkdownCodeBlocks(text: string): string {
   return cleaned.trim();
 }
 
+function extractTextContent(message: unknown): string {
+  if (!message || typeof message !== "object" || !("content" in message)) {
+    return "";
+  }
+
+  const content = message.content;
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  const firstBlock = content[0];
+  if (!firstBlock || typeof firstBlock !== "object") {
+    return "";
+  }
+
+  return "type" in firstBlock && firstBlock.type === "text" && "text" in firstBlock && typeof firstBlock.text === "string"
+    ? firstBlock.text
+    : "";
+}
+
+function looksLikeJsonObject(text: string): boolean {
+  const trimmed = text.trim();
+  return trimmed.startsWith("{") && trimmed.endsWith("}");
+}
+
+function looksLikeRefusalOrProse(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  return !looksLikeJsonObject(text) && (
+    normalized.startsWith("i can't") ||
+    normalized.startsWith("i cannot") ||
+    normalized.startsWith("i'm sorry") ||
+    normalized.startsWith("sorry") ||
+    normalized.startsWith("here's") ||
+    normalized.startsWith("here is")
+  );
+}
+
 /**
  * AI Content Generator class
  */
@@ -68,9 +292,9 @@ export class AIContentGenerator {
     });
 
     this.config = {
-      model: config.model || "claude-3-5-sonnet-20241022",
+      model: config.model || process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
       maxTokens: config.maxTokens || 4000,
-      temperature: config.temperature || 0.7,
+      temperature: config.temperature || 0.3,
     };
   }
 
@@ -95,36 +319,95 @@ export class AIContentGenerator {
       ? `Générer la structure du blog pour : ${request.prompt}`
       : `Generate blog post layout for: ${request.prompt}`;
 
-    const message = await this.anthropic.messages.create({
-      model: this.config.model,
-      max_tokens: 1000, // Small response - just structure
-      temperature: this.config.temperature,
-      system: [
-        {
-          type: "text",
-          text: systemPrompt,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
+    const createLayoutMessage = async (
+      messages: Array<{ role: "user" | "assistant"; content: string }>,
+      temperature = this.config.temperature
+    ) => {
+      return this.anthropic.messages.create({
+        model: this.config.model,
+        max_tokens: 1000,
+        temperature,
+        system: [
+          {
+            type: "text",
+            text: systemPrompt,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
+        messages,
+      });
+    };
+
+    const normalizeLayoutResponse = (parsed: GenerateLayoutResponse): GenerateLayoutResponse => ({
+      ...parsed,
+      layout: Array.isArray(parsed.layout)
+        ? parsed.layout.map((section, index) => ({
+            ...section,
+            id: isMeaningfulText(section.id) ? section.id : `section-${index + 1}`,
+            description: isMeaningfulText(section.description)
+              ? section.description.trim()
+              : `Section ${index + 1}`,
+          }))
+        : [],
+      tags: Array.isArray(parsed.tags)
+        ? parsed.tags.filter(isMeaningfulText).map((tag) => tag.trim()).slice(0, 5)
+        : [],
     });
 
-    const responseText =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const initialMessage = await createLayoutMessage([
+      {
+        role: "user",
+        content: userPrompt,
+      },
+    ]);
 
-    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    let responseText = extractTextContent(initialMessage);
+    let cleanedText = stripMarkdownCodeBlocks(responseText);
 
     try {
-      return JSON.parse(cleanedText);
+      return normalizeLayoutResponse(JSON.parse(cleanedText) as GenerateLayoutResponse);
     } catch (error) {
       console.error("JSON Parse Error (Layout):", error);
-      console.error("Response:", cleanedText);
-      throw new Error(`Failed to parse layout response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Raw layout response (first 500 chars):", responseText.substring(0, 500));
+      console.error("Cleaned layout response (first 500 chars):", cleanedText.substring(0, 500));
+
+      const correctionPrompt = lang === "fr"
+        ? "Ta réponse précédente n'était pas un JSON valide. Corrige-la et renvoie uniquement un objet JSON valide correspondant à {title,slug,excerpt,layout,category?,tags}. N'ajoute aucun commentaire. Répare les guillemets, virgules, échappements et retours de ligne."
+        : "Your previous response was not valid JSON. Fix it and return only a valid JSON object matching {title,slug,excerpt,layout,category?,tags}. Do not add commentary. Repair quotes, commas, escapes, and line breaks.";
+
+      const correctedMessage = await createLayoutMessage(
+        [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+          {
+            role: "assistant",
+            content: responseText,
+          },
+          {
+            role: "user",
+            content: correctionPrompt,
+          },
+        ],
+        0.1
+      );
+
+      responseText = extractTextContent(correctedMessage);
+      cleanedText = stripMarkdownCodeBlocks(responseText);
+
+      try {
+        return normalizeLayoutResponse(JSON.parse(cleanedText) as GenerateLayoutResponse);
+      } catch (retryError) {
+        console.error("JSON Parse Error (Layout Retry):", retryError);
+        console.error("Retry layout response (first 500 chars):", responseText.substring(0, 500));
+
+        if (looksLikeRefusalOrProse(responseText)) {
+          throw new Error("Failed to parse layout response: Anthropic returned prose or a refusal instead of JSON. Use structured outputs for guaranteed schema-valid responses.");
+        }
+
+        throw new Error(`Failed to parse layout response: ${retryError instanceof Error ? retryError.message : 'Unknown error'}`);
+      }
     }
   }
 
@@ -189,7 +472,16 @@ export class AIContentGenerator {
       throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}. This usually means the AI didn't follow the JSON format instructions. Please try again.`);
     }
 
-    return result;
+    return {
+      ...result,
+      sections: normalizeSections(result.sections || []),
+      tags: Array.isArray(result.tags)
+        ? result.tags.filter(isMeaningfulText).map((tag) => tag.trim()).slice(0, 8)
+        : [],
+      excerpt: isMeaningfulText(result.excerpt) ? result.excerpt.trim() : "",
+      title: isMeaningfulText(result.title) ? result.title.trim() : "Untitled",
+      slug: isMeaningfulText(result.slug) ? result.slug.trim() : "untitled",
+    };
   }
 
   /**
@@ -251,312 +543,6 @@ export class AIContentGenerator {
   }
 
   /**
-   * Build the OLD verbose prompt for blog post generation (DEPRECATED - kept for reference)
-   * @deprecated Use buildCompleteBlogPrompt() which uses TOON format
-   */
-  private buildCompleteBlogPromptOLD(request: GenerateCompleteBlogRequest): string {
-    return `You are an expert blog content writer specializing in creating elegant, visually engaging blog posts with sophisticated layouts.
-
-⚠️ CRITICAL: YOUR RESPONSE MUST BE 100% VALID JSON ⚠️
-
-JSON FORMATTING RULES - ZERO TOLERANCE FOR ERRORS:
-1. Response starts with { and ends with } - NOTHING ELSE
-2. NO markdown code blocks (no \`\`\`json or \`\`\`)
-3. NO explanatory text before or after the JSON
-4. ALL quotes inside strings MUST be escaped: use \\" not "
-5. NO literal line breaks in strings - use \\n instead
-6. NO trailing commas after the last item in arrays or objects
-7. ALL object keys must be in "double quotes"
-8. Close EVERY bracket and brace you open
-9. Double-check your JSON is valid before responding
-
-COMMON MISTAKES TO AVOID:
-❌ "content": "She said "hello""  → ✅ "content": "She said \\"hello\\""
-❌ "content": "First line
-Second line"  → ✅ "content": "First line\\nSecond line"
-❌ "tags": ["tag1", "tag2",]  → ✅ "tags": ["tag1", "tag2"]
-❌ {title: "Post"}  → ✅ {"title": "Post"}
-❌ \`\`\`json\\n{...}\\n\`\`\`  → ✅ {...}
-
-If you're unsure about JSON syntax:
-- Every opening { needs a closing }
-- Every opening [ needs a closing ]
-- Every string needs exactly 2 unescaped quotes (start and end)
-- Commas separate items, but NO comma after the last item
-- Property names and string values both need "double quotes"
-
-BEFORE YOU RESPOND: Mentally validate your JSON structure is correct.
-
-# CONTENT PHILOSOPHY
-Create content that is:
-- **Scannable**: Use headings, short paragraphs, and visual breaks
-- **Engaging**: Hook readers immediately, maintain interest throughout
-- **Actionable**: Provide practical value and clear takeaways
-- **Visual**: Use layouts to create visual hierarchy and breathing room
-- **Elegant**: Professional tone with conversational warmth
-
-# LAYOUT TYPES & BEST PRACTICES
-
-**1-column** (Full-width)
-- Use for: Hero sections, introductions, conclusions, long-form narrative
-- Example: Opening hook, main thesis, final call-to-action
-
-**2-columns** (Equal width - 50/50)
-- Use for: Comparisons, before/after, pros/cons, complementary points
-- Example: "Traditional vs Modern", "Benefits vs Challenges"
-
-**2-columns-wide-left** (66/33)
-- Use for: Main content + sidebar tip, primary + supporting info
-- Example: Main explanation (left) + quick tip or stat (right)
-
-**2-columns-wide-right** (33/66)
-- Use for: Icon/visual + detailed explanation
-- Example: Key point (left) + detailed breakdown (right)
-
-**3-columns** (Equal width - 33/33/33)
-- Use for: Features, benefits, steps, listicles
-- Example: "3 Core Principles", "Key Features"
-
-**grid-4-even** (2x2)
-- Use for: Four equal items, quadrants, balanced features
-- Example: "4 Essential Tools", "Key Metrics"
-
-# CONTENT STRUCTURE GUIDELINES
-
-**Opening Section** (1-column):
-- Strong hook (question, stat, or bold statement)
-- Clear value proposition (what reader will learn)
-- Brief context (why this matters now)
-- 2-3 paragraphs maximum
-- Consider adding a hero image or video for visual impact
-
-**Body Sections** (varied layouts):
-- Mix 2-column and 3-column layouts for visual rhythm
-- Each section: 1 clear topic with 2-4 supporting points
-- Use subheadings (## and ###) liberally
-- Include specific examples, data, or case studies
-- Add images, videos, or carousels to break up text and enhance understanding
-
-**Visual Content Placement**:
-- Use images to illustrate concepts, show examples, or add visual interest
-- Use videos for tutorials, demonstrations, or embedded content
-- Place visual content strategically (not every section needs visuals)
-- In multi-column layouts, balance text and visuals across columns
-
-**Quotes** (strategic placement):
-- Use sparingly (1-2 per post maximum)
-- Place in 2-column layouts for visual interest
-- Include author/source for credibility
-
-**Closing Section** (1-column):
-- Synthesize key takeaways (3-5 bullet points)
-- Clear next step or call-to-action
-- Forward-looking statement
-
-# MARKDOWN FORMATTING
-Use markdown to enhance readability:
-- **Bold** for key terms and emphasis
-- *Italics* for subtle emphasis or terms
-- \`code\` for technical terms, commands, or inline code
-- Lists (- or 1.) for scannable points
-- ## Headings for section structure
-- > Blockquotes sparingly for impact
-
-# WRITING STYLE
-- Start sections with clear, descriptive headings
-- Use active voice and concrete language
-- Vary sentence length (mix short punchy sentences with longer explanatory ones)
-- Include transitions between sections
-- Add specificity (numbers, examples, real scenarios)
-
-# AVAILABLE CONTENT BLOCKS
-
-**text** - Rich text content with markdown support
-{
-  "id": "unique-id",
-  "type": "text",
-  "content": "Markdown content here with **bold**, *italic*, lists, etc."
-}
-
-**image** - Visual content with optional caption
-{
-  "id": "unique-id",
-  "type": "image",
-  "src": "https://example.com/image.jpg",
-  "alt": "Descriptive alt text",
-  "caption": "Optional caption text"
-}
-
-**video** - Embedded video (YouTube, Vimeo, etc.)
-{
-  "id": "unique-id",
-  "type": "video",
-  "url": "https://youtube.com/watch?v=...",
-  "caption": "Optional video description"
-}
-
-**quote** - Pull quote or testimonial
-{
-  "id": "unique-id",
-  "type": "quote",
-  "content": "The quote text",
-  "author": "Person Name",
-  "role": "Title or Company"
-}
-
-**carousel** - Image gallery/slideshow
-{
-  "id": "unique-id",
-  "type": "carousel",
-  "slides": [
-    {"src": "url1", "alt": "desc1", "caption": "caption1"},
-    {"src": "url2", "alt": "desc2", "caption": "caption2"}
-  ],
-  "autoPlay": true,
-  "aspectRatio": "16/9"
-}
-
-**pdf** - PDF document embed or download
-{
-  "id": "unique-id",
-  "type": "pdf",
-  "url": "https://example.com/document.pdf",
-  "title": "Document Title",
-  "description": "Brief description",
-  "displayMode": "both"
-}
-
-**IMPORTANT**: For image, video, carousel, and PDF blocks:
-- Use placeholder URLs like "https://placeholder.example/image-name.jpg"
-- Use descriptive placeholder names that indicate what image/video should go there
-- Add clear captions/descriptions so users know what content to add
-- Example: "https://placeholder.example/data-visualization-chart.jpg"
-
-# EXPECTED JSON STRUCTURE
-
-You must return a JSON object with this EXACT structure (remove all comments):
-
-{
-  "title": "Your Compelling Blog Post Title Here",
-  "slug": "your-blog-post-url-slug",
-  "excerpt": "A concise 150-160 character summary that hooks readers and encourages them to read more of your content.",
-  "sections": [
-    {
-      "id": "section-1",
-      "type": "1-column",
-      "columns": [
-        [
-          {
-            "id": "block-1",
-            "type": "text",
-            "content": "## Introduction\\n\\nThis is the opening paragraph with **bold** and *italic* text.\\n\\nSecond paragraph continues here."
-          },
-          {
-            "id": "block-2",
-            "type": "image",
-            "src": "https://placeholder.example/hero-image.jpg",
-            "alt": "Descriptive alt text for the hero image",
-            "caption": "Optional caption explaining the image"
-          }
-        ]
-      ]
-    },
-    {
-      "id": "section-2",
-      "type": "2-columns",
-      "columns": [
-        [
-          {
-            "id": "block-3",
-            "type": "text",
-            "content": "## First Column Heading\\n\\nContent for the first column goes here."
-          }
-        ],
-        [
-          {
-            "id": "block-4",
-            "type": "quote",
-            "content": "This is an inspiring quote that adds credibility.",
-            "author": "Expert Name",
-            "role": "CEO, Company Name"
-          }
-        ]
-      ]
-    },
-    {
-      "id": "section-3",
-      "type": "3-columns",
-      "columns": [
-        [
-          {
-            "id": "block-5",
-            "type": "text",
-            "content": "### Feature One\\n\\nDescription of the first feature."
-          }
-        ],
-        [
-          {
-            "id": "block-6",
-            "type": "text",
-            "content": "### Feature Two\\n\\nDescription of the second feature."
-          }
-        ],
-        [
-          {
-            "id": "block-7",
-            "type": "text",
-            "content": "### Feature Three\\n\\nDescription of the third feature."
-          }
-        ]
-      ]
-    }
-  ],
-  "seo_metadata": {
-    "description": "A clear, benefit-focused meta description under 160 characters that encourages clicks.",
-    "keywords": ["primary-keyword", "secondary-keyword", "long-tail-keyword"],
-    "robots": "index, follow",
-    "openGraph": {
-      "title": "Social Media Optimized Title",
-      "description": "Engaging description for social media sharing."
-    },
-    "twitter": {
-      "card": "summary_large_image",
-      "title": "Twitter-Optimized Title",
-      "description": "Twitter-specific description."
-    }
-  },
-  "category": "Technology",
-  "tags": ["web-development", "react", "performance", "best-practices"]
-}
-
-CRITICAL REMINDERS:
-- ALL strings must use \\n for line breaks (never literal newlines)
-- Escape ALL quotes inside strings with \\"
-- Each block must have unique "id" field
-- Each section must have unique "id" field
-- Use only these layout types: "1-column", "2-columns", "3-columns", "2-columns-wide-left", "2-columns-wide-right", "grid-2x2", "grid-3x3", "grid-2x3", "grid-4-even"
-- Use only these block types: "text", "image", "video", "quote", "carousel", "pdf"
-- Number of columns array must match layout type (1-column = 1 array, 2-columns = 2 arrays, etc.)
-- Start your response with { and end with } with nothing else before or after
-
-${request.tone ? `Tone: ${request.tone}` : "Tone: Professional yet approachable, authoritative yet conversational"}
-${request.length ? `Length: ${request.length}` : "Length: medium (5-7 sections, 800-1200 words)"}
-${request.layoutPreference && request.layoutPreference.length > 0 ? `Preferred layouts: ${request.layoutPreference.join(", ")}. Use these layouts predominantly while maintaining visual variety.` : "Use varied layouts (2-col, 3-col, grids) for visual interest"}
-${request.additionalInstructions ? `\n\nADDITIONAL INSTRUCTIONS:\n${request.additionalInstructions}` : ""}
-
-⚠️ FINAL CHECKLIST BEFORE RESPONDING:
-□ Does my response start with { and end with }?
-□ Did I escape ALL quotes inside strings with \\"?
-□ Did I replace ALL line breaks with \\n?
-□ Did I remove ALL trailing commas?
-□ Are ALL property names in "double quotes"?
-□ Did I avoid markdown code blocks?
-□ Is every bracket properly closed?
-
-RESPOND ONLY WITH VALID JSON NOW:`;
-  }
-
-  /**
    * Generate a single section with specific layout
    * Now using TOON-optimized prompts with multilingual support
    */
@@ -574,37 +560,38 @@ RESPOND ONLY WITH VALID JSON NOW:`;
       ? `Générer une section sur : ${request.prompt}`
       : `Generate a section about: ${request.prompt}`;
 
-    const message = await this.anthropic.messages.create({
-      model: this.config.model,
-      max_tokens: 2000,
-      temperature: this.config.temperature,
-      system: systemPrompt,
-      messages: [
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
-    });
+    const createSectionMessage = async (
+      messages: Array<{ role: "user" | "assistant"; content: string }>,
+      temperature = this.config.temperature
+    ) => {
+      return this.anthropic.messages.create({
+        model: this.config.model,
+        max_tokens: 2000,
+        temperature,
+        system: systemPrompt,
+        messages,
+      });
+    };
 
-    const responseText =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const initialMessage = await createSectionMessage([
+      {
+        role: "user",
+        content: userPrompt,
+      },
+    ]);
 
-    // Parse the JSON response (strip markdown code blocks first)
-    const cleanedText = stripMarkdownCodeBlocks(responseText);
+    let responseText = extractTextContent(initialMessage);
+    let cleanedText = stripMarkdownCodeBlocks(responseText);
 
-    // Try to parse JSON with detailed error reporting
     let result: GenerateSectionResponse;
     try {
       result = JSON.parse(cleanedText) as GenerateSectionResponse;
     } catch (error) {
-      // Log the problematic JSON for debugging
       console.error("JSON Parse Error (Section):", error);
       console.error("Raw response (first 500 chars):", responseText.substring(0, 500));
       console.error("Cleaned JSON (first 500 chars):", cleanedText.substring(0, 500));
       console.error("Cleaned JSON (last 500 chars):", cleanedText.substring(Math.max(0, cleanedText.length - 500)));
 
-      // Try to provide more context about where the error occurred
       if (error instanceof SyntaxError) {
         const match = error.message.match(/position (\d+)/);
         if (match) {
@@ -614,10 +601,44 @@ RESPOND ONLY WITH VALID JSON NOW:`;
         }
       }
 
-      throw new Error(`Failed to parse section response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}. Check server logs for details.`);
+      const correctionPrompt = lang === "fr"
+        ? "Ta réponse précédente n'était pas un JSON valide. Corrige-la et renvoie uniquement un objet JSON valide pour {section:{id,type,columns}}. Ne change pas le sens du contenu. N'ajoute aucun commentaire. Répare les guillemets, virgules, échappements et retours de ligne."
+        : "Your previous response was not valid JSON. Fix it and return only a valid JSON object for {section:{id,type,columns}}. Do not change the meaning of the content. Do not add commentary. Repair quotes, commas, escapes, and line breaks.";
+
+      const correctedMessage = await createSectionMessage(
+        [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+          {
+            role: "assistant",
+            content: responseText,
+          },
+          {
+            role: "user",
+            content: correctionPrompt,
+          },
+        ],
+        0.1
+      );
+
+      responseText = extractTextContent(correctedMessage);
+      cleanedText = stripMarkdownCodeBlocks(responseText);
+
+      try {
+        result = JSON.parse(cleanedText) as GenerateSectionResponse;
+      } catch (retryError) {
+        console.error("JSON Parse Error (Section Retry):", retryError);
+        console.error("Retry response (first 500 chars):", responseText.substring(0, 500));
+        throw new Error(`Failed to parse section response as JSON: ${retryError instanceof Error ? retryError.message : 'Unknown error'}. Check server logs for details.`);
+      }
     }
 
-    return result;
+    return {
+      ...result,
+      section: normalizeSection(result.section, 0),
+    };
   }
 
   /**

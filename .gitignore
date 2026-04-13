@@ -48,3 +48,7 @@ storybook-static/
 *.tmp
 .cache/
 .temp/
+
+# Example app
+example/app/.next/
+example/app/node_modules/

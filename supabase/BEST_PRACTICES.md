@@ -415,16 +415,11 @@ npm-package/
 └── package.json
 ```
 
-### 3. **Example Implementations**
+### 3. **Documentation**
 
-✅ **DO**: Provide framework-specific examples
+✅ **DO**: Provide clear documentation with inline code examples
 
-```
-supabase/examples/
-├── nextjs/
-├── remix/
-└── sveltekit/
-```
+Refer users to the main package docs (`docs/INSTALLATION.md`, `docs/BLOG_ADMIN_GUIDE.md`, `docs/BLOG_GUIDE.md`) for framework-specific setup instructions.
 
 ## 🧪 Testing
 

@@ -44,19 +44,7 @@ cp supabase/migrations/20260405000000_create_blog_schema.sql ./supabase/migratio
 npx supabase db push
 ```
 
-### Step 4: Copy Files to Your Project (1 minute)
-
-```bash
-# Create lib directory if it doesn't exist
-mkdir -p src/lib
-
-# Copy files
-cp supabase/examples/nextjs/supabase-client.ts src/lib/
-cp supabase/examples/nextjs/blog-api.ts src/lib/
-cp supabase/adapters.ts src/lib/
-```
-
-### Step 5: Create Admin User (1 minute)
+### Step 4: Set Up Admin User (1 minute)
 
 1. **Supabase Dashboard → Authentication → Users**
 2. Click your user (or create one)
@@ -73,19 +61,20 @@ cp supabase/adapters.ts src/lib/
 Create `test-connection.ts`:
 
 ```typescript
-import { supabaseClient } from './src/lib/supabase-client';
+import { createBrowserClient } from '@supabase/ssr';
+import { createBlogClient } from 'm14i-blogging/client';
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 async function test() {
-  const { data, error } = await supabaseClient
-    .from('blog.posts')
-    .select('count');
+  const client = createBlogClient(supabase);
+  const { posts, total } = await client.listPosts({ limit: 5 });
 
-  if (error) {
-    console.error('❌ Error:', error);
-  } else {
-    console.log('✅ Success! Connected to Supabase');
-    console.log('Posts count:', data);
-  }
+  console.log('✅ Success! Connected to Supabase');
+  console.log('Posts:', total);
 }
 
 test();
@@ -98,10 +87,11 @@ Run: `npx tsx test-connection.ts`
 ### Create Your First Post (via code)
 
 ```typescript
-import { supabaseClient } from '@/lib/supabase-client';
-import { createPost } from '@/lib/blog-api';
+import { createBlogClient } from 'm14i-blogging/client';
 
-const { post, error } = await createPost(supabaseClient, {
+const client = createBlogClient(supabase);
+
+const post = await client.createPost({
   title: 'My First Post',
   sections: [
     {
@@ -125,23 +115,40 @@ const { post, error } = await createPost(supabaseClient, {
 console.log('Created post:', post);
 ```
 
-### Create a Blog Editor Page
+### Create a Blog Admin Page
 
-1. **Create:** `app/admin/blog/edit/[id]/page.tsx`
-2. **Copy:** Content from `supabase/examples/nextjs/blog-editor-page.tsx`
-3. **Navigate to:** `/admin/blog/edit/post-id-here`
+```tsx
+// app/admin/blog/page.tsx
+import { BlogAdmin } from 'm14i-blogging/admin';
+import { BlogBuilder } from 'm14i-blogging';
+import { Button, Input, Card, Badge } from '@/components/ui';
+
+export default async function BlogAdminPage() {
+  const user = await getUser();
+  return (
+    <BlogAdmin
+      isAllowed={user?.role === "admin"}
+      currentUser={user}
+      basePath="/admin/blog"
+      apiBasePath="/api/blog"
+      components={{ Button, Input, Card, Badge, BlogBuilder }}
+    />
+  );
+}
+```
 
 ### Create a Public Blog Page
 
 ```tsx
 // app/blog/[slug]/page.tsx
-import { createServerSupabaseClient } from '@/lib/supabase-client';
-import { getPostBySlug } from '@/lib/blog-api';
+import { createClient } from '@/lib/supabase/server';
+import { createBlogClient } from 'm14i-blogging/client';
 import { BlogPreview } from 'm14i-blogging';
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const supabase = createServerSupabaseClient();
-  const post = await getPostBySlug(supabase, params.slug);
+  const supabase = await createClient();
+  const client = createBlogClient(supabase);
+  const post = await client.getPostBySlug(params.slug);
 
   if (!post) return <div>Post not found</div>;
 
@@ -149,9 +156,24 @@ export default async function BlogPost({ params }: { params: { slug: string } })
 }
 ```
 
-### Create API Routes (optional)
+### Create API Routes
 
-See `supabase/examples/nextjs/app-routes-example.ts` for complete REST API implementation.
+Use the built-in handler factories from `m14i-blogging/server`:
+
+```typescript
+// app/api/blog/route.ts
+import { createClient } from "@/lib/supabase/server";
+import { createListPostsHandler, createCreatePostHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
+
+async function getBlogClient() {
+  const supabase = await createClient();
+  return createBlogClient(supabase);
+}
+
+export const GET = createListPostsHandler(getBlogClient);
+export const POST = createCreatePostHandler(getBlogClient, checkAuth);
+```
 
 ## 📊 Verify in Supabase Dashboard
 
@@ -164,9 +186,10 @@ See `supabase/examples/nextjs/app-routes-example.ts` for complete REST API imple
 ### List all posts
 
 ```typescript
-import { getPosts } from '@/lib/blog-api';
+import { createBlogClient } from 'm14i-blogging/client';
 
-const { posts, total } = await getPosts(supabaseClient, {
+const client = createBlogClient(supabase);
+const { posts, total } = await client.listPosts({
   status: 'published',
   limit: 10,
 });
@@ -175,36 +198,22 @@ const { posts, total } = await getPosts(supabaseClient, {
 ### Get post by slug
 
 ```typescript
-import { getPostBySlug } from '@/lib/blog-api';
-
-const post = await getPostBySlug(supabaseClient, 'my-first-post');
+const post = await client.getPostBySlug('my-first-post');
 ```
 
 ### Update a post
 
 ```typescript
-import { updatePost } from '@/lib/blog-api';
-
-const { post } = await updatePost(supabaseClient, postId, {
+const updated = await client.updatePost(postId, {
   title: 'Updated Title',
   sections: [...],
 });
 ```
 
-### Publish a draft
-
-```typescript
-import { publishPost } from '@/lib/blog-api';
-
-const { post } = await publishPost(supabaseClient, postId);
-```
-
 ### Search posts
 
 ```typescript
-import { searchPosts } from '@/lib/blog-api';
-
-const results = await searchPosts(supabaseClient, 'typescript');
+const results = await client.searchPosts('typescript');
 ```
 
 ## 🎨 Using BlogBuilder Component
@@ -214,13 +223,14 @@ const results = await searchPosts(supabaseClient, 'typescript');
 
 import { useState } from 'react';
 import { BlogBuilder } from 'm14i-blogging';
-import { updatePostSections } from '@/lib/blog-api';
+import { createBlogClient } from 'm14i-blogging/client';
 
-export default function Editor({ postId, initialSections }) {
+export default function Editor({ postId, initialSections, supabase }) {
   const [sections, setSections] = useState(initialSections);
 
   const handleSave = async () => {
-    await updatePostSections(supabaseClient, postId, sections);
+    const client = createBlogClient(supabase);
+    await client.updatePost(postId, { sections });
   };
 
   return (
@@ -261,7 +271,6 @@ npx supabase gen types typescript --local > src/types/supabase.ts
 
 - [Full README](./README.md) - Complete documentation
 - [Best Practices](./BEST_PRACTICES.md) - Architecture guidelines
-- [Example Routes](./examples/nextjs/app-routes-example.ts) - API implementation
 - [Schema Migration](./migrations/20260405000000_create_blog_schema.sql) - Database schema
 
 ## 🎉 You're Done!

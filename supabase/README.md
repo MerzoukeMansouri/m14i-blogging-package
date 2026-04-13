@@ -7,14 +7,9 @@ This directory contains everything you need to persist blog posts from the `m14i
 ```
 supabase/
 ├── migrations/
-│   └── 20260405000000_create_blog_schema.sql  # Database schema
+│   ├── 20260405000000_create_blog_schema.sql  # Blog posts, media, search
+│   └── 20260405000001_add_taxonomy_tables.sql # Categories and tags
 ├── adapters.ts                                 # Type adapters (DB ↔ Package types)
-├── examples/
-│   └── nextjs/
-│       ├── supabase-client.ts                 # Supabase client setup
-│       ├── blog-api.ts                        # CRUD API functions
-│       ├── app-routes-example.ts              # Next.js API routes
-│       └── blog-editor-page.tsx               # Example editor page
 └── README.md                                   # This file
 ```
 
@@ -92,22 +87,7 @@ npx supabase gen types typescript --local > src/types/supabase.ts
 npx supabase gen types typescript --project-id your-project-ref > src/types/supabase.ts
 ```
 
-### 7. Copy Example Files to Your Project
-
-Copy the example files to your Next.js project:
-
-```bash
-# Client setup
-cp supabase/examples/nextjs/supabase-client.ts src/lib/supabase-client.ts
-
-# API functions
-cp supabase/examples/nextjs/blog-api.ts src/lib/blog-api.ts
-
-# Adapters (must be in the same relative path)
-cp supabase/adapters.ts src/lib/adapters.ts
-```
-
-### 8. Set Up Admin User
+### 7. Set Up Admin User
 
 To create posts, you need an admin user:
 
@@ -195,25 +175,43 @@ SELECT * FROM blog.get_posts_by_category('engineering');
 
 ### 1. Create API Routes
 
-See `examples/nextjs/app-routes-example.ts` for complete examples.
+Use the built-in handler factories from `m14i-blogging/server`:
 
-Quick setup:
+```typescript
+// app/api/blog/route.ts
+import { createClient } from "@/lib/supabase/server";
+import { createListPostsHandler, createCreatePostHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
-```bash
-# Copy the example routes to your app
-mkdir -p app/api/blog/posts
-# Then implement the routes from app-routes-example.ts
+async function getBlogClient() {
+  const supabase = await createClient();
+  return createBlogClient(supabase);
+}
+
+export const GET = createListPostsHandler(getBlogClient);
+export const POST = createCreatePostHandler(getBlogClient, checkAuth);
 ```
 
 ### 2. Create a Blog Editor Page
 
 ```tsx
-// app/admin/blog/edit/[id]/page.tsx
+// app/admin/blog/page.tsx
+import { BlogAdmin } from 'm14i-blogging/admin';
 import { BlogBuilder } from 'm14i-blogging';
-import { supabaseClient } from '@/lib/supabase-client';
-import { getPostById, updatePostSections } from '@/lib/blog-api';
+import { Button, Input, Card, Badge } from '@/components/ui';
 
-// See blog-editor-page.tsx for complete implementation
+export default async function BlogAdminPage() {
+  const user = await getUser();
+  return (
+    <BlogAdmin
+      isAllowed={user?.role === "admin"}
+      currentUser={user}
+      basePath="/admin/blog"
+      apiBasePath="/api/blog"
+      components={{ Button, Input, Card, Badge, BlogBuilder }}
+    />
+  );
+}
 ```
 
 ### 3. Display a Blog Post
@@ -221,12 +219,13 @@ import { getPostById, updatePostSections } from '@/lib/blog-api';
 ```tsx
 // app/blog/[slug]/page.tsx
 import { BlogPreview } from 'm14i-blogging';
-import { createServerSupabaseClient } from '@/lib/supabase-client';
-import { getPostBySlug } from '@/lib/blog-api';
+import { createClient } from '@/lib/supabase/server';
+import { createBlogClient } from 'm14i-blogging/client';
 
 export default async function BlogPostPage({ params }) {
-  const supabase = createServerSupabaseClient();
-  const post = await getPostBySlug(supabase, params.slug);
+  const supabase = await createClient();
+  const client = createBlogClient(supabase);
+  const post = await client.getPostBySlug(params.slug);
 
   return (
     <BlogPreview
@@ -243,10 +242,16 @@ export default async function BlogPostPage({ params }) {
 
 ```tsx
 'use client';
-import { supabaseClient } from '@/lib/supabase-client';
-import { getPublishedPosts } from '@/lib/blog-api';
+import { createBlogClient } from 'm14i-blogging/client';
+import { createBrowserClient } from '@supabase/ssr';
 
-const { posts, total, hasMore } = await getPublishedPosts(supabaseClient, {
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+const client = createBlogClient(supabase);
+
+const { posts, total, hasMore } = await client.listPosts({
   limit: 10,
   offset: 0,
 });
@@ -484,12 +489,14 @@ const channel = supabaseClient
 Example test for CRUD operations:
 
 ```ts
-import { createPost, getPostById, updatePost, deletePost } from '@/lib/blog-api';
+import { createBlogClient } from 'm14i-blogging/client';
 
 describe('Blog API', () => {
   it('should create, read, update, delete a post', async () => {
+    const client = createBlogClient(supabase);
+
     // Create
-    const { post } = await createPost(supabase, {
+    const post = await client.createPost({
       title: 'Test Post',
       sections: [],
     });
@@ -498,18 +505,17 @@ describe('Blog API', () => {
     expect(post.title).toBe('Test Post');
 
     // Read
-    const retrieved = await getPostById(supabase, post.id!);
+    const retrieved = await client.getPostBySlug(post.slug);
     expect(retrieved?.title).toBe('Test Post');
 
     // Update
-    const { post: updated } = await updatePost(supabase, post.id!, {
+    const updated = await client.updatePost(post.id!, {
       title: 'Updated Title',
     });
     expect(updated?.title).toBe('Updated Title');
 
     // Delete
-    const { success } = await deletePost(supabase, post.id!);
-    expect(success).toBe(true);
+    await client.deletePost(post.id!);
   });
 });
 ```

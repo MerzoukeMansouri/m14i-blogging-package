@@ -57,8 +57,9 @@ Ensure your blog database is set up (same as BlogAdmin):
 supabase db push
 
 # Or apply via Supabase Dashboard
-# - Copy content from supabase/migrations/003_blog_system.sql
-# - Run in SQL editor
+# - Copy content from supabase/migrations/20260405000000_create_blog_schema.sql
+# - Copy content from supabase/migrations/20260405000001_add_taxonomy_tables.sql
+# - Run both in SQL editor
 ```
 
 ### 3. Create API Routes
@@ -69,7 +70,8 @@ Create the following API route files in your Next.js app:
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListPostsHandler, createBlogClient } from "m14i-blogging/server";
+import { createListPostsHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -83,7 +85,8 @@ export const GET = createListPostsHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createGetPostBySlugHandler, createBlogClient } from "m14i-blogging/server";
+import { createGetPostBySlugHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -97,7 +100,8 @@ export const GET = createGetPostBySlugHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListCategoriesHandler, createBlogClient } from "m14i-blogging/server";
+import { createListCategoriesHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -111,7 +115,8 @@ export const GET = createListCategoriesHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListTagsHandler, createBlogClient } from "m14i-blogging/server";
+import { createListTagsHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 function getBlogClient() {
   const supabase = createClient();

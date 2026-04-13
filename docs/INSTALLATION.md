@@ -26,9 +26,11 @@ For experienced developers who want to get started quickly:
 # Install the package
 npm install m14i-blogging
 
-# Install Tailwind CSS (if not already installed)
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+# Install peer dependencies
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
+
+# Optional: Install Supabase (required for server/client features)
+npm install @supabase/supabase-js @supabase/ssr
 
 # Optional: Install shadcn/ui for BlogBuilder editor
 npx shadcn@latest init
@@ -36,6 +38,8 @@ npx shadcn@latest add label input textarea select button card
 ```
 
 Then configure Tailwind and import styles. See [Step-by-Step Installation](#step-by-step-installation) for details.
+
+> **Tip:** If you don't need a design system, you can use `BlogBuilderWithDefaults` which requires zero shadcn/ui setup.
 
 ---
 
@@ -53,9 +57,7 @@ yarn add m14i-blogging
 
 Modern package managers (npm 7+, pnpm, yarn) will automatically prompt you to install peer dependencies if they're missing.
 
-### 2. Install Peer Dependencies (If Needed)
-
-If your package manager doesn't automatically install peer dependencies, run:
+### 2. Install Peer Dependencies
 
 ```bash
 npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
@@ -67,22 +69,37 @@ npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 - `remark-gfm` - GitHub Flavored Markdown support
 - `lucide-react` - Icon library
 
-**Note:** `react` and `react-dom` are also peer dependencies, but most React projects already have these installed.
+**Note:** `react` and `react-dom` (>=18.0.0) are also peer dependencies, but most React projects already have these installed.
 
-### 3. Install Tailwind CSS
+### 2b. Install Optional Dependencies (For Server/Client Features)
 
-This package uses Tailwind CSS for styling.
-
-#### Install Tailwind
+If you plan to use the Supabase data layer (`m14i-blogging/client`) or API route handlers (`m14i-blogging/server`):
 
 ```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install @supabase/supabase-js @supabase/ssr
 ```
 
-#### Configure Tailwind
+These are optional — you only need them if using the built-in Supabase integration.
 
-Update your `tailwind.config.js` or `tailwind.config.ts`:
+### 3. Configure Tailwind CSS
+
+This package uses Tailwind CSS for styling. It supports both **Tailwind v3** and **Tailwind v4**.
+
+#### Tailwind v4 (CSS-first config)
+
+If you're using Tailwind v4, add the package's dist path to your CSS config with `@source`:
+
+**app/globals.css:**
+```css
+@import "tailwindcss";
+
+/* Scan m14i-blogging classes */
+@source "../node_modules/m14i-blogging/dist";
+```
+
+#### Tailwind v3 (JS config)
+
+If you're using Tailwind v3, update your `tailwind.config.js` or `tailwind.config.ts`:
 
 ```js
 /** @type {import('tailwindcss').Config} */
@@ -101,7 +118,7 @@ module.exports = {
 }
 ```
 
-**Important:** The `./node_modules/m14i-blogging/dist/**/*.{js,mjs,cjs}` line is required for Tailwind to find the package's classes.
+**Important:** The content path for m14i-blogging is required for Tailwind to discover the package's utility classes.
 
 ### 4. Import Package Styles
 
@@ -155,6 +172,16 @@ import './index.css';
 If you plan to use the **BlogBuilder** component (the drag & drop editor), you need shadcn/ui components.
 
 **If you're only using BlogPreview** (read-only display), you can skip this step.
+
+**If you don't have a design system**, you can use `BlogBuilderWithDefaults` instead — it ships with built-in fallback components and requires zero shadcn/ui setup:
+
+```tsx
+import { BlogBuilderWithDefaults } from 'm14i-blogging';
+
+<BlogBuilderWithDefaults sections={sections} onChange={setSections} />
+```
+
+To use the full `BlogBuilder` with your own components:
 
 ```bash
 # Initialize shadcn/ui
@@ -214,12 +241,24 @@ This package uses Tailwind CSS for styling to provide:
 - Consistent design system
 - Full control over styling
 
-### Minimum Tailwind Version
+### Supported Tailwind Versions
 
-- Tailwind CSS 3.0 or higher required
-- Tailwind CSS 4.0 supported
+- Tailwind CSS 3.0+ supported (JS config)
+- Tailwind CSS 4.0+ supported (CSS-first config)
 
-### Full Tailwind Configuration Example
+### Tailwind v4 Configuration (Recommended)
+
+Tailwind v4 uses CSS-first configuration with `@source` to specify content paths:
+
+**app/globals.css:**
+```css
+@import "tailwindcss";
+
+/* REQUIRED: Scan m14i-blogging package classes */
+@source "../node_modules/m14i-blogging/dist";
+```
+
+### Tailwind v3 Configuration
 
 **tailwind.config.js:**
 ```js
@@ -314,11 +353,18 @@ After installation, you should have:
 **1. Install dependencies:**
 ```bash
 npm install m14i-blogging
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
-**2. Configure Tailwind** (`tailwind.config.js`):
+**2. Configure Tailwind:**
+
+*Tailwind v4* — add to your `app/globals.css`:
+```css
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+```
+
+*Tailwind v3* — add to `tailwind.config.js`:
 ```js
 module.exports = {
   content: [
@@ -346,11 +392,18 @@ npx shadcn@latest add label input textarea select button card
 **1. Install dependencies:**
 ```bash
 npm install m14i-blogging
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
-**2. Configure Tailwind** (`tailwind.config.js`):
+**2. Configure Tailwind:**
+
+*Tailwind v4* — add to your CSS entry file:
+```css
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+```
+
+*Tailwind v3* — add to `tailwind.config.js`:
 ```js
 module.exports = {
   content: [
@@ -373,11 +426,18 @@ import '../styles/globals.css';
 **1. Install dependencies:**
 ```bash
 npm install m14i-blogging
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
-**2. Configure Tailwind** (`tailwind.config.js`):
+**2. Configure Tailwind:**
+
+*Tailwind v4* — add to your `index.css`:
+```css
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+```
+
+*Tailwind v3* — add to `tailwind.config.js`:
 ```js
 module.exports = {
   content: [
@@ -395,23 +455,23 @@ import 'm14i-blogging/styles';
 import './index.css';
 ```
 
-**4. Ensure CSS is imported** (`index.css`):
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
 ### Remix
 
 **1. Install dependencies:**
 ```bash
 npm install m14i-blogging
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
 ```
 
-**2. Configure Tailwind** (`tailwind.config.js`):
+**2. Configure Tailwind:**
+
+*Tailwind v4* — add to your CSS entry file:
+```css
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+```
+
+*Tailwind v3* — add to `tailwind.config.js`:
 ```js
 module.exports = {
   content: [
@@ -449,6 +509,13 @@ export const links: LinksFunction = () => [
    ```
 
 2. **Verify Tailwind config includes package:**
+
+   *Tailwind v4* (CSS):
+   ```css
+   @source "../node_modules/m14i-blogging/dist";
+   ```
+
+   *Tailwind v3* (JS config):
    ```js
    content: [
      // ...
@@ -540,7 +607,7 @@ npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
    npm run build
    ```
 
-2. **Check Node.js version:** Ensure Node.js 16+ is installed:
+2. **Check Node.js version:** Ensure Node.js 18+ is installed:
    ```bash
    node --version
    ```
@@ -582,7 +649,7 @@ import type { LayoutSection } from 'm14i-blogging';
 const sections: LayoutSection[] = [
   {
     id: 'test',
-    layout: '1-column',
+    type: '1-column',
     columns: [[
       {
         id: 'text-1',

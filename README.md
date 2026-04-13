@@ -23,6 +23,12 @@ A complete blog content management solution with two main components:
 
 ```bash
 npm install m14i-blogging
+
+# Install peer dependencies
+npm install @hello-pangea/dnd react-markdown remark-gfm lucide-react
+
+# Optional: For Supabase integration
+npm install @supabase/supabase-js @supabase/ssr
 ```
 
 ### 1. Setup Database
@@ -35,9 +41,20 @@ supabase db push
 
 Or copy migrations from `node_modules/m14i-blogging/supabase/migrations/`
 
+> **Migrations included:**
+> - `20260405000000_create_blog_schema.sql` — Blog posts, media, search
+> - `20260405000001_add_taxonomy_tables.sql` — Categories and tags
+
 ### 2. Configure Tailwind
 
-Add to your `tailwind.config.js`:
+**Tailwind v4** — add to your `app/globals.css`:
+
+```css
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+```
+
+**Tailwind v3** — add to your `tailwind.config.js`:
 
 ```js
 module.exports = {
@@ -66,7 +83,8 @@ Complete admin interface for managing your blog.
 **app/api/blog/route.ts**
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListPostsHandler, createCreatePostHandler, createBlogClient } from "m14i-blogging/server";
+import { createListPostsHandler, createCreatePostHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 async function getBlogClient() {
   const supabase = await createClient();
@@ -80,7 +98,8 @@ export const POST = createCreatePostHandler(getBlogClient, checkAuth);
 **app/api/blog/[id]/route.ts**
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createUpdatePostHandler, createDeletePostHandler, createBlogClient } from "m14i-blogging/server";
+import { createUpdatePostHandler, createDeletePostHandler } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 async function getBlogClient() {
   const supabase = await createClient();
@@ -101,7 +120,7 @@ import { BlogAdmin } from "m14i-blogging/admin";
 import { Button, Input, Card, Badge } from "@/components/ui";
 import { BlogBuilder } from "m14i-blogging";
 
-export default function BlogAdminPage() {
+export default async function BlogAdminPage() {
   const user = await getUser(); // Your auth logic
   const isAdmin = user?.role === "admin";
 
@@ -251,19 +270,21 @@ Fully typed with comprehensive type exports:
 
 ```typescript
 import type {
+  // Core types
+  LayoutSection,
+  ContentBlock,
+
   // Database types
   BlogPostRow,
   BlogPostInsert,
   BlogPostUpdate,
-  CategoryRow,
-  TagRow,
-
-  // Component types
-  BlogAdminProps,
-  BlogProps,
-  LayoutSection,
-  ContentBlock,
+  BlogCategory,
+  BlogTag,
 } from 'm14i-blogging';
+
+// Component prop types from their respective entry points
+import type { BlogAdminProps } from 'm14i-blogging/admin';
+import type { BlogProps } from 'm14i-blogging/public';
 ```
 
 ## Package Exports
@@ -271,7 +292,7 @@ import type {
 Clean separation through multiple entry points:
 
 ```javascript
-import { BlogBuilder, BlogPreview } from 'm14i-blogging';           // Core components
+import { BlogBuilder, BlogBuilderWithDefaults, BlogPreview } from 'm14i-blogging';  // Core components
 import { BlogAdmin } from 'm14i-blogging/admin';                    // Admin interface
 import { Blog } from 'm14i-blogging/public';                        // Public blog
 import { createBlogClient } from 'm14i-blogging/client';            // Data layer
@@ -279,9 +300,11 @@ import { createListPostsHandler } from 'm14i-blogging/server';      // API handl
 import 'm14i-blogging/styles';                                      // Styles
 ```
 
+> **Tip:** `BlogBuilderWithDefaults` ships with built-in fallback UI components — no shadcn/ui required.
+
 ## AI Content Generation
 
-The package includes an AI-powered content generator using Anthropic's Claude API.
+The package includes an AI-powered content generator using Anthropic's Claude API. The `@anthropic-ai/sdk` dependency is bundled with the package — no extra install needed.
 
 ### Recommended Model
 

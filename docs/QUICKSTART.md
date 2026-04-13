@@ -28,7 +28,7 @@ In your main app file (e.g., `_app.tsx`, `layout.tsx`, or `main.tsx`):
 import 'm14i-blogging/styles';
 ```
 
-**Note:** You also need to configure Tailwind CSS. See [Installation Guide](./INSTALLATION.md) for details.
+**Note:** You also need to configure Tailwind CSS to scan the package's classes. See [Installation Guide](./INSTALLATION.md) for Tailwind v3 and v4 setup details.
 
 ### 2. Create a Blog Post Preview
 
@@ -64,6 +64,8 @@ function MyBlogPost() {
 
 ### 3. Add the Blog Editor
 
+**Option A: With your own components (shadcn/ui)**
+
 ```tsx
 import { BlogBuilder } from 'm14i-blogging';
 import { useState } from 'react';
@@ -73,6 +75,24 @@ function MyEditor() {
 
   return (
     <BlogBuilder
+      sections={sections}
+      onChange={setSections}
+    />
+  );
+}
+```
+
+**Option B: No design system? Use built-in defaults**
+
+```tsx
+import { BlogBuilderWithDefaults } from 'm14i-blogging';
+import { useState } from 'react';
+
+function MyEditor() {
+  const [sections, setSections] = useState<LayoutSection[]>([]);
+
+  return (
+    <BlogBuilderWithDefaults
       sections={sections}
       onChange={setSections}
     />
@@ -263,7 +283,6 @@ function Editor() {
 
 - 📖 **[Complete Styling Guide](./STYLING.md)** - Full customization documentation
 - 🔍 **[SEO Guide](./SEO_GUIDE.md)** - Optimize for search engines
-- 📊 **[Gallery Layouts](./GALLERY_LAYOUTS.md)** - Advanced grid layouts
 - 📚 **[Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package)** - Interactive examples and playground
 - 🎨 **Theme Playground** - Try the Theme Playground story in Storybook
 - 📘 **[Full README](../README.md)** - Complete API reference

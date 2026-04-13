@@ -56,8 +56,9 @@ Run the blog system migrations:
 supabase db push
 
 # Or apply via Supabase Dashboard:
-# - Copy content from supabase/migrations/003_blog_system.sql
-# - Run in SQL editor
+# - Copy content from supabase/migrations/20260405000000_create_blog_schema.sql
+# - Copy content from supabase/migrations/20260405000001_add_taxonomy_tables.sql
+# - Run both in SQL editor
 ```
 
 ### 3. Create API Routes
@@ -71,8 +72,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListPostsHandler,
   createCreatePostHandler,
-  createBlogClient,
 } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 // Your auth check function
 async function checkAuth(request: Request) {
@@ -109,16 +110,15 @@ export const GET = createListPostsHandler(getBlogClient);
 export const POST = createCreatePostHandler(getBlogClient, checkAuth);
 ```
 
-**`app/api/blog/[id]/route.ts`** (Get/Update/Delete post)
+**`app/api/blog/[id]/route.ts`** (Update/Delete post)
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
 import {
-  createGetPostHandler,
   createUpdatePostHandler,
   createDeletePostHandler,
-  createBlogClient,
 } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -129,7 +129,6 @@ async function getBlogClient() {
   return createBlogClient(supabase);
 }
 
-export const GET = createGetPostHandler(getBlogClient);
 export const PATCH = createUpdatePostHandler(getBlogClient, checkAuth);
 export const DELETE = createDeletePostHandler(getBlogClient, checkAuth);
 ```
@@ -141,8 +140,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListCategoriesHandler,
   createCreateCategoryHandler,
-  createBlogClient,
 } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -164,8 +163,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListTagsHandler,
   createCreateTagHandler,
-  createBlogClient,
 } from "m14i-blogging/server";
+import { createBlogClient } from "m14i-blogging/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -267,12 +266,12 @@ The package provides handler factories for all routes:
 // Posts
 import {
   createListPostsHandler,
-  createGetPostHandler,
   createGetPostBySlugHandler,
   createCreatePostHandler,
   createUpdatePostHandler,
   createDeletePostHandler,
   createPublishPostHandler,
+  createSearchPostsHandler,
 } from "m14i-blogging/server";
 
 // Categories

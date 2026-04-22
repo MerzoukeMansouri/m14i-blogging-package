@@ -173,7 +173,8 @@ export interface BlogStats {
 }
 
 /**
- * Category with post count (from stats)
+ * Category with post count (derived from posts)
+ * Categories are stored as free text in posts.category
  */
 export interface BlogCategory {
   name: string;
@@ -182,119 +183,13 @@ export interface BlogCategory {
 }
 
 /**
- * Tag with post count (from stats)
+ * Tag with post count (derived from posts)
+ * Tags are stored as free text array in posts.tags
  */
 export interface BlogTag {
   name: string;
   slug: string;
   postCount: number;
-}
-
-// ============================================================================
-// Category & Tag Management Types (v0.4.0+)
-// ============================================================================
-
-/**
- * Complete category from database
- */
-export interface CategoryRow {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  color: string | null; // Hex color code
-  icon: string | null; // Icon name or emoji
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-}
-
-/**
- * Data required to insert a new category
- */
-export interface CategoryInsert {
-  name: string;
-  slug: string;
-  description?: string | null;
-  color?: string | null;
-  icon?: string | null;
-  display_order?: number;
-  created_by?: string | null;
-}
-
-/**
- * Data that can be updated in existing category
- */
-export interface CategoryUpdate {
-  name?: string;
-  slug?: string;
-  description?: string | null;
-  color?: string | null;
-  icon?: string | null;
-  display_order?: number;
-}
-
-/**
- * Category with post count (from database function)
- */
-export interface CategoryWithCount {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  color: string | null;
-  icon: string | null;
-  display_order: number;
-  post_count: number;
-}
-
-/**
- * Complete tag from database
- */
-export interface TagRow {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  color: string | null; // Hex color code
-  usage_count: number;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-}
-
-/**
- * Data required to insert a new tag
- */
-export interface TagInsert {
-  name: string;
-  slug: string;
-  description?: string | null;
-  color?: string | null;
-  created_by?: string | null;
-}
-
-/**
- * Data that can be updated in existing tag
- */
-export interface TagUpdate {
-  name?: string;
-  slug?: string;
-  description?: string | null;
-  color?: string | null;
-}
-
-/**
- * Tag with post count (from database function)
- */
-export interface TagWithCount {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  color: string | null;
-  post_count: number;
 }
 
 // ============================================================================

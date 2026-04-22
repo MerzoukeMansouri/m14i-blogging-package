@@ -433,13 +433,9 @@ export function createStatsHandler(
   return async function GET(): Promise<NextResponse> {
     try {
       const blog = await getBlogClient();
-      const [stats, categories, tags] = await Promise.all([
-        blog.stats.getStats(),
-        blog.stats.getCategories(),
-        blog.stats.getTags(),
-      ]);
+      const stats = await blog.stats.getStats();
 
-      return NextResponse.json({ stats, categories, tags });
+      return NextResponse.json({ stats });
     } catch (error) {
       return createErrorResponse(error, "Failed to fetch blog stats");
     }
@@ -585,108 +581,3 @@ function createGenericDeleteHandler(
   };
 }
 
-// ============================================================================
-// Category Handlers
-// ============================================================================
-
-/**
- * GET /api/blog/categories
- * List all categories
- */
-export function createListCategoriesHandler(getBlogClient: () => Promise<any>) {
-  return createGenericListHandler(getBlogClient, "categories", "categories");
-}
-
-/**
- * POST /api/blog/categories
- * Create a new category (admin only)
- */
-export function createCreateCategoryHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericCreateHandler(getBlogClient, checkAuth, "categories", "category");
-}
-
-/**
- * GET /api/blog/categories/[id]
- * Get a single category by ID
- */
-export function createGetCategoryHandler(getBlogClient: () => Promise<any>) {
-  return createGenericGetHandler(getBlogClient, "categories", "category");
-}
-
-/**
- * PATCH /api/blog/categories/[id]
- * Update a category (admin only)
- */
-export function createUpdateCategoryHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericUpdateHandler(getBlogClient, checkAuth, "categories", "category");
-}
-
-/**
- * DELETE /api/blog/categories/[id]
- * Delete a category (admin only)
- */
-export function createDeleteCategoryHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericDeleteHandler(getBlogClient, checkAuth, "categories", "category");
-}
-
-// ============================================================================
-// Tag Handlers
-// ============================================================================
-
-/**
- * GET /api/blog/tags
- * List all tags
- */
-export function createListTagsHandler(getBlogClient: () => Promise<any>) {
-  return createGenericListHandler(getBlogClient, "tags", "tags");
-}
-
-/**
- * POST /api/blog/tags
- * Create a new tag (admin only)
- */
-export function createCreateTagHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericCreateHandler(getBlogClient, checkAuth, "tags", "tag");
-}
-
-/**
- * GET /api/blog/tags/[id]
- * Get a single tag by ID
- */
-export function createGetTagHandler(getBlogClient: () => Promise<any>) {
-  return createGenericGetHandler(getBlogClient, "tags", "tag");
-}
-
-/**
- * PATCH /api/blog/tags/[id]
- * Update a tag (admin only)
- */
-export function createUpdateTagHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericUpdateHandler(getBlogClient, checkAuth, "tags", "tag");
-}
-
-/**
- * DELETE /api/blog/tags/[id]
- * Delete a tag (admin only)
- */
-export function createDeleteTagHandler(
-  getBlogClient: () => Promise<any>,
-  checkAuth: (request: NextRequest) => Promise<boolean>
-) {
-  return createGenericDeleteHandler(getBlogClient, checkAuth, "tags", "tag");
-}

@@ -131,5 +131,5 @@ export type {
   BrandContext,
 } from './types/aiGeneration';
 
-// Re-export core types
-export type * from '@m14i/blogging-core';
+// Re-export core types (server-safe)
+export type * from '@m14i/blogging-core/client';

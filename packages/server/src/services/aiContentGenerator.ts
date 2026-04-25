@@ -5,8 +5,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import type { LayoutSection, LayoutType, ContentBlock, TextBlock, BrandContext } from "@m14i/blogging-core";
-import { getTemplate, mergeBrandContext } from "@m14i/blogging-core";
+import type { LayoutSection, LayoutType, ContentBlock, TextBlock, BrandContext } from "@m14i/blogging-core/client";
+import { getTemplate, mergeBrandContext } from "@m14i/blogging-core/client";
 import type {
   GenerateCompleteBlogRequest,
   GenerateCompleteBlogResponse,

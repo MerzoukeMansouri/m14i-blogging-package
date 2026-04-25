@@ -3,7 +3,7 @@
  * These types define the request/response structures for AI-powered content generation
  */
 
-import type { LayoutSection, LayoutType, SEOMetadata, BrandContext as CoreBrandContext, LayoutTemplate as CoreLayoutTemplate } from "@m14i/blogging-core";
+import type { LayoutSection, LayoutType, SEOMetadata, BrandContext as CoreBrandContext, LayoutTemplate as CoreLayoutTemplate } from "@m14i/blogging-core/client";
 
 // Re-export core types for convenience
 export type { CoreBrandContext as BrandContext, CoreLayoutTemplate as LayoutTemplate };

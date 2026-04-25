@@ -14,7 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import type { BlogFilterParams } from "@m14i/blogging-core";
+import type { BlogFilterParams } from "@m14i/blogging-core/client";
 
 // ============================================================================
 // Type Guards and Utilities

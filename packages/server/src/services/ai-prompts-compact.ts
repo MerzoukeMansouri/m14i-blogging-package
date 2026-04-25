@@ -3,7 +3,7 @@
  * Enhanced with content best practices and brand context integration
  */
 
-import type { BrandContext } from "@m14i/blogging-core";
+import type { BrandContext } from "@m14i/blogging-core/client";
 
 const LANG = {
   en: {

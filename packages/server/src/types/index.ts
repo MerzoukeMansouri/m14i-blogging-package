@@ -4,7 +4,7 @@
  */
 
 // Re-export all core types
-export type * from "@m14i/blogging-core";
+export type * from "@m14i/blogging-core/client";
 
 // Re-export server-specific AI generation types
 export type {

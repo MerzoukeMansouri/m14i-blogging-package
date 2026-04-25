@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.4...v2.0.5) (2026-04-25)
+
+### 🐛 Bug Fixes
+
+* externalize use-sync-external-store to prevent dynamic require ([d876c23](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/d876c23f71a22c3e12128e8ec8c13a057157ecf8))
+
 ## [2.0.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.3...v2.0.4) (2026-04-25)
 
 ### 🐛 Bug Fixes

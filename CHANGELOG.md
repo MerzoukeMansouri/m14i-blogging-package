@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.11](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.10...v2.0.11) (2026-04-25)
+
+### 🐛 Bug Fixes
+
+* expand /client exports to include server-safe types and utils ([e357d7c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/e357d7cfe15db583b3b25f2886817ecdb601d7e8))
+
 ## [2.0.10](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.9...v2.0.10) (2026-04-25)
 
 ### 📚 Documentation

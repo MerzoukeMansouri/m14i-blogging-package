@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.6](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.5...v2.0.6) (2026-04-25)
+
+### 🐛 Bug Fixes
+
+* import ContentBlockRenderer from core in BlogBuilder ([702bc06](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/702bc0691f675bb3c31530ac2cf618cba0c8aa20))
+
 ## [2.0.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.4...v2.0.5) (2026-04-25)
 
 ### 🐛 Bug Fixes

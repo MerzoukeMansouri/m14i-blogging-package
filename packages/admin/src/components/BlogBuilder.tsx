@@ -3,9 +3,8 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Trash2, Edit2 } from "lucide-react";
-import { getLayoutClasses, getLayoutLabel, createEmptyColumns, createDefaultBlock, mergeConfig } from "@m14i/blogging-core";
+import { getLayoutClasses, getLayoutLabel, createEmptyColumns, createDefaultBlock, mergeConfig, ContentBlockRenderer } from "@m14i/blogging-core";
 import { ContentBlockInlineEditor } from "./ContentBlockInlineEditor";
-import { ContentBlockRenderer } from "./ContentBlockRenderer";
 import type {
   LayoutSection,
   ContentBlock,

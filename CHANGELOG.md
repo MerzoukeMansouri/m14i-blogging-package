@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.1.0...v2.0.0) (2026-04-25)
+
+### ⚠ BREAKING CHANGES
+
+* Package split into @m14i/blogging-{core,admin,server}
+
+- Split monolith into 3 focused packages for easier SaaS integration
+- @m14i/blogging-core: Public blog UI (3 peer deps, ~50KB)
+- @m14i/blogging-admin: CMS with WYSIWYG (11 peer deps, ~200KB)
+- @m14i/blogging-server: API routes + AI (1 peer dep, ~110KB)
+
+Migration:
+- Update imports: m14i-blogging → @m14i/blogging-core
+- Update imports: m14i-blogging/admin → @m14i/blogging-admin
+- Update imports: m14i-blogging/server → @m14i/blogging-server
+- See INSTALL.md for fresh installation guide
+
+Benefits:
+- 90% reduction in node_modules for read-only blogs
+- Minimal peer dependencies for core package
+- Better tree-shaking and bundle optimization
+- Easier SaaS integration
+- Same API, zero functional breaking changes
+
+🤖 Generated with Claude Code (https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+* Remove blog_categories and blog_tags tables
+
+Posts now use free-text category and tags fields only.
+The blog.stats methods derive categories/tags from posts.
+
+Removed:
+- blog_categories and blog_tags database tables
+- Category/tag CRUD API route handlers
+- CategoryRow, TagRow and related types
+- blog.categories.* and blog.tags.* client methods
+
+Migration:
+- Run supabase/migrations/20260423000000_remove_taxonomy_tables.sql
+- Remove /api/blog/categories and /api/blog/tags routes
+- Use blog.stats.getCategories() and blog.stats.getTags() instead
+
+See BREAKING_CHANGES_v2.md for full migration guide.
+
+### ✨ Features
+
+* remove taxonomy tables, simplify to free-text categories/tags ([4c3e0e9](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4c3e0e925a83b40b7dea6f7599aedc13d5efbefa))
+* split monolith into modular packages ([4356fbe](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4356fbee57ecaa6af9f7ffe8ef122e4326519683))
+
+### 🐛 Bug Fixes
+
+* force postcss>=8.5.10 via pnpm override ([df88a7c](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/df88a7c22496cbc75b6b8f7e16502d9b9c8225f8))
+* remove deleted PreviewView from storybook and update postcss ([db4b02b](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/db4b02b13703e1c6c65a33d1e6281a947729f4aa))
+
 ## [1.1.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v1.0.2...v1.1.0) (2026-04-13)
 
 ### ✨ Features

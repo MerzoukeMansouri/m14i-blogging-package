@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 const Blog = dynamic(
-  () => import("m14i-blogging/public").then((m) => m.Blog),
+  () => import("@m14i/blogging-core").then((m) => m.Blog),
   { ssr: false },
 );
 

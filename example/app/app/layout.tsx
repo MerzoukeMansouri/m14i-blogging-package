@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "m14i-blogging/styles";
+import "@m14i/blogging-core/styles";
 
 export const metadata: Metadata = {
   title: "m14i-blogging Example",

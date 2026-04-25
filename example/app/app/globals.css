@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "../node_modules/m14i-blogging/dist";
+@source "../node_modules/@m14i/blogging-core/dist";
 
 :root {
   --blog-primary: 220 100% 50%;

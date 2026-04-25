@@ -15,7 +15,6 @@ export type {
   BlogAdminComponents,
   BlogAdminLabels,
   CurrentUser,
-  PreviewData,
   BlogAdminView,
   BlogAdminRoute,
 } from "./types";
@@ -35,18 +34,17 @@ export { usePostEditor } from "./hooks/usePostEditor";
 export { TaxonomySelector } from "./components/TaxonomySelector";
 export { CategoryDialog } from "./components/CategoryDialog";
 export { TagDialog } from "./components/TagDialog";
+export { AIAssistantPanel } from "./components/AIAssistantPanel";
+export { ContentBuilderPanel } from "./components/ContentBuilderPanel";
+export { CollapsibleFormSection } from "./components/CollapsibleFormSection";
 export { AccessDenied } from "./components/AccessDenied";
+
+// Blog builder components
+export { BlogEditorWithSidebar } from "../components/BlogEditorWithSidebar";
 
 // Views (for custom routing)
 export { ListView } from "./views/ListView";
 export { EditorView } from "./views/EditorView";
-export { PreviewView } from "./views/PreviewView";
 
 // Utilities
 export { parseRoute, buildPath, navigateTo } from "./utils/router";
-export {
-  savePreviewData,
-  loadPreviewData,
-  clearPreviewData,
-  clearAllPreviewData,
-} from "./utils/storage";

@@ -19,6 +19,8 @@ import type {
   ImproveContentRequest,
   ImproveContentResponse,
   AIGenerationConfig,
+  BrandContext,
+  GenerateFromTemplateRequest,
 } from "../../types/aiGeneration";
 import {
   generateLayoutPrompt,
@@ -27,6 +29,8 @@ import {
   generateSEOPrompt,
   generateImprovePrompt,
 } from "./ai-prompts-compact";
+import { getTemplate } from "../../config/layoutTemplates";
+import { mergeBrandContext } from "../../config/defaults";
 
 function getExpectedColumnCount(layoutType: LayoutType): number {
   switch (layoutType) {
@@ -36,8 +40,6 @@ function getExpectedColumnCount(layoutType: LayoutType): number {
     case "2-columns-wide-left":
     case "2-columns-wide-right":
       return 2;
-    case "3-columns":
-      return 3;
     case "grid-2x2":
     case "grid-4-even":
       return 4;
@@ -292,10 +294,31 @@ export class AIContentGenerator {
     });
 
     this.config = {
-      model: config.model || process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
+      model: config.model || process.env.ANTHROPIC_MODEL || "claude-3-5-haiku-20241022",
       maxTokens: config.maxTokens || 4000,
       temperature: config.temperature || 0.3,
     };
+  }
+
+  /**
+   * Get brand context from database or defaults
+   * @private
+   */
+  private async getBrandContext(supabaseClient?: any): Promise<BrandContext> {
+    if (!supabaseClient) {
+      return mergeBrandContext();
+    }
+
+    try {
+      const { data } = await supabaseClient
+        .from("blog_brand_settings")
+        .select("*")
+        .single();
+
+      return mergeBrandContext(data || undefined);
+    } catch {
+      return mergeBrandContext();
+    }
   }
 
   /**
@@ -304,14 +327,17 @@ export class AIContentGenerator {
    * Now using TOON-optimized prompts with multilingual support
    */
   async generateLayout(
-    request: GenerateLayoutRequest
+    request: GenerateLayoutRequest & { supabaseClient?: any }
   ): Promise<GenerateLayoutResponse> {
+    const brandContext = await this.getBrandContext(request.supabaseClient);
+
     const systemPrompt = generateLayoutPrompt({
       length: request.length,
       layoutPreference: request.layoutPreference,
       tone: request.tone,
       additionalInstructions: request.additionalInstructions,
       language: request.language || "en",
+      brandContext,
     });
 
     const lang = request.language || "en";
@@ -416,9 +442,10 @@ export class AIContentGenerator {
    * Now with multilingual support
    */
   async generateCompleteBlogPost(
-    request: GenerateCompleteBlogRequest
+    request: GenerateCompleteBlogRequest & { supabaseClient?: any }
   ): Promise<GenerateCompleteBlogResponse> {
-    const systemPrompt = this.buildCompleteBlogPrompt(request);
+    const brandContext = await this.getBrandContext(request.supabaseClient);
+    const systemPrompt = this.buildCompleteBlogPrompt(request, brandContext);
     const lang = request.language || "en";
     const userPrompt = lang === "fr"
       ? `Générer un article de blog complet sur : ${request.prompt}`
@@ -490,9 +517,10 @@ export class AIContentGenerator {
    * Now with multilingual support
    */
   async *generateCompleteBlogPostStream(
-    request: GenerateCompleteBlogRequest
+    request: GenerateCompleteBlogRequest & { supabaseClient?: any }
   ): AsyncGenerator<string, void, undefined> {
-    const systemPrompt = this.buildCompleteBlogPrompt(request);
+    const brandContext = await this.getBrandContext(request.supabaseClient);
+    const systemPrompt = this.buildCompleteBlogPrompt(request, brandContext);
     const lang = request.language || "en";
     const userPrompt = lang === "fr"
       ? `Générer un article de blog complet sur : ${request.prompt}`
@@ -532,13 +560,14 @@ export class AIContentGenerator {
    * Extracted for reuse between streaming and non-streaming methods
    * Now using TOON-optimized prompts with multilingual support
    */
-  private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest): string {
+  private buildCompleteBlogPrompt(request: GenerateCompleteBlogRequest, brandContext: BrandContext): string {
     return generateCompletePrompt({
       tone: request.tone,
       length: request.length,
       layoutPreference: request.layoutPreference,
       additionalInstructions: request.additionalInstructions,
       language: request.language || "en",
+      brandContext,
     });
   }
 
@@ -547,12 +576,15 @@ export class AIContentGenerator {
    * Now using TOON-optimized prompts with multilingual support
    */
   async generateSection(
-    request: GenerateSectionRequest
+    request: GenerateSectionRequest & { supabaseClient?: any; brandContext?: BrandContext }
   ): Promise<GenerateSectionResponse> {
+    const brandContext = request.brandContext || await this.getBrandContext(request.supabaseClient);
+
     const systemPrompt = generateSectionPrompt(
       request.layoutType,
       request.context,
-      request.language || "en"
+      request.language || "en",
+      brandContext
     );
 
     const lang = request.language || "en";
@@ -638,6 +670,88 @@ export class AIContentGenerator {
     return {
       ...result,
       section: normalizeSection(result.section, 0),
+    };
+  }
+
+  /**
+   * Generate complete blog post from template
+   * Faster and more reliable than custom AI layout generation
+   */
+  async generateFromTemplate(
+    request: GenerateFromTemplateRequest & { supabaseClient?: any }
+  ): Promise<GenerateCompleteBlogResponse> {
+    const template = getTemplate(request.templateId);
+    if (!template) {
+      throw new Error(`Template not found: ${request.templateId}`);
+    }
+
+    const brandContext = await this.getBrandContext(request.supabaseClient);
+    const lang = request.language || "en";
+
+    // Generate title, excerpt, slug
+    const titlePrompt = generateLayoutPrompt({
+      length: template.suggestedLength,
+      tone: request.tone || brandContext.tone,
+      language: lang,
+      brandContext,
+    });
+
+    const titleUserPrompt = lang === "fr"
+      ? `Générer titre et extrait pour : ${request.prompt}`
+      : `Generate title and excerpt for: ${request.prompt}`;
+
+    const titleMessage = await this.anthropic.messages.create({
+      model: this.config.model,
+      max_tokens: 500,
+      temperature: this.config.temperature,
+      system: titlePrompt,
+      messages: [{ role: "user", content: titleUserPrompt }],
+    });
+
+    const titleText = extractTextContent(titleMessage);
+    const titleCleaned = stripMarkdownCodeBlocks(titleText);
+    let titleData: { title: string; slug: string; excerpt: string; category?: string };
+    try {
+      titleData = JSON.parse(titleCleaned);
+    } catch {
+      titleData = {
+        title: request.prompt,
+        slug: request.prompt.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        excerpt: request.prompt,
+      };
+    }
+
+    // Generate all sections in parallel using template structure
+    const sectionPromises = template.sections.map(async (templateSection, index) => {
+      const sectionRequest: GenerateSectionRequest & { brandContext?: BrandContext } = {
+        prompt: `${request.prompt}. ${templateSection.contentGuidance}`,
+        layoutType: templateSection.layoutType,
+        language: lang,
+        context: `Purpose: ${templateSection.purpose}`,
+        brandContext,
+      };
+
+      const result = await this.generateSection(sectionRequest);
+      return {
+        ...result.section,
+        id: result.section.id || `section-${index + 1}`,
+      };
+    });
+
+    const sections = await Promise.all(sectionPromises);
+
+    return {
+      title: titleData.title,
+      slug: titleData.slug,
+      excerpt: titleData.excerpt,
+      sections: normalizeSections(sections),
+      seo_metadata: {
+        description: titleData.excerpt.substring(0, 160),
+        keywords: [],
+        robots: "index, follow",
+      },
+      category: titleData.category,
+      tags: [],
     };
   }
 
@@ -742,7 +856,6 @@ ${request.tags ? `Existing tags: ${request.tags.join(", ")}` : ""}`;
     const requirements: Record<LayoutType, string> = {
       "1-column": "1 column - full width content",
       "2-columns": "2 columns - equal width",
-      "3-columns": "3 columns - equal width",
       "2-columns-wide-left": "2 columns - left column wider (66% / 33%)",
       "2-columns-wide-right": "2 columns - right column wider (33% / 66%)",
       "grid-2x2": "4 columns - 2x2 grid layout",

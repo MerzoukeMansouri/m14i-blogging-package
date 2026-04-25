@@ -1,0 +1,63 @@
+{
+  "name": "@m14i/blogging-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Server-side blog utilities - API routes, AI content generation, and media upload for Next.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [
+    "blog",
+    "server",
+    "api",
+    "ai",
+    "nextjs",
+    "supabase"
+  ],
+  "author": "M14I",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MerzoukeMansouri/m14i-blogging-package.git",
+    "directory": "packages/server"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@m14i/blogging-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
+    "@supabase/supabase-js": "^2.48.1",
+    "@types/node": "^22.0.0",
+    "next": "^15.5.15",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -442,6 +442,42 @@ export function createStatsHandler(
   };
 }
 
+/**
+ * Create a handler for listing categories with post counts
+ */
+export function createCategoriesHandler(
+  getBlogClient: () => Promise<any>
+): () => Promise<NextResponse> {
+  return async function GET(): Promise<NextResponse> {
+    try {
+      const blog = await getBlogClient();
+      const categories = await blog.stats.getCategories();
+
+      return NextResponse.json({ categories });
+    } catch (error) {
+      return createErrorResponse(error, "Failed to fetch categories");
+    }
+  };
+}
+
+/**
+ * Create a handler for listing tags with post counts
+ */
+export function createTagsHandler(
+  getBlogClient: () => Promise<any>
+): () => Promise<NextResponse> {
+  return async function GET(): Promise<NextResponse> {
+    try {
+      const blog = await getBlogClient();
+      const tags = await blog.stats.getTags();
+
+      return NextResponse.json({ tags });
+    } catch (error) {
+      return createErrorResponse(error, "Failed to fetch tags");
+    }
+  };
+}
+
 // ============================================================================
 // Generic CRUD Handler Factory
 // ============================================================================

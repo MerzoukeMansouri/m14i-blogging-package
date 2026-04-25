@@ -78,11 +78,20 @@
   "packageManager": "pnpm@10.25.0",
   "peerDependencies": {
     "@hello-pangea/dnd": "^16.0.0",
+    "@tiptap/extension-image": "^2.10.0",
+    "@tiptap/extension-link": "^2.10.0",
+    "@tiptap/extension-placeholder": "^2.10.0",
+    "@tiptap/react": "^2.10.0",
+    "@tiptap/starter-kit": "^2.10.0",
     "lucide-react": "^0.0.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
     "react-markdown": "^9.0.0",
-    "remark-gfm": "^4.0.0"
+    "rehype-stringify": "^10.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
+    "unified": "^11.0.0"
   },
   "peerDependenciesMeta": {
     "@supabase/supabase-js": {
@@ -97,6 +106,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "react-syntax-highlighter": "^16.1.1",
     "recharts": "^3.8.1"
   },
   "devDependencies": {

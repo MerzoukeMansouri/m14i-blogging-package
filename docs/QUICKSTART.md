@@ -1,19 +1,19 @@
 # Quick Start Guide - M14I Blogging
 
-Get started with m14i-blogging in 5 minutes.
+Get started with @m14i/blogging-core in 5 minutes.
 
 **Package Links:**
-- npm: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
-- Storybook: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
+- npm: [https://www.npmjs.com/package/@m14i/blogging-core](https://www.npmjs.com/package/@m14i/blogging-core)
+- Storybook: [https://merzoukemansouri.github.io/@m14i/blogging-core-package](https://merzoukemansouri.github.io/@m14i/blogging-core-package)
 
 ## Installation
 
 ```bash
-npm install m14i-blogging
+npm install @m14i/blogging-core
 # or
-pnpm add m14i-blogging
+pnpm add @m14i/blogging-core
 # or
-yarn add m14i-blogging
+yarn add @m14i/blogging-core
 ```
 
 **Need detailed installation instructions?** See the **[Complete Installation Guide](./INSTALLATION.md)** for step-by-step setup, Tailwind configuration, and troubleshooting.
@@ -25,7 +25,7 @@ yarn add m14i-blogging
 In your main app file (e.g., `_app.tsx`, `layout.tsx`, or `main.tsx`):
 
 ```tsx
-import 'm14i-blogging/styles';
+import '@m14i/blogging-core/styles';
 ```
 
 **Note:** You also need to configure Tailwind CSS to scan the package's classes. See [Installation Guide](./INSTALLATION.md) for Tailwind v3 and v4 setup details.
@@ -33,8 +33,8 @@ import 'm14i-blogging/styles';
 ### 2. Create a Blog Post Preview
 
 ```tsx
-import { BlogPreview } from 'm14i-blogging';
-import type { LayoutSection } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
+import type { LayoutSection } from '@m14i/blogging-core';
 
 const sections: LayoutSection[] = [
   {
@@ -67,7 +67,7 @@ function MyBlogPost() {
 **Option A: With your own components (shadcn/ui)**
 
 ```tsx
-import { BlogBuilder } from 'm14i-blogging';
+import { BlogBuilder } from '@m14i/blogging-core';
 import { useState } from 'react';
 
 function MyEditor() {
@@ -85,7 +85,7 @@ function MyEditor() {
 **Option B: No design system? Use built-in defaults**
 
 ```tsx
-import { BlogBuilderWithDefaults } from 'm14i-blogging';
+import { BlogBuilderWithDefaults } from '@m14i/blogging-core';
 import { useState } from 'react';
 
 function MyEditor() {
@@ -117,7 +117,7 @@ Create a `blog-theme.css` file:
 Import it after the library CSS:
 
 ```tsx
-import 'm14i-blogging/styles';
+import '@m14i/blogging-core/styles';
 import './blog-theme.css';  // Your custom theme
 ```
 
@@ -125,7 +125,7 @@ import './blog-theme.css';  // Your custom theme
 
 ```tsx
 import { useEffect } from 'react';
-import { applyTheme, themePresets } from 'm14i-blogging';
+import { applyTheme, themePresets } from '@m14i/blogging-core';
 
 function App() {
   useEffect(() => {
@@ -156,11 +156,11 @@ function App() {
 
 ```tsx
 // app/layout.tsx
-import 'm14i-blogging/styles';
+import '@m14i/blogging-core/styles';
 import './globals.css';
 
 // app/blog/[slug]/page.tsx
-import { BlogPreview } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
 
 export default function BlogPost({ params }) {
   const { sections } = getPost(params.slug); // Your data fetching
@@ -173,10 +173,10 @@ export default function BlogPost({ params }) {
 
 ```tsx
 // pages/_app.tsx
-import 'm14i-blogging/styles';
+import '@m14i/blogging-core/styles';
 
 // pages/blog/[slug].tsx
-import { BlogPreview } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
 
 export default function BlogPost({ post }) {
   return <BlogPreview title={post.title} sections={post.sections} />;
@@ -187,25 +187,25 @@ export default function BlogPost({ post }) {
 
 ```tsx
 // main.tsx
-import 'm14i-blogging/styles';
+import '@m14i/blogging-core/styles';
 import './index.css';
 
 // App.tsx
-import { BlogPreview } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
 ```
 
 ### Remix
 
 ```tsx
 // app/root.tsx
-import blogStyles from 'm14i-blogging/styles?url';
+import blogStyles from '@m14i/blogging-core/styles?url';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: blogStyles },
 ];
 
 // app/routes/blog.$slug.tsx
-import { BlogPreview } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
 ```
 
 ## Common Patterns
@@ -214,7 +214,7 @@ import { BlogPreview } from 'm14i-blogging';
 
 ```tsx
 import Image from 'next/image';
-import { BlogPreview } from 'm14i-blogging';
+import { BlogPreview } from '@m14i/blogging-core';
 
 <BlogPreview
   title="My Post"
@@ -227,7 +227,7 @@ import { BlogPreview } from 'm14i-blogging';
 
 ```tsx
 import { useState, useEffect } from 'react';
-import { applyTheme, themePresets } from 'm14i-blogging';
+import { applyTheme, themePresets } from '@m14i/blogging-core';
 
 function App() {
   const [isDark, setIsDark] = useState(false);
@@ -254,7 +254,7 @@ function App() {
 ### Save to Backend
 
 ```tsx
-import { BlogBuilder } from 'm14i-blogging';
+import { BlogBuilder } from '@m14i/blogging-core';
 
 function Editor() {
   const [sections, setSections] = useState<LayoutSection[]>([]);
@@ -283,7 +283,7 @@ function Editor() {
 
 - 📖 **[Complete Styling Guide](./STYLING.md)** - Full customization documentation
 - 🔍 **[SEO Guide](./SEO_GUIDE.md)** - Optimize for search engines
-- 📚 **[Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package)** - Interactive examples and playground
+- 📚 **[Live Storybook](https://merzoukemansouri.github.io/@m14i/blogging-core-package)** - Interactive examples and playground
 - 🎨 **Theme Playground** - Try the Theme Playground story in Storybook
 - 📘 **[Full README](../README.md)** - Complete API reference
 
@@ -291,15 +291,15 @@ function Editor() {
 
 - Check the [Styling Guide](./STYLING.md) for customization examples
 - Review the [SEO Guide](./SEO_GUIDE.md) for optimization tips
-- Browse the [Live Storybook](https://merzoukemansouri.github.io/m14i-blogging-package) for examples
+- Browse the [Live Storybook](https://merzoukemansouri.github.io/@m14i/blogging-core-package) for examples
 - Explore [all documentation](./README.md) for complete guides
-- Open an issue on [GitHub](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues) for bugs or questions
+- Open an issue on [GitHub](https://github.com/MerzoukeMansouri/@m14i/blogging-core-package/issues) for bugs or questions
 
 ## Resources
 
-- **npm Package**: [https://www.npmjs.com/package/m14i-blogging](https://www.npmjs.com/package/m14i-blogging)
-- **Storybook**: [https://merzoukemansouri.github.io/m14i-blogging-package](https://merzoukemansouri.github.io/m14i-blogging-package)
-- **GitHub**: [https://github.com/MerzoukeMansouri/m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package)
+- **npm Package**: [https://www.npmjs.com/package/@m14i/blogging-core](https://www.npmjs.com/package/@m14i/blogging-core)
+- **Storybook**: [https://merzoukemansouri.github.io/@m14i/blogging-core-package](https://merzoukemansouri.github.io/@m14i/blogging-core-package)
+- **GitHub**: [https://github.com/MerzoukeMansouri/@m14i/blogging-core-package](https://github.com/MerzoukeMansouri/@m14i/blogging-core-package)
 
 ---
 

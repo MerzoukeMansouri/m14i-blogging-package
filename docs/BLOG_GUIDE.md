@@ -43,9 +43,9 @@ The `Blog` component provides a complete, drop-in public blog interface for disp
 If not already installed:
 
 ```bash
-npm install m14i-blogging
+npm install @m14i/blogging-core
 # or
-pnpm add m14i-blogging
+pnpm add @m14i/blogging-core
 ```
 
 ### 2. Set Up Database
@@ -70,8 +70,8 @@ Create the following API route files in your Next.js app:
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListPostsHandler } from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+import { createListPostsHandler } from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -85,8 +85,8 @@ export const GET = createListPostsHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createGetPostBySlugHandler } from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+import { createGetPostBySlugHandler } from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -100,8 +100,8 @@ export const GET = createGetPostBySlugHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListCategoriesHandler } from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+import { createListCategoriesHandler } from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -115,8 +115,8 @@ export const GET = createListCategoriesHandler(getBlogClient);
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createListTagsHandler } from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+import { createListTagsHandler } from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 function getBlogClient() {
   const supabase = createClient();
@@ -131,7 +131,7 @@ export const GET = createListTagsHandler(getBlogClient);
 **`app/blog/[[...path]]/page.tsx`**
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 import { Button, Card, Badge, Input } from "@/components/ui";
 
 export default function BlogPage() {
@@ -196,8 +196,8 @@ Instead of API routes, you can pass a Supabase client directly:
 
 ```typescript
 import { createClient } from "@/lib/supabase/client";
-import { createBlogClient } from "m14i-blogging/client";
-import { Blog } from "m14i-blogging/public";
+import { createBlogClient } from "@m14i/blogging-core/client";
+import { Blog } from "@m14i/blogging-core/public";
 
 export default function BlogPage() {
   const supabase = createClient();
@@ -222,7 +222,7 @@ export default function BlogPage() {
 Minimal setup with defaults:
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 
 export default function BlogPage() {
   return <Blog basePath="/blog" />;
@@ -232,7 +232,7 @@ export default function BlogPage() {
 ### With shadcn/ui Components
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 import {
   Button,
   Card,
@@ -266,7 +266,7 @@ export default function BlogPage() {
 ### With Custom Callbacks
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 
 export default function BlogPage() {
   return (
@@ -403,7 +403,7 @@ import {
   PostListView,
   Sidebar,
   SearchBox,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 
 export default function CustomBlogPage() {
   return (
@@ -441,7 +441,7 @@ import {
   ListLayout,
   MasonryLayout,
   MagazineLayout,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 
 function CustomPostList() {
   const { posts, isLoading } = usePosts();
@@ -476,7 +476,7 @@ For custom routing (e.g., separate Next.js pages):
 
 ```typescript
 // app/blog/page.tsx
-import { BlogProvider, PostListView } from "m14i-blogging/public";
+import { BlogProvider, PostListView } from "@m14i/blogging-core/public";
 
 export default function BlogIndexPage() {
   return (
@@ -487,7 +487,7 @@ export default function BlogIndexPage() {
 }
 
 // app/blog/[slug]/page.tsx
-import { BlogProvider, PostDetailView } from "m14i-blogging/public";
+import { BlogProvider, PostDetailView } from "@m14i/blogging-core/public";
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   return (
@@ -498,7 +498,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 }
 
 // app/blog/category/[category]/page.tsx
-import { BlogProvider, CategoryView } from "m14i-blogging/public";
+import { BlogProvider, CategoryView } from "@m14i/blogging-core/public";
 
 export default function CategoryPage({ params }: { params: { category: string } }) {
   return (
@@ -526,7 +526,7 @@ import {
   useTags,
   useSearch,
   useRelatedPosts,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 
 function CustomBlogList() {
   const { posts, total, isLoading, error } = usePosts({
@@ -565,7 +565,7 @@ export default function BlogPage() {
 If you prefer to handle routing yourself:
 
 ```typescript
-import { BlogProvider, PostListView, PostDetailView } from "m14i-blogging/public";
+import { BlogProvider, PostListView, PostDetailView } from "@m14i/blogging-core/public";
 import { useRouter, usePathname } from "next/navigation";
 
 export default function BlogPage() {
@@ -597,8 +597,8 @@ For server-side rendering:
 
 ```typescript
 import { createClient } from "@/lib/supabase/server";
-import { createBlogClient } from "m14i-blogging/client";
-import { BlogProvider, PostListView } from "m14i-blogging/public";
+import { createBlogClient } from "@m14i/blogging-core/client";
+import { BlogProvider, PostListView } from "@m14i/blogging-core/public";
 
 export default async function BlogPage() {
   const supabase = await createClient();
@@ -637,7 +637,7 @@ import type {
   PostListResponse,
   CategoryWithCount,
   TagWithCount,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 
 const props: BlogProps = {
   basePath: "/blog",
@@ -659,7 +659,7 @@ import type {
   UseCategoriesReturn,
   UseTagsReturn,
   UseSearchReturn,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 ```
 
 ---
@@ -669,7 +669,7 @@ import type {
 ### Example 1: Simple Blog
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 
 export default function SimpleBlog() {
   return <Blog basePath="/blog" />;
@@ -679,7 +679,7 @@ export default function SimpleBlog() {
 ### Example 2: Magazine Layout Blog
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 import { Button, Card, Badge } from "@/components/ui";
 
 export default function MagazineBlog() {
@@ -699,7 +699,7 @@ export default function MagazineBlog() {
 ### Example 3: Tech Blog with Categories
 
 ```typescript
-import { Blog } from "m14i-blogging/public";
+import { Blog } from "@m14i/blogging-core/public";
 
 export default function TechBlog() {
   return (
@@ -727,7 +727,7 @@ import {
   useCategories,
   PostCard,
   Pagination,
-} from "m14i-blogging/public";
+} from "@m14i/blogging-core/public";
 
 function CustomBlogList() {
   const [page, setPage] = useState(1);
@@ -774,4 +774,4 @@ export default function BlogPage() {
 
 - Check the [main README](../README.md)
 - Review the [BlogAdmin guide](./BLOG_ADMIN_GUIDE.md) for backend setup
-- Open an issue on [GitHub](https://github.com/MerzoukeMansouri/m14i-blogging-package)
+- Open an issue on [GitHub](https://github.com/MerzoukeMansouri/@m14i/blogging-core-package)

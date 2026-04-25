@@ -282,7 +282,7 @@ export const NewspaperStyle: Story = {
     sections: [
       {
         id: "section-1",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {

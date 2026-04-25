@@ -17,18 +17,6 @@ export interface CurrentUser {
 }
 
 // ============================================================================
-// Preview Data
-// ============================================================================
-
-export interface PreviewData {
-  title: string;
-  sections: LayoutSection[];
-  excerpt?: string;
-  featured_image?: string;
-  category?: string;
-  tags: string[];
-}
-
 // ============================================================================
 // Theme & Colors
 // ============================================================================
@@ -190,6 +178,8 @@ export interface BlogAdminComponents {
     onClick?: () => void;
     children: ReactNode;
   }>;
+  PlusIcon?: ComponentType<{ className?: string }>;
+  XIcon?: ComponentType<{ className?: string }>;
   BlogBuilder?: ComponentType<{
     sections: LayoutSection[];
     onChange: (sections: LayoutSection[]) => void;
@@ -331,7 +321,7 @@ export interface BlogAdminProps {
 // Internal View Types
 // ============================================================================
 
-export type BlogAdminView = "list" | "create" | "edit" | "preview";
+export type BlogAdminView = "list" | "create" | "edit" | "preview" | "context";
 
 export interface BlogAdminRoute {
   view: BlogAdminView;

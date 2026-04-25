@@ -50,7 +50,7 @@ const sampleSections: LayoutSection[] = [
   },
   {
     id: "section-3",
-    type: "3-columns",
+    type: "grid-2x2",
     columns: [
       [
         {

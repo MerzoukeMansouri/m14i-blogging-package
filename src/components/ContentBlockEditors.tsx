@@ -1,11 +1,13 @@
 "use client";
 
 import React from "react";
+import { WYSIWYGEditor } from "./WYSIWYGEditor";
 import type {
   TextBlock,
   ImageBlock,
   VideoBlock,
   QuoteBlock,
+  CodeBlock,
   PDFBlock,
   CarouselBlock,
   ChartBlock,
@@ -57,7 +59,7 @@ export function TextEditor({ block, onChange, components, onImprove }: TextEdito
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-xs text-muted-foreground">Contenu (Markdown)</Label>
+        <Label className="text-xs text-muted-foreground">Content (Rich Text)</Label>
         {onImprove && block.content && (
           <div className="relative">
             <button
@@ -69,7 +71,7 @@ export function TextEditor({ block, onChange, components, onImprove }: TextEdito
             </button>
 
             {showImprovementMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white border rounded-md shadow-lg z-10 min-w-[180px]">
+              <div className="absolute right-0 top-full mt-1 bg-white border rounded-md shadow-lg z-20 min-w-[180px]">
                 <button
                   onClick={() => handleImprove("expand")}
                   className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
@@ -111,13 +113,10 @@ export function TextEditor({ block, onChange, components, onImprove }: TextEdito
           </div>
         )}
       </div>
-      <Textarea
-        value={block.content}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          onChange({ ...block, content: e.target.value })
-        }
-        className="min-h-[150px] font-mono text-sm resize-y"
-        placeholder="**Gras**, *italique*, # Titre, etc."
+      <WYSIWYGEditor
+        content={block.content}
+        onChange={(content) => onChange({ ...block, content })}
+        placeholder="Start typing... Use markdown shortcuts like # for headings, ** for bold"
         disabled={isImproving}
       />
     </div>
@@ -715,6 +714,88 @@ export function ChartEditor({ block, onChange, components }: ChartEditorProps): 
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, caption: e.target.value })}
           placeholder="Source: ..."
           className="text-sm h-8 mt-1"
+        />
+      </div>
+    </div>
+  );
+}
+
+interface CodeEditorProps {
+  block: CodeBlock;
+  onChange: (block: CodeBlock) => void;
+  components: EditorComponents;
+}
+
+export function CodeEditor({ block, onChange, components }: CodeEditorProps): React.ReactElement {
+  const { Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = components;
+
+  // Language display map
+  const languageLabels: Record<string, string> = {
+    javascript: "JavaScript",
+    typescript: "TypeScript",
+    python: "Python",
+    java: "Java",
+    csharp: "C#",
+    cpp: "C++",
+    php: "PHP",
+    ruby: "Ruby",
+    go: "Go",
+    rust: "Rust",
+    sql: "SQL",
+    html: "HTML",
+    css: "CSS",
+    bash: "Bash",
+    json: "JSON",
+    yaml: "YAML",
+  };
+
+  // Ensure language has a value
+  const language = block.language || "javascript";
+  const displayLabel = languageLabels[language] || language;
+
+  // Initialize language if not set
+  React.useEffect(() => {
+    if (!block.language) {
+      onChange({ ...block, language: "javascript" });
+    }
+  }, [block.language]);
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Langage</Label>
+        <div className="relative">
+          <select
+            value={language}
+            onChange={(e) => onChange({ ...block, language: e.target.value })}
+            className="w-full text-sm h-8 mt-1 px-3 rounded-md border border-input bg-background"
+          >
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="csharp">C#</option>
+            <option value="cpp">C++</option>
+            <option value="php">PHP</option>
+            <option value="ruby">Ruby</option>
+            <option value="go">Go</option>
+            <option value="rust">Rust</option>
+            <option value="sql">SQL</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="bash">Bash</option>
+            <option value="json">JSON</option>
+            <option value="yaml">YAML</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">Code</Label>
+        <Textarea
+          value={block.code}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onChange({ ...block, code: e.target.value })}
+          placeholder="// Votre code ici"
+          className="text-sm font-mono mt-1 min-h-[200px]"
         />
       </div>
     </div>

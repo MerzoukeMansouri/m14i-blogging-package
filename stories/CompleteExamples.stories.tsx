@@ -620,7 +620,7 @@ Transform your data into actionable insights with AI-powered analytics, real-tim
       },
       {
         id: "pricing",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {
@@ -798,7 +798,7 @@ This investment will fuel our expansion across three key areas:`,
       },
       {
         id: "priorities",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {
@@ -1354,7 +1354,7 @@ These aren't just statistics—they represent a fundamental shift in how organiz
       },
       {
         id: "companies",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {

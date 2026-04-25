@@ -8,6 +8,7 @@ export type {
   ImageBlock,
   VideoBlock,
   QuoteBlock,
+  CodeBlock,
   CarouselBlock,
   CarouselSlide,
   PDFBlock,
@@ -48,15 +49,9 @@ export type {
   BlogMediaRow,
   BlogMediaInsert,
   BlogMediaUpdate,
-  // Category & tag management (v0.4.0+)
-  CategoryRow,
-  CategoryInsert,
-  CategoryUpdate,
-  CategoryWithCount,
-  TagRow,
-  TagInsert,
-  TagUpdate,
-  TagWithCount,
+  // Helper types
+  BlogPost as BlogPostCamelCase,
+  BlogMedia,
 } from "./database";
 
 // Re-export AI generation types

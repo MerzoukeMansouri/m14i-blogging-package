@@ -5,9 +5,8 @@
  * Manages post editor state and auto-save
  */
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
-import { savePreviewData, clearPreviewData } from "../utils/storage";
 import { sanitizeSections } from "../utils/sanitize";
 import type { BlogPostRow, BlogPostInsert, BlogPostUpdate } from "../../types/database";
 import type { LayoutSection } from "../../types";
@@ -48,7 +47,6 @@ export function usePostEditor(initialPost?: BlogPostRow) {
 
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * Update a field in the state
@@ -113,58 +111,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     setIsDirty(true);
   }, []);
 
-  /**
-   * Open preview in new tab
-   */
-  const openPreview = useCallback(() => {
-    if (!features.preview) return;
 
-    const previewSlug = state.slug || "draft";
-
-    // Save current state to sessionStorage
-      savePreviewData(previewSlug, {
-        title: state.title,
-        sections: sanitizeSections(state.sections),
-        excerpt: state.excerpt,
-        featured_image: state.featured_image,
-        category: state.category,
-      tags: state.tags,
-    });
-
-    // Open preview in new tab
-    window.open(`${basePath}/preview/${previewSlug}`, "_blank");
-  }, [state, features.preview, basePath]);
-
-  /**
-   * Auto-save to sessionStorage
-   */
-  useEffect(() => {
-    if (!features.autoSave || !isDirty) return;
-
-    // Clear existing timer
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    // Set new timer
-    autoSaveTimerRef.current = setTimeout(() => {
-      const key = state.slug || "draft";
-      savePreviewData(key, {
-        title: state.title,
-        sections: sanitizeSections(state.sections),
-        excerpt: state.excerpt,
-        featured_image: state.featured_image,
-        category: state.category,
-        tags: state.tags,
-      });
-    }, 3000); // Auto-save after 3 seconds of inactivity
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [state, isDirty, features.autoSave]);
 
   /**
    * Prepare post data for API
@@ -199,11 +146,7 @@ export function usePostEditor(initialPost?: BlogPostRow) {
   const markAsSaved = useCallback(() => {
     setIsDirty(false);
     setIsSaving(false);
-    // Clear preview data after successful save
-    if (state.slug) {
-      clearPreviewData(state.slug);
-    }
-  }, [state.slug]);
+  }, []);
 
   /**
    * Set saving state
@@ -219,7 +162,6 @@ export function usePostEditor(initialPost?: BlogPostRow) {
     updateField,
     updateSectionAtIndex,
     updateSEO,
-    openPreview,
     preparePostData,
     markAsSaved,
     setSaving,

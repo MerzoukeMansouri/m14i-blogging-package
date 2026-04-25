@@ -2,23 +2,21 @@
 
 /**
  * useTaxonomy Hook
- * Manages categories and tags
+ * Manages categories and tags (derived from posts)
  */
 
 import { useState, useCallback, useEffect } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
 import type {
-  CategoryRow,
-  CategoryInsert,
-  TagRow,
-  TagInsert,
+  BlogCategory,
+  BlogTag,
 } from "../../types/database";
 
 export function useTaxonomy() {
   const { apiClient, features } = useBlogAdminContext();
 
-  const [categories, setCategories] = useState<CategoryRow[]>([]);
-  const [tags, setTags] = useState<TagRow[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [tags, setTags] = useState<BlogTag[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,48 +70,6 @@ export function useTaxonomy() {
   }, [fetchCategories, fetchTags]);
 
   /**
-   * Create a new category
-   */
-  const createCategory = useCallback(
-    async (category: CategoryInsert) => {
-      setError(null);
-
-      try {
-        const newCategory = await apiClient.createCategory(category);
-        setCategories((prev) => [...prev, newCategory]);
-        return newCategory;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create category";
-        setError(message);
-        console.error("Error creating category:", err);
-        throw err;
-      }
-    },
-    [apiClient]
-  );
-
-  /**
-   * Create a new tag
-   */
-  const createTag = useCallback(
-    async (tag: TagInsert) => {
-      setError(null);
-
-      try {
-        const newTag = await apiClient.createTag(tag);
-        setTags((prev) => [...prev, newTag]);
-        return newTag;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create tag";
-        setError(message);
-        console.error("Error creating tag:", err);
-        throw err;
-      }
-    },
-    [apiClient]
-  );
-
-  /**
    * Auto-load taxonomy on mount
    */
   useEffect(() => {
@@ -126,7 +82,5 @@ export function useTaxonomy() {
     loading,
     error,
     loadTaxonomy,
-    createCategory,
-    createTag,
   };
 }

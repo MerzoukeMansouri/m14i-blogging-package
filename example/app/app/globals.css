@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@source "../node_modules/m14i-blogging/dist";
+
+:root {
+  --blog-primary: 220 100% 50%;
+  --blog-font-family: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--blog-font-family), system-ui, sans-serif;
+}

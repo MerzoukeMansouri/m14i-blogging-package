@@ -11,15 +11,22 @@ import {
   jsonResponse,
   errorResponse,
   successResponse,
+  getSupabaseClient,
 } from "../utils";
-import { createAIContentGenerator } from "../services/aiContentGenerator";
-import { applyRateLimit } from "../middleware/rateLimit";
+import { AIContentGenerator, createAIContentGenerator } from "../services/aiContentGenerator";
+import { applyRateLimit, getRateLimiter } from "../middleware/rateLimit";
 import type {
   GenerateCompleteBlogRequest,
   GenerateSectionRequest,
   GenerateSEORequest,
   ImproveContentRequest,
 } from "../../types/aiGeneration";
+
+// Default rate limit configuration
+const DEFAULT_RATE_LIMIT = {
+  requests: 10,
+  window: 60 * 60, // 1 hour in seconds
+};
 
 /**
  * Create POST handler for /api/blog/generate/complete
@@ -156,7 +163,6 @@ export function createGenerateSectionRoute(config: RouteConfig) {
       const validLayouts = [
         "1-column",
         "2-columns",
-        "3-columns",
         "2-columns-wide-left",
         "2-columns-wide-right",
         "grid-2x2",
@@ -351,6 +357,96 @@ export function createImproveContentRoute(config: RouteConfig) {
 
       // Improve content
       const result = await generator.improveContent(body);
+
+      return successResponse(result);
+    } catch (error: any) {
+      if (error.message?.includes("ANTHROPIC_API_KEY")) {
+        return errorResponse(
+          "AI service not configured. Please set ANTHROPIC_API_KEY environment variable.",
+          500
+        );
+      }
+
+      if (error.status === 429) {
+        return errorResponse(
+          "Rate limit exceeded. Please try again later.",
+          429
+        );
+      }
+
+      const message = handleError(error, config);
+      return errorResponse(message, 500);
+    }
+  }
+
+  return { POST };
+}
+
+/**
+ * Create POST handler for /api/blog/generate/template
+ *
+ * Generate blog post from proven template structure
+ *
+ * @example
+ * ```typescript
+ * // app/api/blog/generate/template/route.ts
+ * import { createGenerateFromTemplateRoute } from 'm14i-blogging/server';
+ * import { supabase } from '@/lib/supabase-client';
+ *
+ * export const { POST } = createGenerateFromTemplateRoute({ supabase });
+ * ```
+ */
+export function createGenerateFromTemplateRoute(config: RouteConfig) {
+  async function POST(request: Request) {
+    try {
+      // Require admin access
+      await requireAdmin(config);
+
+      // Apply rate limiting (10 per hour)
+      const rateLimit = applyRateLimit(request, {
+        limit: 10,
+        windowMs: 60 * 60 * 1000, // 1 hour
+      });
+
+      if (!rateLimit.allowed) {
+        return new Response(
+          JSON.stringify({
+            error: "Rate limit exceeded. Please try again later.",
+            resetTime: new Date(rateLimit.resetTime).toISOString(),
+          }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              ...rateLimit.headers,
+            },
+          }
+        );
+      }
+
+      const body = await request.json();
+
+      // Validate required fields
+      if (!body.prompt || typeof body.prompt !== "string") {
+        return errorResponse("prompt is required and must be a string", 400);
+      }
+      if (!body.templateId || typeof body.templateId !== "string") {
+        return errorResponse("templateId is required and must be a string", 400);
+      }
+
+      // Create AI generator
+      const generator = createAIContentGenerator();
+
+      // Get Supabase client for brand context
+      const supabase = await getSupabaseClient(config);
+
+      // Generate blog post from template
+      const result = await generator.generateFromTemplate({
+        prompt: body.prompt,
+        templateId: body.templateId,
+        language: body.language || "en",
+        supabaseClient: supabase,
+      });
 
       return successResponse(result);
     } catch (error: any) {

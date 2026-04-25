@@ -49,6 +49,16 @@ storybook-static/
 .cache/
 .temp/
 
+# Screenshots and test artifacts
+*.png
+*.jpg
+*.jpeg
+*.gif
+playwright-*.txt
+playwright-*.log
+snapshot-*.yml
+
 # Example app
 example/app/.next/
 example/app/node_modules/
+.playwright-mcp

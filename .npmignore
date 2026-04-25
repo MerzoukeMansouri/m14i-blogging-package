@@ -1,7 +1,46 @@
-src/
+# Development
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+.storybook
+stories
 tsconfig.json
-*.md
-!README.md
+tsup.config.ts
+
+# Source (dist is published)
+src
+
+# Example
+example
+
+# Docs
+docs
+.claude
+
+# Git
+.git
 .gitignore
+
+# CI
+.github
+
+# Build artifacts
+node_modules
+.DS_Store
+*.log
+
+# Supabase (include migrations)
+supabase/seed.sql
+supabase/config.toml
+supabase/.temp
+
+# Workspace files
+pnpm-workspace.yaml
 pnpm-lock.yaml
-node_modules/
+
+# Package-specific ignores
+packages/*/src
+packages/*/tsconfig.json
+packages/*/tsup.config.ts

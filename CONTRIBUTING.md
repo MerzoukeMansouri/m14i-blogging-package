@@ -112,6 +112,56 @@ pnpm run storybook
 pnpm run build-storybook
 ```
 
+### 🔄 Development Workflow (Monorepo)
+
+This project is a pnpm workspace monorepo with two packages:
+- **Root** (`/`) - The library package (`m14i-blogging`)
+- **Example App** (`/example/app`) - A Next.js demo app
+
+#### Important: Changes Don't Auto-Reflect in Example App
+
+When you modify library source code (`src/**`), you **MUST rebuild** before changes appear in the example app:
+
+```bash
+# After editing library code (src/**)
+pnpm build
+
+# Then restart the example app if running
+cd example/app
+pnpm dev
+```
+
+#### Development Modes
+
+**Option 1: Watch Mode (Recommended)**
+```bash
+# Terminal 1: Auto-rebuild library on changes
+pnpm dev
+
+# Terminal 2: Run example app
+cd example/app
+pnpm dev
+```
+
+**Option 2: Manual Build**
+```bash
+# Edit code in src/**
+# Then build
+pnpm build
+
+# Test in example app
+cd example/app
+pnpm dev
+```
+
+#### Why Rebuild is Required
+
+- The example app imports from `m14i-blogging` workspace dependency
+- It reads compiled code from `dist/`, not source from `src/`
+- Changes to `src/` only take effect after building to `dist/`
+
+📖 **See [Development Workflow Guide](./.claude/DEVELOPMENT.md) for detailed development patterns and troubleshooting**
+
 ## 🧪 Testing
 
 Before submitting a PR:

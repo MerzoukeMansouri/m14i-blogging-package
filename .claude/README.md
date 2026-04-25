@@ -129,10 +129,16 @@ To improve the skills:
 
 ## Documentation
 
+### For Users
 - [Integration Guide](../docs/INTEGRATION_GUIDE.md) - Complete manual setup
 - [What's New](../docs/WHATS_NEW.md) - Latest features
 - [README](../README.md) - Package overview
 - [Storybook](https://merzoukemansouri.github.io/m14i-blogging-package) - Component demos
+
+### For Contributors
+- [Development Workflow](./DEVELOPMENT.md) - How to develop this package
+- [Contributing Guide](../CONTRIBUTING.md) - Contribution guidelines
+- [Release Process](../docs/RELEASE_PROCESS.md) - How releases work
 
 ## Support
 

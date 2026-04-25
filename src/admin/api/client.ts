@@ -11,12 +11,9 @@ import type {
   BlogPostUpdate,
   BlogPostListResponse,
   BlogFilterParams,
-  CategoryRow,
-  CategoryInsert,
-  CategoryUpdate,
-  TagRow,
-  TagInsert,
-  TagUpdate,
+  BlogCategory,
+  BlogTag,
+  BlogStats,
 } from "../../types/database";
 
 import type {
@@ -183,147 +180,31 @@ export class BlogAdminAPIClient {
   }
 
   // ============================================================================
-  // Categories
+  // Categories & Tags (derived from posts)
   // ============================================================================
 
   /**
-   * List all categories
+   * List all categories with post counts
    */
-  async listCategories(): Promise<CategoryRow[]> {
-    return this.listEntities<CategoryRow>("categories");
+  async listCategories(): Promise<BlogCategory[]> {
+    const res = await this.makeRequest(`${this.basePath}/stats/categories`);
+    return this.extractDataFromResponse(await res.json(), "categories");
   }
 
   /**
-   * Get a single category by ID
+   * List all tags with post counts
    */
-  async getCategory(id: string): Promise<CategoryRow> {
-    return this.getEntity<CategoryRow>("categories", id, "category");
+  async listTags(): Promise<BlogTag[]> {
+    const res = await this.makeRequest(`${this.basePath}/stats/tags`);
+    return this.extractDataFromResponse(await res.json(), "tags");
   }
 
   /**
-   * Create a new category
+   * Get blog statistics
    */
-  async createCategory(category: CategoryInsert): Promise<CategoryRow> {
-    return this.createEntity<CategoryRow>("categories", category, "category");
-  }
-
-  /**
-   * Update an existing category
-   */
-  async updateCategory(id: string, updates: CategoryUpdate): Promise<CategoryRow> {
-    return this.updateEntity<CategoryRow>("categories", id, updates, "category");
-  }
-
-  /**
-   * Delete a category
-   */
-  async deleteCategory(id: string): Promise<void> {
-    return this.deleteEntity("categories", id);
-  }
-
-  // ============================================================================
-  // Tags
-  // ============================================================================
-
-  /**
-   * List all tags
-   */
-  async listTags(): Promise<TagRow[]> {
-    return this.listEntities<TagRow>("tags");
-  }
-
-  /**
-   * Get a single tag by ID
-   */
-  async getTag(id: string): Promise<TagRow> {
-    return this.getEntity<TagRow>("tags", id, "tag");
-  }
-
-  /**
-   * Create a new tag
-   */
-  async createTag(tag: TagInsert): Promise<TagRow> {
-    return this.createEntity<TagRow>("tags", tag, "tag");
-  }
-
-  /**
-   * Update an existing tag
-   */
-  async updateTag(id: string, updates: TagUpdate): Promise<TagRow> {
-    return this.updateEntity<TagRow>("tags", id, updates, "tag");
-  }
-
-  /**
-   * Delete a tag
-   */
-  async deleteTag(id: string): Promise<void> {
-    return this.deleteEntity("tags", id);
-  }
-
-  // ============================================================================
-  // Generic CRUD Operations
-  // ============================================================================
-
-  /**
-   * List all entities of a given type
-   */
-  private async listEntities<T>(entityType: string): Promise<T[]> {
-    const res = await this.makeRequest(`${this.basePath}/${entityType}`);
-    return this.extractDataFromResponse(await res.json(), entityType);
-  }
-
-  /**
-   * Get a single entity by ID
-   */
-  private async getEntity<T>(
-    entityType: string,
-    id: string,
-    responseKey: string
-  ): Promise<T> {
-    const res = await this.makeRequest(`${this.basePath}/${entityType}/${id}`);
-    return this.extractDataFromResponse(await res.json(), responseKey);
-  }
-
-  /**
-   * Create a new entity
-   */
-  private async createEntity<T>(
-    entityType: string,
-    data: any,
-    responseKey: string
-  ): Promise<T> {
-    const res = await this.makeJsonRequest(
-      `${this.basePath}/${entityType}`,
-      "POST",
-      data
-    );
-    return this.extractDataFromResponse(await res.json(), responseKey);
-  }
-
-  /**
-   * Update an existing entity
-   */
-  private async updateEntity<T>(
-    entityType: string,
-    id: string,
-    updates: any,
-    responseKey: string
-  ): Promise<T> {
-    const res = await this.makeJsonRequest(
-      `${this.basePath}/${entityType}/${id}`,
-      "PATCH",
-      updates
-    );
-    return this.extractDataFromResponse(await res.json(), responseKey);
-  }
-
-  /**
-   * Delete an entity
-   */
-  private async deleteEntity(entityType: string, id: string): Promise<void> {
-    await this.makeRequest(`${this.basePath}/${entityType}/${id}`, {
-      method: "DELETE",
-    });
+  async getStats(): Promise<BlogStats> {
+    const res = await this.makeRequest(`${this.basePath}/stats`);
+    return this.extractDataFromResponse(await res.json(), "stats");
   }
 
   // ============================================================================
@@ -364,6 +245,15 @@ export class BlogAdminAPIClient {
     request: ImproveContentRequest
   ): Promise<ImproveContentResponse> {
     return this.makeAIGenerationRequest<ImproveContentResponse>("improve", request);
+  }
+
+  /**
+   * Generate complete blog post from template
+   */
+  async generateFromTemplate(
+    request: { prompt: string; templateId: string; language?: "en" | "fr"; tone?: string }
+  ): Promise<any> {
+    return this.makeAIGenerationRequest<any>("template", request);
   }
 
   /**

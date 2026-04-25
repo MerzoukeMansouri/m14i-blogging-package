@@ -94,24 +94,46 @@ export function ListView() {
             {total} {total === 1 ? "article" : "articles"}
           </p>
         </div>
-        {Button ? (
-          <Button onClick={() => {
-            const path = buildPath(basePath, "create");
-            navigate ? navigate(path) : (window.location.href = path);
-          }}>
-            {labels.newPost}
-          </Button>
-        ) : (
-          <button
-            onClick={() => {
-              const path = buildPath(basePath, "create");
-              navigate ? navigate(path) : (window.location.href = path);
-            }}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-          >
-            {labels.newPost}
-          </button>
-        )}
+        <div className="flex gap-3">
+          {Button ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  window.location.href = `${basePath}/context`;
+                }}
+              >
+                ⚙️ Brand Context
+              </Button>
+              <Button onClick={() => {
+                const path = buildPath(basePath, "create");
+                navigate ? navigate(path) : (window.location.href = path);
+              }}>
+                {labels.newPost}
+              </Button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  window.location.href = `${basePath}/context`;
+                }}
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                ⚙️ Brand Context
+              </button>
+              <button
+                onClick={() => {
+                  const path = buildPath(basePath, "create");
+                  navigate ? navigate(path) : (window.location.href = path);
+                }}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+              >
+                {labels.newPost}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -155,7 +177,7 @@ export function ListView() {
         >
           <option value="all">{labels.allCategories}</option>
           {categories.map((cat) => (
-            <option key={cat.id} value={cat.name}>
+            <option key={cat.slug} value={cat.name}>
               {cat.name}
             </option>
           ))}

@@ -8,15 +8,18 @@
 import { useState, useEffect } from "react";
 import { useBlogAdminContext } from "../context/BlogAdminContext";
 import { usePosts } from "../hooks/usePosts";
-import { createEmptyColumns } from "../../utils";
+import { createEmptyColumns, createDefaultBlock } from "../../utils";
 import { usePostEditor } from "../hooks/usePostEditor";
 import { TaxonomySelector } from "../components/TaxonomySelector";
 import { CategoryDialog } from "../components/CategoryDialog";
 import { TagDialog } from "../components/TagDialog";
+import { CollapsibleFormSection } from "../components/CollapsibleFormSection";
+import { BlogEditorContainer } from "../components/BlogEditorContainer";
 import { buildPath } from "../utils/router";
 import { BlogAdminAPIClient } from "../api/client";
 import type { BlogPostRow, BlogPostInsert } from "../../types/database";
 import type { LayoutType, LayoutSection } from "../../types/layouts";
+import type { ContentBlockType } from "../../types";
 
 export interface EditorViewProps {
   postId?: string;
@@ -112,6 +115,52 @@ function InputField({
   );
 }
 
+// Fallback components for when shadcn/ui isn't provided
+const FallbackComponents = {
+  Button: ({ children, onClick, className = "" }: any) => (
+    <button onClick={onClick} className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 ${className}`}>
+      {children}
+    </button>
+  ),
+  Card: ({ children, className = "" }: any) => (
+    <div className={`border rounded-lg p-4 ${className}`}>{children}</div>
+  ),
+  CardContent: ({ children, className = "" }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  CardHeader: ({ children, className = "" }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  Label: ({ children, className = "" }: any) => (
+    <label className={`block text-sm font-medium text-gray-700 ${className}`}>{children}</label>
+  ),
+  Input: (props: any) => <input {...props} className={`border rounded px-3 py-2 ${props.className || ""}`} />,
+  Textarea: (props: any) => <textarea {...props} className={`border rounded px-3 py-2 ${props.className || ""}`} />,
+  Select: ({ children, onValueChange, ...props }: any) => (
+    <select
+      {...props}
+      onChange={(e) => onValueChange?.(e.target.value)}
+      className={`border rounded px-3 py-2 ${props.className || ""}`}
+    >
+      {children}
+    </select>
+  ),
+  SelectTrigger: () => null,
+  SelectValue: () => null,
+  SelectContent: () => null,
+  SelectItem: (props: any) => <option {...props} />,
+  PlusIcon: ({ className = "" }: any) => <span className={className}>+</span>,
+  XIcon: ({ className = "" }: any) => <span className={className}>✕</span>,
+};
+
+// Helper to get components with fallbacks
+function getComponentsWithFallbacks(components?: any): any {
+  return {
+    ...FallbackComponents,
+    ...components,
+  };
+}
+
 export function EditorView({ postId }: EditorViewProps) {
   const { apiClient, components, labels, basePath, features, navigate, colors, layout, classNames } = useBlogAdminContext();
   const { getPost, createPost, updatePost } = usePosts();
@@ -119,15 +168,12 @@ export function EditorView({ postId }: EditorViewProps) {
   const [loadingPost, setLoadingPost] = useState(!!postId);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [showTagDialog, setShowTagDialog] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showLayerPanel, setShowLayerPanel] = useState(false);
 
   // AI Generation state
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
-  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
-  const [generatePrompt, setGeneratePrompt] = useState("");
-  const [generateAction, setGenerateAction] = useState<"complete" | "section" | "seo">("complete");
-  const [selectedLayoutType, setSelectedLayoutType] = useState<LayoutType>("1-column");
-  const [generateLanguage, setGenerateLanguage] = useState<"en" | "fr">("en");
 
   // Progressive generation state
   const [generationPhase, setGenerationPhase] = useState<"idle" | "layout" | "sections">("idle");
@@ -141,7 +187,6 @@ export function EditorView({ postId }: EditorViewProps) {
     updateField,
     updateSectionAtIndex,
     updateSEO,
-    openPreview,
     preparePostData,
     markAsSaved,
     setSaving,
@@ -150,11 +195,9 @@ export function EditorView({ postId }: EditorViewProps) {
   const Button = components?.Button;
   const Input = components?.Input;
   const Card = components?.Card;
-  const BlogBuilder = components?.BlogBuilder;
   const totalSections = state.sections.length;
   const generatingSectionCount = generatingSections.size;
   const completedSectionCount = completedSections.size;
-  const isFullPostGenerating = isGenerating && generateAction === "complete";
 
   // Load existing post if editing
   useEffect(() => {
@@ -173,6 +216,26 @@ export function EditorView({ postId }: EditorViewProps) {
 
     loadPost();
   }, [postId, getPost]);
+
+  // Keyboard shortcuts for sidebars
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + L - Toggle Layer Panel
+      if ((e.metaKey || e.ctrlKey) && e.key === 'l') {
+        e.preventDefault();
+        setShowLayerPanel(prev => !prev);
+      }
+
+      // Cmd/Ctrl + I - Toggle AI Panel
+      if ((e.metaKey || e.ctrlKey) && e.key === 'i') {
+        e.preventDefault();
+        setShowAIPanel(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Navigation helper
   const navigateToPath = (path: string): void => {
@@ -228,12 +291,13 @@ export function EditorView({ postId }: EditorViewProps) {
   };
 
   // AI Generation handlers
-  const handleGenerateComplete = async (): Promise<void> => {
-    if (!generatePrompt.trim()) {
-      setGenerationError("Please enter a topic or prompt");
-      return;
-    }
-
+  const handleGenerateComplete = async (
+    prompt: string,
+    language: "en" | "fr" = "en",
+    layoutPreference?: LayoutType[],
+    tone?: string,
+    length?: "short" | "medium" | "long"
+  ): Promise<void> => {
     setIsGenerating(true);
     setGenerationError(null);
     setGenerationPhase("layout");
@@ -243,10 +307,11 @@ export function EditorView({ postId }: EditorViewProps) {
     try {
       // Step 1: Generate layout structure only
       const layoutResult = await apiClient.generateLayout({
-        prompt: generatePrompt,
-        length: "medium",
-        tone: "professional",
-        language: generateLanguage,
+        prompt,
+        length: length || "medium",
+        tone: tone || "professional",
+        language,
+        layoutPreference,
       });
 
       // Update basic fields immediately
@@ -273,9 +338,7 @@ export function EditorView({ postId }: EditorViewProps) {
       // Mark ALL sections as generating upfront (spinners on every section)
       setGeneratingSections(new Set(layoutResult.layout.map((s: any) => String(s.id))));
 
-      // Close dialog and show the layout with loading sections
-      setShowGenerateDialog(false);
-      setGeneratePrompt("");
+      // Show the layout with loading sections
       setGenerationPhase("sections");
 
       // Step 2: Generate content for each section progressively
@@ -287,7 +350,7 @@ export function EditorView({ postId }: EditorViewProps) {
             prompt: layoutSection.description,
             layoutType: layoutSection.type,
             context: `${layoutResult.title} - ${layoutResult.excerpt}`,
-            language: generateLanguage,
+            language,
           });
 
           updateSectionAtIndex(i, sectionResult.section);
@@ -314,34 +377,72 @@ export function EditorView({ postId }: EditorViewProps) {
       console.error("Error generating blog post:", err);
       setGenerationError(err.message || "Failed to generate blog post. Please try again.");
       setGenerationPhase("idle");
-      // Keep dialog open on error so user sees the error message
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleGenerateSection = async (): Promise<void> => {
-    if (!generatePrompt.trim()) {
-      setGenerationError("Please enter a topic for this section");
-      return;
+  const handleGenerateFromTemplate = async (
+    prompt: string,
+    language: "en" | "fr" = "en",
+    templateId: string,
+    tone?: string
+  ): Promise<void> => {
+    setIsGenerating(true);
+    setGenerationError(null);
+    setGenerationPhase("layout");
+    setGeneratingSections(new Set());
+    setCompletedSections(new Set());
+
+    try {
+      const result = await apiClient.generateFromTemplate({
+        prompt,
+        templateId,
+        language,
+        tone,
+      });
+
+      // Update all fields from template result
+      updateField("title", result.title);
+      updateField("slug", result.slug);
+      updateField("excerpt", result.excerpt);
+      updateField("category", result.category || "");
+      updateField("tags", result.tags || []);
+      updateField("sections", result.sections || []);
+      updateField("seo_metadata", result.seo_metadata || {
+        metaTitle: result.title,
+        metaDescription: result.excerpt || "",
+      });
+
+      setGenerationPhase("idle");
+    } catch (err: any) {
+      console.error("Error generating from template:", err);
+      setGenerationError(err.message || "Failed to generate from template. Please try again.");
+      setGenerationPhase("idle");
+    } finally {
+      setIsGenerating(false);
     }
+  };
+
+  const handleGenerateSection = async (
+    prompt: string,
+    language: "en" | "fr" = "en",
+    layoutType: LayoutType = "1-column"
+  ): Promise<void> => {
 
     setIsGenerating(true);
     setGenerationError(null);
 
     try {
       const result = await apiClient.generateSection({
-        prompt: generatePrompt,
-        layoutType: selectedLayoutType,
+        prompt,
+        layoutType,
         context: state.title,
-        language: generateLanguage,
+        language,
       });
 
       // Add new section to existing sections
       updateField("sections", [...state.sections, result.section]);
-
-      setShowGenerateDialog(false);
-      setGeneratePrompt("");
     } catch (err: any) {
       console.error("Error generating section:", err);
       setGenerationError(err.message || "Failed to generate section. Please try again.");
@@ -349,6 +450,8 @@ export function EditorView({ postId }: EditorViewProps) {
       setIsGenerating(false);
     }
   };
+
+  // Handle adding layout from sidebar
 
   const handleGenerateSEO = async (): Promise<void> => {
     setIsGenerating(true);
@@ -370,31 +473,12 @@ export function EditorView({ postId }: EditorViewProps) {
       if (result.tags && result.tags.length > 0) {
         updateField("tags", result.tags);
       }
-
-      setShowGenerateDialog(false);
     } catch (err: any) {
       console.error("Error generating SEO:", err);
       setGenerationError(err.message || "Failed to generate SEO metadata. Please try again.");
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleGenerate = (): void => {
-    const generationHandlers = {
-      complete: handleGenerateComplete,
-      section: handleGenerateSection,
-      seo: handleGenerateSEO,
-    };
-
-    generationHandlers[generateAction]();
-  };
-
-  const openGenerateDialog = (action: "complete" | "section" | "seo"): void => {
-    setGenerateAction(action);
-    setGenerationError(null);
-    setGeneratePrompt("");
-    setShowGenerateDialog(true);
   };
 
   // Handle content improvement for individual text blocks
@@ -422,46 +506,57 @@ export function EditorView({ postId }: EditorViewProps) {
   }
 
   return (
-    <div className="space-y-6 pb-20">
-      {/* Header */}
-      <div className="flex items-center justify-between sticky top-0 z-10 bg-background/95 backdrop-blur py-4 border-b">
+    <div className="h-screen flex flex-col bg-white relative">
+        {/* Header */}
+        <div className="flex items-center justify-between sticky top-0 z-20 bg-white border-b border-gray-200 py-4 px-6">
         <div className="flex items-center gap-4">
           <ActionButton
             Button={Button}
             variant="ghost"
             onClick={() => navigateToPath(buildPath(basePath, "list"))}
-            fallbackClassName="px-3 py-1.5 hover:bg-accent rounded"
+            fallbackClassName="px-3 py-1.5 hover:bg-gray-100 rounded"
           >
             ← {labels.back}
           </ActionButton>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-gray-900">
             {postId ? labels.editPost : labels.newPost}
           </h1>
           {isDirty && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-gray-500">
               {labels.unsavedChanges}
             </span>
           )}
         </div>
 
         <div className="flex gap-2">
-          {features.preview && (
-            <ActionButton
-              Button={Button}
-              variant="outline"
-              onClick={openPreview}
-              fallbackClassName="px-4 py-2 border rounded-md"
-            >
-              {labels.preview}
-            </ActionButton>
-          )}
+          <ActionButton
+            Button={Button}
+            variant="outline"
+            onClick={() => setShowLayerPanel(!showLayerPanel)}
+            fallbackClassName="px-3 py-2 border border-gray-300 rounded-md flex items-center gap-2 transition-colors hover:bg-gray-50 text-gray-700"
+          >
+            <span className="text-lg">📐</span>
+            <span className="hidden sm:inline">Layers</span>
+            <kbd className="hidden lg:inline text-xs ml-1 px-1 py-0.5 bg-gray-100 border border-gray-300 rounded opacity-60">⌘L</kbd>
+          </ActionButton>
+
+          <ActionButton
+            Button={Button}
+            variant="outline"
+            onClick={() => setShowAIPanel(true)}
+            fallbackClassName="px-3 py-2 border border-gray-300 rounded-md flex items-center gap-2 transition-colors hover:bg-gray-50 text-gray-700"
+          >
+            <span className="text-lg">✨</span>
+            <span className="hidden sm:inline">AI</span>
+            <kbd className="hidden lg:inline text-xs ml-1 px-1 py-0.5 bg-gray-100 border border-gray-300 rounded opacity-60">⌘I</kbd>
+          </ActionButton>
 
           <ActionButton
             Button={Button}
             variant="outline"
             onClick={handleSave}
             disabled={isSaving || !isDirty}
-            fallbackClassName="px-4 py-2 border rounded-md disabled:opacity-50"
+            fallbackClassName="px-4 py-2 border border-gray-300 rounded-md disabled:opacity-50 text-gray-700 hover:bg-gray-50"
           >
             {isSaving ? labels.saving : labels.saveDraft}
           </ActionButton>
@@ -470,128 +565,68 @@ export function EditorView({ postId }: EditorViewProps) {
             Button={Button}
             onClick={handlePublish}
             disabled={isSaving}
-            fallbackClassName="px-4 py-2 bg-primary text-primary-foreground rounded-md disabled:opacity-50"
+            fallbackClassName="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50 hover:bg-blue-700"
           >
             {labels.publish}
           </ActionButton>
         </div>
       </div>
 
-      <div className={classNames?.editorLayout || "grid grid-cols-1 lg:grid-cols-3 gap-6"}>
-        {/* Main Content - BlogBuilder */}
-        <div className={classNames?.editorMain || "lg:col-span-2 space-y-6"}>
+        {/* Metadata Section */}
+        <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+          <div className="space-y-3 max-w-5xl mx-auto">
           {/* Title & Slug */}
-          <CardWrapper Card={Card}>
-            <div className="space-y-4 p-6">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  {labels.title} *
-                </label>
-                <InputField
-                  Input={Input}
-                  id="title"
-                  value={state.title}
-                  onChange={(value) => updateField("title", value)}
-                  placeholder={labels.titlePlaceholder}
-                  className={Input ? "text-2xl font-bold" : "w-full px-3 py-2 border rounded-md text-2xl font-bold"}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="slug" className="text-sm font-medium">
-                  {labels.slug} *
-                </label>
-                <InputField
-                  Input={Input}
-                  id="slug"
-                  value={state.slug}
-                  onChange={(value) => updateField("slug", value)}
-                  placeholder="url-friendly-slug"
-                />
-              </div>
-            </div>
-          </CardWrapper>
-
-          {/* AI Generation Toolbar */}
-          <CardWrapper Card={Card} fallbackClassName="border rounded-lg p-4 bg-gradient-to-r from-purple-50 to-blue-50">
-            <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-gray-700">AI Assistant:</span>
-                <ActionButton
-                  Button={Button}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openGenerateDialog("complete")}
-                  disabled={isGenerating}
-                  fallbackClassName="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  ✨ Generate Full Post
-                </ActionButton>
-                <ActionButton
-                  Button={Button}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openGenerateDialog("section")}
-                  disabled={isGenerating}
-                  fallbackClassName="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  ➕ Generate Section
-                </ActionButton>
-                <ActionButton
-                  Button={Button}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openGenerateDialog("seo")}
-                  disabled={isGenerating || !state.title}
-                  fallbackClassName="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  🔍 Generate SEO
-                </ActionButton>
-              </div>
-            </div>
-          </CardWrapper>
-
-          {isFullPostGenerating && generationPhase !== "idle" && (
-            <CardWrapper Card={Card} fallbackClassName="border rounded-lg p-4 bg-background">
-              <div className="p-4 flex items-start gap-4">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mt-0.5"></div>
-                <div className="space-y-1">
-                  <p className="font-medium">
-                    {generationPhase === "layout"
-                      ? "Generating blog layout..."
-                      : "Generating section content..."}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {generationPhase === "layout"
-                      ? "Creating the full structure before filling each section."
-                      : `${completedSectionCount}/${totalSections} sections filled, ${generatingSectionCount} still generating.`}
-                  </p>
+          <CollapsibleFormSection
+            title={labels.title || "Title & Slug"}
+            icon="✍️"
+            isComplete={!!state.title && !!state.slug}
+            modalContent={
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="title" className="text-sm font-medium">{labels.title} *</label>
+                    <InputField
+                      Input={Input}
+                      id="title"
+                      value={state.title}
+                      onChange={(value) => updateField("title", value)}
+                      placeholder={labels.titlePlaceholder}
+                      className={Input ? "text-xl font-bold" : "w-full px-3 py-2 border rounded-md text-xl font-bold"}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="slug" className="text-sm font-medium">{labels.slug} *</label>
+                    <InputField
+                      Input={Input}
+                      id="slug"
+                      value={state.slug}
+                      onChange={(value) => updateField("slug", value)}
+                      placeholder="url-friendly-slug"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="excerpt" className="text-sm font-medium">{labels.excerpt}</label>
+                  <textarea
+                    id="excerpt"
+                    value={state.excerpt}
+                    onChange={(e) => updateField("excerpt", e.target.value)}
+                    placeholder={labels.excerptPlaceholder}
+                    rows={3}
+                    className="w-full px-3 py-2 border rounded-md resize-none"
+                  />
                 </div>
               </div>
-            </CardWrapper>
-          )}
+            }
+            Button={Button}
+          />
 
-          {/* BlogBuilder */}
-          {BlogBuilder && (
-            <CardWrapper Card={Card}>
-              <div className="p-6">
-                <BlogBuilder
-                  sections={state.sections}
-                  onChange={(sections: any) => updateField("sections", sections)}
-                  generatingSections={generatingSections}
-                />
-              </div>
-            </CardWrapper>
-          )}
-        </div>
-
-        {/* Sidebar - Metadata */}
-        <div className={classNames?.editorSidebar || "space-y-6"}>
           {/* Taxonomy */}
-          <div className={classNames?.sidebarSection || ""}>
-            <CardWrapper Card={Card}>
-              <div className="p-6">
-                <h3 className="font-semibold mb-4">{labels.taxonomy}</h3>
+          <CollapsibleFormSection
+            title={labels.taxonomy}
+            icon="🏷️"
+            isComplete={!!state.category || state.tags.length > 0}
+            modalContent={
               <TaxonomySelector
                 selectedCategory={state.category}
                 selectedTags={state.tags}
@@ -600,341 +635,119 @@ export function EditorView({ postId }: EditorViewProps) {
                 onCreateCategory={() => setShowCategoryDialog(true)}
                 onCreateTag={() => setShowTagDialog(true)}
               />
-              </div>
-            </CardWrapper>
-          </div>
+            }
+            Button={Button}
+          />
 
           {/* Featured Image */}
           {features.featuredImage && (
-            <div className={classNames?.sidebarSection || ""}>
-              <CardWrapper Card={Card}>
-              <div className="p-6 space-y-4">
-                <h3 className="font-semibold">{labels.featuredImage}</h3>
-                <InputField
-                  Input={Input}
-                  id="featured_image"
-                  value={state.featured_image}
-                  onChange={(value) => updateField("featured_image", value)}
-                  placeholder="https://..."
-                />
-                {state.featured_image && (
-                  <img
-                    src={state.featured_image}
-                    alt="Featured"
-                    className="w-full h-40 object-cover rounded-md"
+            <CollapsibleFormSection
+              title={labels.featuredImage}
+              icon="🖼️"
+              isComplete={!!state.featured_image}
+              modalContent={
+                <div className="space-y-4">
+                  <InputField
+                    Input={Input}
+                    id="featured_image"
+                    value={state.featured_image}
+                    onChange={(value) => updateField("featured_image", value)}
+                    placeholder="https://..."
                   />
-                )}
-              </div>
-            </CardWrapper>
-            </div>
+                  {state.featured_image && (
+                    <img
+                      src={state.featured_image}
+                      alt="Featured"
+                      className="w-full h-48 object-cover rounded-md"
+                    />
+                  )}
+                </div>
+              }
+              Button={Button}
+            />
           )}
-
-          {/* Excerpt */}
-          <div className={classNames?.sidebarSection || ""}>
-            <CardWrapper Card={Card}>
-            <div className="p-6 space-y-4">
-              <h3 className="font-semibold">{labels.excerpt}</h3>
-              <textarea
-                value={state.excerpt}
-                onChange={(e) => updateField("excerpt", e.target.value)}
-                placeholder={labels.excerptPlaceholder}
-                rows={4}
-                className="w-full px-3 py-2 border rounded-md resize-none"
-              />
-            </div>
-          </CardWrapper>
-          </div>
 
           {/* SEO */}
           {features.seo && (
-            <div className={classNames?.sidebarSection || ""}>
-              <CardWrapper Card={Card}>
-              <div className="p-6 space-y-4">
-                <h3 className="font-semibold">{labels.seo}</h3>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Meta Title</label>
-                  <InputField
-                    Input={Input}
-                    id="meta_title"
-                    value={state.seo_metadata.metaTitle}
-                    onChange={(value) => updateSEO("metaTitle", value)}
-                    placeholder={state.title}
-                  />
+            <CollapsibleFormSection
+              title={labels.seo}
+              icon="🔍"
+              isComplete={!!state.seo_metadata.metaTitle && !!state.seo_metadata.metaDescription}
+              modalContent={
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Meta Title</label>
+                    <InputField
+                      Input={Input}
+                      id="meta_title"
+                      value={state.seo_metadata.metaTitle}
+                      onChange={(value) => updateSEO("metaTitle", value)}
+                      placeholder={state.title}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Meta Description</label>
+                    <textarea
+                      value={state.seo_metadata.metaDescription}
+                      onChange={(e) => updateSEO("metaDescription", e.target.value)}
+                      placeholder={state.excerpt}
+                      rows={3}
+                      className="w-full px-3 py-2 border rounded-md resize-none"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Meta Description</label>
-                  <textarea
-                    value={state.seo_metadata.metaDescription}
-                    onChange={(e) => updateSEO("metaDescription", e.target.value)}
-                    placeholder={state.excerpt}
-                    rows={3}
-                    className="w-full px-3 py-2 border rounded-md resize-none"
-                  />
-                </div>
-              </div>
-            </CardWrapper>
-            </div>
+              }
+              Button={Button}
+            />
           )}
-        </div>
-      </div>
-
-      {/* Dialogs */}
-      <CategoryDialog
-        open={showCategoryDialog}
-        onOpenChange={setShowCategoryDialog}
-        onSuccess={(category) => {
-          updateField("category", category.name);
-          setShowCategoryDialog(false);
-        }}
-      />
-
-      <TagDialog
-        open={showTagDialog}
-        onOpenChange={setShowTagDialog}
-        onSuccess={(tag) => {
-          updateField("tags", [...state.tags, tag.name]);
-          setShowTagDialog(false);
-        }}
-      />
-
-      {/* AI Generation Dialog */}
-      {showGenerateDialog && (
-        <div
-          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          style={{ backgroundColor: colors?.dialogOverlay || 'rgba(0, 0, 0, 0.7)' }}
-        >
-          <div
-            className="border rounded-none shadow-2xl max-w-md w-full p-8 space-y-6"
-            style={{
-              backgroundColor: colors?.dialogBg || colors?.background || '#0A192F',
-              borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)'
-            }}
-          >
-            <div
-              className="flex items-center justify-between border-b pb-4"
-              style={{ borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)' }}
-            >
-              <h2
-                className="text-xl font-['Playfair_Display']"
-                style={{ color: colors?.text || '#F2F5F7' }}
-              >
-                {generateAction === "complete" && "Generate Full Blog Post"}
-                {generateAction === "section" && "Generate Section"}
-                {generateAction === "seo" && "Generate SEO Metadata"}
-              </h2>
-              <button
-                onClick={() => setShowGenerateDialog(false)}
-                className="transition-colors"
-                style={{
-                  color: colors?.textMuted || 'rgba(242, 245, 247, 0.5)',
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = colors?.accent || colors?.primary || '#B87333'}
-                onMouseLeave={(e) => e.currentTarget.style.color = colors?.textMuted || 'rgba(242, 245, 247, 0.5)'}
-                disabled={isGenerating}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-5">
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: colors?.textMuted || 'rgba(242, 245, 247, 0.7)' }}
-              >
-                {generateAction === "complete" &&
-                  "Describe the topic or theme for your blog post. The AI will generate a complete post with title, sections, and SEO metadata."}
-                {generateAction === "section" &&
-                  "Describe what this section should cover. You can also choose the layout type."}
-                {generateAction === "seo" &&
-                  "AI will analyze your post content and generate optimized SEO metadata including meta description, keywords, and social media tags."}
-              </p>
-
-              {generateAction !== "seo" && (
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium font-['Inter']"
-                    style={{ color: colors?.text || '#F2F5F7' }}
-                  >
-                    {generateAction === "complete" ? "Topic or Prompt" : "Section Topic"}
-                  </label>
-                  <textarea
-                    value={generatePrompt}
-                    onChange={(e) => setGeneratePrompt(e.target.value)}
-                    placeholder={
-                      generateAction === "complete"
-                        ? "e.g., Best practices for React performance optimization"
-                        : "e.g., Benefits of server-side rendering"
-                    }
-                    rows={3}
-                    className="w-full px-4 py-3 resize-none focus:outline-none transition-colors font-['Inter']"
-                    style={{
-                      backgroundColor: colors?.inputBg || colors?.background || '#0A192F',
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderColor: colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)',
-                      color: colors?.text || '#F2F5F7',
-                    }}
-                    onFocus={(e) => e.currentTarget.style.borderColor = colors?.accent || colors?.primary || '#B87333'}
-                    onBlur={(e) => e.currentTarget.style.borderColor = colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'}
-                    disabled={isGenerating}
-                   />
-                </div>
-              )}
-
-              {generateAction !== "seo" && (
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium font-['Inter']"
-                    style={{ color: colors?.text || '#F2F5F7' }}
-                  >
-                    Language
-                  </label>
-                  <div className="flex gap-2">
-                    {(["en", "fr"] as const).map((lang) => (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => setGenerateLanguage(lang)}
-                        disabled={isGenerating}
-                        className="px-4 py-2 text-sm font-medium transition-all font-['Inter'] border"
-                        style={{
-                          backgroundColor: generateLanguage === lang
-                            ? (colors?.buttonPrimary || colors?.accent || colors?.primary || '#B87333')
-                            : 'transparent',
-                          color: generateLanguage === lang
-                            ? (colors?.buttonPrimaryText || colors?.background || '#0A192F')
-                            : (colors?.text || '#F2F5F7'),
-                          borderColor: generateLanguage === lang
-                            ? (colors?.accent || colors?.primary || '#B87333')
-                            : (colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'),
-                        }}
-                      >
-                        {lang === "en" ? "🇬🇧 English" : "🇫🇷 Français"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {generateAction === "section" && (
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium font-['Inter']"
-                    style={{ color: colors?.text || '#F2F5F7' }}
-                  >
-                    Layout Type
-                  </label>
-                  <select
-                    value={selectedLayoutType}
-                    onChange={(e) => setSelectedLayoutType(e.target.value as LayoutType)}
-                    className="w-full px-4 py-3 focus:outline-none transition-colors font-['Inter']"
-                    style={{
-                      backgroundColor: colors?.inputBg || colors?.background || '#0A192F',
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderColor: colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)',
-                      color: colors?.text || '#F2F5F7',
-                    }}
-                    onFocus={(e) => e.currentTarget.style.borderColor = colors?.accent || colors?.primary || '#B87333'}
-                    onBlur={(e) => e.currentTarget.style.borderColor = colors?.inputBorder || colors?.border || 'rgba(184, 115, 51, 0.3)'}
-                    disabled={isGenerating}
-                  >
-                    <option value="1-column">1 Column</option>
-                    <option value="2-columns">2 Columns (Equal)</option>
-                      <option value="3-columns">3 Columns</option>
-                      <option value="2-columns-wide-left">2 Columns (Wide Left)</option>
-                      <option value="2-columns-wide-right">2 Columns (Wide Right)</option>
-                      <option value="grid-2x2">Grid 2x2</option>
-                  </select>
-                </div>
-              )}
-
-              {generationError && (
-                <div
-                  className="p-4 border"
-                  style={{
-                    backgroundColor: colors?.errorBg || 'rgba(153, 27, 27, 0.2)',
-                    borderColor: colors?.error || 'rgba(239, 68, 68, 0.3)',
-                  }}
-                >
-                  <p
-                    className="text-sm"
-                    style={{ color: colors?.error || '#FCA5A5' }}
-                  >
-                    {generationError}
-                  </p>
-                </div>
-              )}
-
-              {/* Generation Progress in Dialog - Only for layout phase */}
-              {isGenerating && generateAction === "complete" && generationPhase === "layout" && (
-                <div className="p-4 border rounded" style={{
-                  backgroundColor: colors?.background || '#0A192F',
-                  borderColor: colors?.border || 'rgba(184, 115, 51, 0.2)',
-                }}>
-                  <div className="flex items-center gap-3">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: colors?.primary || '#B87333' }}></div>
-                    <span className="text-sm" style={{ color: colors?.text || '#F2F5F7' }}>
-                      Generating blog structure...
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="flex gap-3 justify-end pt-4 border-t"
-              style={{ borderColor: colors?.dialogBorder || colors?.border || 'rgba(184, 115, 51, 0.2)' }}
-            >
-              <button
-                onClick={() => setShowGenerateDialog(false)}
-                className="px-6 py-2.5 border transition-all font-['Inter']"
-                style={{
-                  borderColor: colors?.buttonSecondary || 'rgba(242, 245, 247, 0.2)',
-                  color: colors?.buttonSecondaryText || colors?.text || '#F2F5F7',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = colors?.accent || colors?.primary || 'rgba(184, 115, 51, 0.5)';
-                  e.currentTarget.style.color = colors?.accent || colors?.primary || '#B87333';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = colors?.buttonSecondary || 'rgba(242, 245, 247, 0.2)';
-                  e.currentTarget.style.color = colors?.buttonSecondaryText || colors?.text || '#F2F5F7';
-                }}
-                disabled={isGenerating}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating || (generateAction !== "seo" && !generatePrompt.trim())}
-                className="px-6 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-['Inter'] font-medium"
-                style={{
-                  backgroundColor: colors?.buttonPrimary || colors?.accent || colors?.primary || '#B87333',
-                  color: colors?.buttonPrimaryText || colors?.background || '#0A192F',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isGenerating && (generateAction === "seo" || generatePrompt.trim())) {
-                    e.currentTarget.style.opacity = '0.9';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                }}
-              >
-                {isGenerating ? (
-                  <span className="flex items-center gap-2">
-                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#0A192F]"></span>
-                    Generating...
-                  </span>
-                ) : (
-                  "Generate"
-                )}
-              </button>
-            </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Blog Editor - Takes remaining height */}
+        <BlogEditorContainer
+          sections={state.sections}
+          onChange={(sections) => updateField("sections", sections)}
+          generatingSections={generatingSections}
+          components={getComponentsWithFallbacks(components)}
+          showLayerPanel={showLayerPanel}
+          onToggleLayerPanel={() => setShowLayerPanel(!showLayerPanel)}
+          showAIPanel={showAIPanel}
+          onToggleAIPanel={() => setShowAIPanel(!showAIPanel)}
+          aiPanelProps={{
+            isGenerating,
+            generationPhase,
+            generationError,
+            onGenerateComplete: handleGenerateComplete,
+            onGenerateFromTemplate: handleGenerateFromTemplate,
+            onGenerateSection: handleGenerateSection,
+            onGenerateSEO: handleGenerateSEO,
+            completedSectionCount,
+            totalSections,
+            generatingSectionCount,
+            hasTitle: !!state.title,
+            Button,
+            Input,
+          }}
+        />
+
+        {/* Modals & Dialogs */}
+        <CategoryDialog
+          open={showCategoryDialog}
+          onOpenChange={setShowCategoryDialog}
+          onSuccess={(category) => {
+            updateField("category", category.name);
+            setShowCategoryDialog(false);
+          }}
+        />
+
+        <TagDialog
+          open={showTagDialog}
+          onOpenChange={setShowTagDialog}
+          onSuccess={(tag) => {
+            updateField("tags", [...state.tags, tag.name]);
+            setShowTagDialog(false);
+          }}
+        />
+      </div>
   );
 }

@@ -51,8 +51,8 @@ export interface GenerateCompleteBlogResponse {
   };
   /** Suggested category */
   category?: string;
-  /** Suggested tags */
-  tags: string[];
+  /** Suggested tags (optional, can be added manually) */
+  tags?: string[];
 }
 
 /**
@@ -91,8 +91,8 @@ export interface GenerateLayoutResponse {
   }>;
   /** Suggested category */
   category?: string;
-  /** Suggested tags */
-  tags: string[];
+  /** Suggested tags (optional, can be added manually) */
+  tags?: string[];
 }
 
 /**
@@ -185,6 +185,70 @@ export interface AIGenerationError {
   code?: "RATE_LIMIT" | "API_ERROR" | "INVALID_REQUEST" | "AUTHENTICATION_ERROR";
   /** Additional details */
   details?: string;
+}
+
+/**
+ * Brand context for AI generation
+ * Provides site/brand information to ground AI responses
+ */
+export interface BrandContext {
+  /** Site or brand name */
+  siteName: string;
+  /** Site description or tagline */
+  description: string;
+  /** Industry or niche (e.g., "technology", "healthcare", "education") */
+  industry?: string;
+  /** Target audience description (e.g., "developers", "small business owners") */
+  targetAudience?: string;
+  /** Preferred tone (e.g., "professional", "casual", "technical", "friendly") */
+  tone?: string;
+  /** Vocabulary preferences */
+  vocabulary?: {
+    /** Words/phrases to prefer in generated content */
+    prefer?: string[];
+    /** Words/phrases to avoid in generated content */
+    avoid?: string[];
+  };
+}
+
+/**
+ * Layout template definition
+ * Pre-defined blog post structures for common content types
+ */
+export interface LayoutTemplate {
+  /** Unique template identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Template description */
+  description: string;
+  /** When to use this template */
+  useCase: string;
+  /** Suggested content length */
+  suggestedLength: "short" | "medium" | "long";
+  /** Template sections with layout types and content guidance */
+  sections: Array<{
+    /** Layout type for this section */
+    layoutType: LayoutType;
+    /** What content should be generated for this section */
+    contentGuidance: string;
+    /** Purpose of this section in the overall narrative */
+    purpose: string;
+  }>;
+}
+
+/**
+ * Request to generate from a template
+ */
+export interface GenerateFromTemplateRequest {
+  /** The topic or prompt describing what the blog post should be about */
+  prompt: string;
+  /** Template ID to use */
+  templateId: string;
+  /** Optional: Language for the generated content (default: "en") */
+  language?: "en" | "fr";
+  /** Optional: Override tone from brand context */
+  tone?: string;
 }
 
 /**

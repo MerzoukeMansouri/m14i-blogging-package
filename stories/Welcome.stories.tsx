@@ -97,7 +97,7 @@ And much more! If you can imagine it, you can build it.`,
             {
               id: "f2",
               type: "text",
-              content: "### 📐 Flexible Layouts\n\n1, 2, 3 columns, plus grid layouts (2x2, 3x3, 2x3, 4-even) for any design.",
+              content: "### 📐 Flexible Layouts\n\n1, 2 columns (equal or asymmetric), plus grid layouts (2x2, 3x3, 2x3, 4-even) for any design.",
             },
           ],
           [
@@ -295,11 +295,11 @@ Side-by-side content, ideal for:
 - Comparisons
 - Before/After
 
-**3-columns**
-Three equal columns for:
-- Feature cards
-- Pricing tables
-- Team members`,
+**2-columns-wide-left / 2-columns-wide-right**
+Asymmetric 2-column layouts for:
+- Content + sidebar
+- Visual + details
+- Stats + narrative`,
             },
           ],
           [
@@ -350,7 +350,7 @@ Three equal columns for:
       },
       {
         id: "custom-options",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {

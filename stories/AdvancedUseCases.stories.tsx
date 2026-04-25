@@ -396,7 +396,7 @@ TechConf brings together the brightest minds in technology for an unforgettable 
       },
       {
         id: "schedule",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {
@@ -818,7 +818,7 @@ I believe in learning by doing. This course is packed with practical examples an
       },
       {
         id: "testimonials",
-        type: "3-columns",
+        type: "grid-2x2",
         columns: [
           [
             {

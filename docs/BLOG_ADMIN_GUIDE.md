@@ -42,9 +42,9 @@ The `BlogAdmin` component provides a complete, drop-in blog administration inter
 If not already installed:
 
 ```bash
-npm install m14i-blogging
+npm install @m14i/blogging-core
 # or
-pnpm add m14i-blogging
+pnpm add @m14i/blogging-core
 ```
 
 ### 2. Set Up Database Migrations
@@ -72,8 +72,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListPostsHandler,
   createCreatePostHandler,
-} from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+} from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 // Your auth check function
 async function checkAuth(request: Request) {
@@ -117,8 +117,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createUpdatePostHandler,
   createDeletePostHandler,
-} from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+} from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -140,8 +140,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListCategoriesHandler,
   createCreateCategoryHandler,
-} from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+} from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -163,8 +163,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createListTagsHandler,
   createCreateTagHandler,
-} from "m14i-blogging/server";
-import { createBlogClient } from "m14i-blogging/client";
+} from "@m14i/blogging-core/server";
+import { createBlogClient } from "@m14i/blogging-core/client";
 
 async function checkAuth(request: Request) {
   // Same as above
@@ -184,13 +184,13 @@ export const POST = createCreateTagHandler(getBlogClient, checkAuth);
 **`app/(protected)/admin/blog/page.tsx`**
 
 ```tsx
-import { BlogAdmin } from "m14i-blogging/admin";
+import { BlogAdmin } from "@m14i/blogging-core/admin";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BlogBuilder } from "m14i-blogging";
+import { BlogBuilder } from "@m14i/blogging-core";
 
 export default async function BlogAdminPage() {
   const supabase = await createClient();
@@ -272,7 +272,7 @@ import {
   createDeletePostHandler,
   createPublishPostHandler,
   createSearchPostsHandler,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 
 // Categories
 import {
@@ -281,7 +281,7 @@ import {
   createCreateCategoryHandler,
   createUpdateCategoryHandler,
   createDeleteCategoryHandler,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 
 // Tags
 import {
@@ -290,7 +290,7 @@ import {
   createCreateTagHandler,
   createUpdateTagHandler,
   createDeleteTagHandler,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 ```
 
 ### Authentication
@@ -318,8 +318,8 @@ export const DELETE = createDeletePostHandler(getBlogClient, checkAuth);
 Minimal setup with defaults:
 
 ```tsx
-import { BlogAdmin } from "m14i-blogging/admin";
-import { BlogBuilder } from "m14i-blogging";
+import { BlogAdmin } from "@m14i/blogging-core/admin";
+import { BlogBuilder } from "@m14i/blogging-core";
 
 export default function AdminPage() {
   const user = useUser(); // Your auth hook
@@ -339,14 +339,14 @@ export default function AdminPage() {
 Full integration with your design system:
 
 ```tsx
-import { BlogAdmin } from "m14i-blogging/admin";
+import { BlogAdmin } from "@m14i/blogging-core/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
-import { BlogBuilder } from "m14i-blogging";
+import { BlogBuilder } from "@m14i/blogging-core";
 
 export default function AdminPage() {
   const user = useUser();
@@ -532,7 +532,7 @@ import {
   usePosts,
   useTaxonomy,
   usePostEditor,
-} from "m14i-blogging/admin";
+} from "@m14i/blogging-core/admin";
 
 function CustomPostList() {
   const { posts, loading, fetchPosts, deletePost } = usePosts();
@@ -557,7 +557,7 @@ function CustomPostList() {
 ### Using API Client Directly
 
 ```tsx
-import { BlogAdminAPIClient } from "m14i-blogging/admin";
+import { BlogAdminAPIClient } from "@m14i/blogging-core/admin";
 
 const apiClient = new BlogAdminAPIClient("/api/blog");
 
@@ -591,7 +591,7 @@ import {
   savePreviewData,
   loadPreviewData,
   clearPreviewData,
-} from "m14i-blogging/admin";
+} from "@m14i/blogging-core/admin";
 
 // Save draft preview
 savePreviewData("my-slug", {
@@ -624,7 +624,7 @@ import type {
   BlogAdminFeatures,
   BlogAdminLabels,
   BlogAdminComponents,
-} from "m14i-blogging/admin";
+} from "@m14i/blogging-core/admin";
 
 import type {
   BlogPostRow,
@@ -632,7 +632,7 @@ import type {
   BlogPostUpdate,
   CategoryRow,
   TagRow,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 ```
 
 ---
@@ -669,7 +669,7 @@ This error occurs if you try to use hooks outside the BlogAdmin component. Ensur
 
 For issues, questions, or feature requests:
 
-- GitHub Issues: [m14i-blogging-package](https://github.com/MerzoukeMansouri/m14i-blogging-package/issues)
+- GitHub Issues: [@m14i/blogging-core-package](https://github.com/MerzoukeMansouri/@m14i/blogging-core-package/issues)
 - Documentation: [README.md](../README.md)
 
 ---

@@ -1,0 +1,8 @@
+import { createGenerateSEORoute } from '@m14i/blogging-server';
+import { createClient } from "@/lib/supabase-server";
+
+// Demo mode: skip auth (matches isAllowed={true} on admin panel)
+export const { POST } = createGenerateSEORoute({
+  supabase: () => createClient(),
+  isAdmin: () => Promise.resolve(true),
+});

@@ -4,6 +4,8 @@ import "./styles.css";
 // Components
 export { BlogBuilder } from "./components/BlogBuilder";
 export { BlogBuilderWithDefaults } from "./components/BlogBuilderWithDefaults";
+export { BlogEditorWithSidebar } from "./components/BlogEditorWithSidebar";
+export { ContentLayerPanel } from "./components/ContentLayerPanel";
 export { BlogPreview } from "./components/BlogPreview";
 export { ContentBlockRenderer } from "./components/ContentBlockRenderer";
 export { ContentBlockInlineEditor } from "./components/ContentBlockInlineEditor";

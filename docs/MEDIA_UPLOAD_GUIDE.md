@@ -1,6 +1,6 @@
 # Media Upload Guide
 
-This guide explains how to use the media upload functionality in m14i-blogging to handle image and PDF uploads.
+This guide explains how to use the media upload functionality in @m14i/blogging-core to handle image and PDF uploads.
 
 ## Table of Contents
 
@@ -76,11 +76,11 @@ Create an API route at `app/api/blog/media/route.ts`:
 ```typescript
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createBlogClient } from "m14i-blogging/client";
+import { createBlogClient } from "@m14i/blogging-core/client";
 import {
   createMediaHandlers,
   createSupabaseStorageAdapter,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -146,7 +146,7 @@ import {
   handleFileUpload,
   validateFile,
   type ValidationOptions,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -193,7 +193,7 @@ The system includes comprehensive validation:
 ### Size Validation
 
 ```typescript
-import { validateFileSize } from "m14i-blogging/server";
+import { validateFileSize } from "@m14i/blogging-core/server";
 
 const validation = validateFileSize(file, 10); // 10MB limit
 if (!validation.valid) {
@@ -204,7 +204,7 @@ if (!validation.valid) {
 ### Type Validation
 
 ```typescript
-import { validateFileType } from "m14i-blogging/server";
+import { validateFileType } from "@m14i/blogging-core/server";
 
 const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
 const validation = validateFileType(file, allowedTypes);
@@ -216,7 +216,7 @@ if (!validation.valid) {
 ### Complete Validation
 
 ```typescript
-import { validateFile } from "m14i-blogging/server";
+import { validateFile } from "@m14i/blogging-core/server";
 
 const validation = validateFile(file, {
   maxSizeMB: 5,
@@ -231,7 +231,7 @@ if (!validation.valid) {
 ### Filename Sanitization
 
 ```typescript
-import { sanitizeFileName, generateUniqueFileName } from "m14i-blogging/server";
+import { sanitizeFileName, generateUniqueFileName } from "@m14i/blogging-core/server";
 
 // Sanitize filename
 const safe = sanitizeFileName("My File (1).pdf"); // "My_File_1_.pdf"
@@ -249,7 +249,7 @@ const unique = generateUniqueFileName("photo.jpg");
 "use client";
 
 import { useState } from "react";
-import type { UploadResult } from "m14i-blogging/server";
+import type { UploadResult } from "@m14i/blogging-core/server";
 
 export function MediaUploader() {
   const [uploading, setUploading] = useState(false);
@@ -515,7 +515,7 @@ import type {
   UploadedFile,
   ValidationOptions,
   StorageAdapter,
-} from "m14i-blogging/server";
+} from "@m14i/blogging-core/server";
 
 // Upload result
 const result: UploadResult = {

@@ -52,7 +52,11 @@ export {
   createGenerateSectionRoute,
   createGenerateSEORoute,
   createImproveContentRoute,
+  createGenerateFromTemplateRoute,
 } from './routes/generate';
+
+// Export brand settings route handler
+export { createBrandSettingsRoute } from './routes/brand-settings';
 
 // Export AI services
 export { createAIContentGenerator, AIContentGenerator } from './services/aiContentGenerator';
@@ -71,6 +75,8 @@ export {
   createSearchPostsHandler,
   createMediaHandlers,
   createStatsHandler,
+  createCategoriesHandler,
+  createTagsHandler,
   isAdmin,
   parseFilterParams,
 } from './api-routes';

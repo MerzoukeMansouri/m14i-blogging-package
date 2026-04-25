@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import { BlogAdminProvider } from "../../src/admin/context/BlogAdminContext";
 import { ListView } from "../../src/admin/views/ListView";
 import { EditorView } from "../../src/admin/views/EditorView";
-import { PreviewView } from "../../src/admin/views/PreviewView";
 import { AccessDenied } from "../../src/admin/components/AccessDenied";
 import type { BlogAdminProps } from "../../src/admin/types";
 import { MockBlogAdminAPIClient } from "./blog-admin-api";
@@ -82,9 +81,6 @@ export function BlogAdminWrapper({
 
       case "edit":
         return <EditorView postId={currentRoute.params?.id} />;
-
-      case "preview":
-        return <PreviewView slug={currentRoute.params?.slug || "draft"} />;
 
       default:
         return <ListView />;

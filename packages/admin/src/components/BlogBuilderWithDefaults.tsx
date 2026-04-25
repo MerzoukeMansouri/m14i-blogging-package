@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * BlogBuilder with Default Components
  *

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.8](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.7...v2.0.8) (2026-04-25)
+
+### 🐛 Bug Fixes
+
+* add "use client" directive to BlogBuilderWithDefaults ([a0426db](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/a0426dbe67b950666695013ee31a497095de050b))
+
 ## [2.0.7](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.6...v2.0.7) (2026-04-25)
 
 ### 📚 Documentation

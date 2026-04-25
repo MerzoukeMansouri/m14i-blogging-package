@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.2...v2.0.3) (2026-04-25)
+
+### 🐛 Bug Fixes
+
+* update example app to use new [@m14i](https://github.com/m14i) scoped packages ([9acf35f](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9acf35f62e6e94fea02833cfae0148bbe8008b18))
+
 ## [2.0.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.1...v2.0.2) (2026-04-25)
 
 ### ♻️ Code Refactoring

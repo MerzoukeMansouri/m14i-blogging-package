@@ -44,8 +44,13 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "pnpm --filter @m14i/blogging-core build && pnpm --filter @m14i/blogging-server build && pnpm --filter @m14i/blogging-admin build",
+    "build:core": "pnpm --filter @m14i/blogging-core build",
+    "build:admin": "pnpm --filter @m14i/blogging-admin build",
+    "build:server": "pnpm --filter @m14i/blogging-server build",
+    "dev:packages": "pnpm --filter @m14i/blogging-core dev & pnpm --filter @m14i/blogging-server dev & pnpm --filter @m14i/blogging-admin dev",
+    "dev:example": "pnpm --filter m14i-blogging-example dev",
+    "clean": "rm -rf packages/*/dist example/app/.next",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "semantic-release": "semantic-release"

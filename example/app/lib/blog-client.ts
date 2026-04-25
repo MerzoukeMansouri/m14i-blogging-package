@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
-import { createBlogClient } from '@m14i/blogging-core';
+import { createBlogClient } from '@m14i/blogging-core/client';
 
 export async function getBlogClient() {
   const supabase = await createClient();

@@ -35,6 +35,24 @@ export default defineConfig([
     ],
     injectStyle: false,
   },
+  // Client-only exports (server-safe)
+  {
+    entry: {
+      'client/index': 'src/client/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    treeshake: true,
+    splitting: false,
+    minify: false,
+    outExtension: getOutputExtension,
+    external: [
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+    ],
+    injectStyle: false,
+  },
   // CSS bundle
   {
     entry: {

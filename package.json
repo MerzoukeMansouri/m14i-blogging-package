@@ -76,6 +76,11 @@
     "access": "public"
   },
   "packageManager": "pnpm@10.25.0",
+  "pnpm": {
+    "overrides": {
+      "postcss@<8.5.10": ">=8.5.10"
+    }
+  },
   "peerDependencies": {
     "@hello-pangea/dnd": "^16.0.0",
     "@tiptap/extension-image": "^2.10.0",

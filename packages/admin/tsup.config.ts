@@ -24,6 +24,8 @@ export default defineConfig([
       'react',
       'react-dom',
       'react/jsx-runtime',
+      'use-sync-external-store',
+      'use-sync-external-store/shim',
       '@hello-pangea/dnd',
       'lucide-react',
       'react-markdown',

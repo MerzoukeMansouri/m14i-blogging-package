@@ -5,9 +5,10 @@
  * Fetch blog tags with post counts
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import type { TagWithCount } from "../types";
 import { useBlogContext } from "../context/BlogContext";
+import { useAsyncData } from "../../utils/hooks/useAsyncData";
 
 export interface UseTagsReturn {
   tags: TagWithCount[];
@@ -22,50 +23,32 @@ export interface UseTagsReturn {
 export function useTags(): UseTagsReturn {
   const { apiBasePath, apiClient } = useBlogContext();
 
-  const [tags, setTags] = useState<TagWithCount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTags = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      let result: TagWithCount[];
-
-      // If custom API client is provided (e.g., Supabase client)
-      if (apiClient) {
-        const stats = await apiClient.tags.listWithCounts();
-        result = stats;
-      } else {
-        // Use API endpoint
-        const response = await fetch(`${apiBasePath}/tags`);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch tags: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        result = Array.isArray(data) ? data : (data.tags ?? []);
-      }
-
-      setTags(result || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setTags([]);
-    } finally {
-      setIsLoading(false);
+  const fetchTags = useCallback(async (): Promise<TagWithCount[]> => {
+    // If custom API client is provided (e.g., Supabase client)
+    if (apiClient) {
+      return await apiClient.tags.listWithCounts();
     }
+
+    // Use API endpoint
+    const response = await fetch(`${apiBasePath}/tags`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tags: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : (data.tags ?? []);
   }, [apiBasePath, apiClient]);
 
-  useEffect(() => {
-    fetchTags();
-  }, [fetchTags]);
+  const { data, isLoading, error, execute } = useAsyncData(fetchTags, {
+    initialData: [],
+    autoFetch: true,
+  });
 
   return {
-    tags,
+    tags: data ?? [],
     isLoading,
     error,
-    refresh: fetchTags,
+    refresh: execute,
   };
 }

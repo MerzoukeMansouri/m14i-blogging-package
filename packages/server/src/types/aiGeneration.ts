@@ -9,6 +9,23 @@ import type { LayoutSection, LayoutType, SEOMetadata, BrandContext as CoreBrandC
 export type { CoreBrandContext as BrandContext, CoreLayoutTemplate as LayoutTemplate };
 
 /**
+ * Extended SEO metadata with social media fields
+ * Used in AI generation responses
+ */
+export interface ExtendedSEOMetadata extends SEOMetadata {
+  openGraph?: {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
+  twitter?: {
+    card?: string;
+    title?: string;
+    description?: string;
+  };
+}
+
+/**
  * Request to generate a complete blog post from a prompt
  */
 export interface GenerateCompleteBlogRequest {
@@ -39,18 +56,7 @@ export interface GenerateCompleteBlogResponse {
   /** Generated content sections with layouts */
   sections: LayoutSection[];
   /** Generated SEO metadata */
-  seo_metadata: SEOMetadata & {
-    openGraph?: {
-      title?: string;
-      description?: string;
-      image?: string;
-    };
-    twitter?: {
-      card?: string;
-      title?: string;
-      description?: string;
-    };
-  };
+  seo_metadata: ExtendedSEOMetadata;
   /** Suggested category */
   category?: string;
   /** Suggested tags (optional, can be added manually) */
@@ -140,17 +146,7 @@ export interface GenerateSEORequest {
  */
 export interface GenerateSEOResponse {
   /** Generated SEO metadata */
-  seo_metadata: SEOMetadata & {
-    openGraph?: {
-      title?: string;
-      description?: string;
-    };
-    twitter?: {
-      card?: string;
-      title?: string;
-      description?: string;
-    };
-  };
+  seo_metadata: ExtendedSEOMetadata;
   /** Suggested or improved tags */
   tags?: string[];
 }

@@ -175,6 +175,10 @@ export { useTags } from "./public/hooks/useTags";
 export { useSearch } from "./public/hooks/useSearch";
 export { useRelatedPosts } from "./public/hooks/useRelatedPosts";
 
+// Utility Hooks
+export { useAsyncData } from "./utils/hooks/useAsyncData";
+export type { UseAsyncDataOptions, UseAsyncDataReturn } from "./utils/hooks/useAsyncData";
+
 // Public Context
 export { BlogProvider, useBlogContext } from "./public/context/BlogContext";
 
@@ -200,6 +204,8 @@ export {
   pluralize,
   formatNumber,
 } from "./public/utils/formatting";
+
+export { markdownToHtml, markdownToHtmlSync } from "./utils/markdown";
 
 // Public Types
 export type {

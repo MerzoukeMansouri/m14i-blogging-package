@@ -102,14 +102,11 @@ export function mergeBrandContext(dbContext?: Partial<BrandContext>): BrandConte
   }
 
   return {
-    siteName: dbContext.siteName || DEFAULT_BRAND_CONTEXT.siteName,
-    description: dbContext.description || DEFAULT_BRAND_CONTEXT.description,
-    industry: dbContext.industry || DEFAULT_BRAND_CONTEXT.industry,
-    targetAudience: dbContext.targetAudience || DEFAULT_BRAND_CONTEXT.targetAudience,
-    tone: dbContext.tone || DEFAULT_BRAND_CONTEXT.tone,
+    ...DEFAULT_BRAND_CONTEXT,
+    ...dbContext,
     vocabulary: {
-      prefer: dbContext.vocabulary?.prefer || DEFAULT_BRAND_CONTEXT.vocabulary?.prefer,
-      avoid: dbContext.vocabulary?.avoid || DEFAULT_BRAND_CONTEXT.vocabulary?.avoid,
+      ...DEFAULT_BRAND_CONTEXT.vocabulary,
+      ...dbContext.vocabulary,
     },
   };
 }

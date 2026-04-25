@@ -19,7 +19,7 @@ import {
   Link as LinkIcon,
   CodeSquare,
 } from "lucide-react";
-import { markdownToHtmlSync } from "../utils/markdown";
+import { markdownToHtmlSync } from "@m14i/blogging-core";
 
 export interface WYSIWYGEditorProps {
   content: string;

@@ -5,9 +5,10 @@
  * Fetch a single blog post by slug
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type { BlogPostRow } from "../../types";
 import { useBlogContext } from "../context/BlogContext";
+import { useAsyncData } from "../../utils/hooks/useAsyncData";
 
 export interface UsePostReturn {
   post: BlogPostRow | null;
@@ -22,54 +23,38 @@ export interface UsePostReturn {
 export function usePost(slug: string | undefined): UsePostReturn {
   const { apiBasePath, apiClient } = useBlogContext();
 
-  const [post, setPost] = useState<BlogPostRow | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchPost = useCallback(async () => {
+  const fetchPost = useCallback(async (): Promise<BlogPostRow | null> => {
     if (!slug) {
-      setPost(null);
-      setIsLoading(false);
-      return;
+      return null;
     }
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      let result: BlogPostRow;
-
-      // If custom API client is provided (e.g., Supabase client)
-      if (apiClient) {
-        result = await apiClient.posts.getBySlug(slug);
-      } else {
-        // Use API endpoint
-        const response = await fetch(`${apiBasePath}/slug/${encodeURIComponent(slug)}`);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch post: ${response.statusText}`);
-        }
-
-        result = await response.json();
-      }
-
-      setPost(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setPost(null);
-    } finally {
-      setIsLoading(false);
+    // If custom API client is provided (e.g., Supabase client)
+    if (apiClient) {
+      return await apiClient.posts.getBySlug(slug);
     }
+
+    // Use API endpoint
+    const response = await fetch(`${apiBasePath}/slug/${encodeURIComponent(slug)}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch post: ${response.statusText}`);
+    }
+
+    return await response.json();
   }, [apiBasePath, apiClient, slug]);
 
+  const { data, isLoading, error, execute } = useAsyncData(fetchPost, {
+    initialData: null,
+  });
+
   useEffect(() => {
-    fetchPost();
-  }, [fetchPost]);
+    execute();
+  }, [execute]);
 
   return {
-    post,
+    post: data ?? null,
     isLoading,
     error,
-    refresh: fetchPost,
+    refresh: execute,
   };
 }

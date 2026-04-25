@@ -13,34 +13,17 @@ import type {
   ChartBlock,
   ChartDataPoint,
 } from "@m14i/blogging-core";
+import type { BaseBlockEditorProps, ImprovementInstruction } from "../types/editorComponents";
 
-interface EditorComponents {
-  Label: React.ComponentType<{ className?: string; children: React.ReactNode }>;
-  Input: React.ComponentType<any>;
-  Textarea: React.ComponentType<any>;
-  Select: React.ComponentType<any>;
-  SelectTrigger: React.ComponentType<any>;
-  SelectValue: React.ComponentType<any>;
-  SelectContent: React.ComponentType<any>;
-  SelectItem: React.ComponentType<any>;
-  Button: React.ComponentType<any>;
-  PlusIcon: React.ComponentType<{ className?: string }>;
-  XIcon: React.ComponentType<{ className?: string }>;
-}
-
-interface TextEditorProps {
-  block: TextBlock;
-  onChange: (block: TextBlock) => void;
-  components: EditorComponents;
-  onImprove?: (content: string, instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => Promise<string>;
-}
+// Specific editor prop types extending the base
+type TextEditorProps = BaseBlockEditorProps<TextBlock>;
 
 export function TextEditor({ block, onChange, components, onImprove }: TextEditorProps): React.ReactElement {
   const { Label, Textarea, Button } = components;
   const [isImproving, setIsImproving] = React.useState(false);
   const [showImprovementMenu, setShowImprovementMenu] = React.useState(false);
 
-  const handleImprove = async (instruction: "expand" | "shorten" | "rewrite" | "add-examples" | "improve-clarity" | "make-engaging") => {
+  const handleImprove = async (instruction: ImprovementInstruction) => {
     if (!onImprove || !block.content) return;
 
     setIsImproving(true);

@@ -49,12 +49,14 @@ export { BlogBuilder } from "./components/BlogBuilder";
 export { BlogBuilderWithDefaults } from "./components/BlogBuilderWithDefaults";
 export { BlogEditorWithSidebar } from "./components/BlogEditorWithSidebar";
 export { ContentLayerPanel } from "./components/ContentLayerPanel";
-export { ContentBlockRenderer } from "./components/ContentBlockRenderer";
+// Re-exported from core
+// export { ContentBlockRenderer } from "@m14i/blogging-core";
 export { ContentBlockInlineEditor } from "./components/ContentBlockInlineEditor";
 export { WYSIWYGEditor } from "./components/WYSIWYGEditor";
 
 // Editor Types
 export type { BlogBuilderProps } from "./components/BlogBuilder";
+export type { BaseBlockEditorProps, EditorComponents, ImprovementInstruction } from "./types/editorComponents";
 
 // Views
 export { ListView } from "./views/ListView";

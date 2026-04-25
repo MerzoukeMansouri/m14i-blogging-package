@@ -1,11 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { BlogBuilderWithDefaults } from "m14i-blogging";
-import type { LayoutSection } from "m14i-blogging";
+import { BlogBuilderWithDefaults } from "@m14i/blogging-admin";
+import type { LayoutSection } from "@m14i/blogging-core";
 
 const BlogAdmin = dynamic(
-  () => import("m14i-blogging/admin").then((m) => m.BlogAdmin),
+  () => import("@m14i/blogging-admin").then((m) => m.BlogAdmin),
   { ssr: false },
 );
 

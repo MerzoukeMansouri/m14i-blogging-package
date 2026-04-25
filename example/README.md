@@ -136,7 +136,7 @@ docker compose up -d
 Replace `BlogBuilderWithDefaults` with `BlogBuilder` and pass your own shadcn/ui components:
 
 ```tsx
-import { BlogBuilder } from "m14i-blogging";
+import { BlogBuilder } from "@m14i/blogging-admin";
 import { Button, Card, Input, Label, Textarea } from "@/components/ui";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { PlusIcon, XIcon } from "lucide-react";

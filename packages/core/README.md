@@ -72,10 +72,12 @@ const { related } = useRelatedPosts(postId);
 const { layout, setLayout } = useBlogContext();
 ```
 
-## Client
+## Client (Server-Safe)
+
+For server-side usage (API routes, RSC), import from `/client`:
 
 ```ts
-import { createBlogClient } from '@m14i/blogging-core';
+import { createBlogClient } from '@m14i/blogging-core/client';
 
 const client = createBlogClient({
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,

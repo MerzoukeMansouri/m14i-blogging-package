@@ -115,11 +115,13 @@ export default function AdminPage() {
 }
 ```
 
-**API route**:
+**API route** (server-side):
 ```ts
 import { createPostsRoutes } from '@m14i/blogging-server';
+import { createBlogClient } from '@m14i/blogging-core/client';
 
-export const { GET, POST } = createPostsRoutes({ supabase: getSupabase });
+const blogClient = createBlogClient(supabase);
+export const { GET, POST } = createPostsRoutes({ blogClient });
 ```
 
 ---

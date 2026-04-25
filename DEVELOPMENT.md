@@ -5,6 +5,9 @@
 This is a monorepo with 3 packages:
 
 - **@m14i/blogging-core** - Core blog components, public views, types, utils
+  - Main export: Client components (Blog, PostCard, etc.)
+  - `/client` subpath: Server-safe exports (createBlogClient)
+  - `/styles`: CSS bundle
 - **@m14i/blogging-admin** - Admin panel, CMS, editors (depends on core)
 - **@m14i/blogging-server** - API routes, server utilities (depends on core)
 
@@ -138,8 +141,10 @@ vim packages/server/src/index.ts
 # 3. Rebuild
 pnpm build:server
 
-# 4. Use it in example app
+# 4. Use it in example app (server-side)
 vim example/app/app/api/my-route/route.ts
+# import { createBlogClient } from '@m14i/blogging-core/client';
+# import { myRoute } from '@m14i/blogging-server';
 ```
 
 ### Debug build issues
@@ -184,6 +189,21 @@ vim packages/core/src/components/BlogPreview.tsx
 pnpm build           # Rebuild packages
 rm -rf example/app/.next  # Clear Next.js cache
 pnpm dev:example     # Restart
+```
+
+### "You're importing a component that needs createContext"
+**Problem:** Server components importing client components
+
+**Solution:**
+- Server-side code (API routes): Import from `@m14i/blogging-core/client`
+- Client-side code (pages, components): Import from `@m14i/blogging-core`
+
+```ts
+// ✅ Server route
+import { createBlogClient } from '@m14i/blogging-core/client';
+
+// ✅ Client component
+import { Blog } from '@m14i/blogging-core';
 ```
 
 ### "Dynamic require of 'react' is not supported"

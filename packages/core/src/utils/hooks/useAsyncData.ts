@@ -1,5 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
+/**
+ * Convert error to user-friendly message
+ */
+function formatError(err: unknown): string {
+  return err instanceof Error ? err.message : "An error occurred";
+}
+
 export interface UseAsyncDataOptions<T> {
   /**
    * Initial data value
@@ -102,7 +109,7 @@ export function useAsyncData<T>(
 
         return result;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        const errorMessage = formatError(err);
 
         if (isMountedRef.current) {
           setError(errorMessage);

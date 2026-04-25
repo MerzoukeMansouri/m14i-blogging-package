@@ -15,6 +15,23 @@ import type {
 } from "@m14i/blogging-core";
 import type { BaseBlockEditorProps, ImprovementInstruction } from "../types/editorComponents";
 
+// AI Improvement Options
+const IMPROVEMENT_OPTIONS = [
+  { instruction: "expand" as const, icon: "📝", label: "Expand" },
+  { instruction: "shorten" as const, icon: "✂️", label: "Shorten" },
+  { instruction: "rewrite" as const, icon: "🔄", label: "Rewrite" },
+  { instruction: "add-examples" as const, icon: "💡", label: "Add Examples" },
+  { instruction: "improve-clarity" as const, icon: "🎯", label: "Improve Clarity" },
+  { instruction: "make-engaging" as const, icon: "⭐", label: "Make Engaging" },
+] as const;
+
+// Chart height constraints
+const CHART_HEIGHT = {
+  MIN: 150,
+  MAX: 600,
+  DEFAULT: 300,
+} as const;
+
 // Specific editor prop types extending the base
 type TextEditorProps = BaseBlockEditorProps<TextBlock>;
 
@@ -55,42 +72,15 @@ export function TextEditor({ block, onChange, components, onImprove }: TextEdito
 
             {showImprovementMenu && (
               <div className="absolute right-0 top-full mt-1 bg-white border rounded-md shadow-lg z-20 min-w-[180px]">
-                <button
-                  onClick={() => handleImprove("expand")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  📝 Expand
-                </button>
-                <button
-                  onClick={() => handleImprove("shorten")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  ✂️ Shorten
-                </button>
-                <button
-                  onClick={() => handleImprove("rewrite")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  🔄 Rewrite
-                </button>
-                <button
-                  onClick={() => handleImprove("add-examples")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  💡 Add Examples
-                </button>
-                <button
-                  onClick={() => handleImprove("improve-clarity")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  🎯 Improve Clarity
-                </button>
-                <button
-                  onClick={() => handleImprove("make-engaging")}
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                >
-                  ⭐ Make Engaging
-                </button>
+                {IMPROVEMENT_OPTIONS.map(({ instruction, icon, label }) => (
+                  <button
+                    key={instruction}
+                    onClick={() => handleImprove(instruction)}
+                    className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                  >
+                    {icon} {label}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -630,10 +620,10 @@ export function ChartEditor({ block, onChange, components }: ChartEditorProps): 
         <Label className="text-xs text-muted-foreground">Hauteur (px)</Label>
         <Input
           type="number"
-          value={block.height || 300}
+          value={block.height || CHART_HEIGHT.DEFAULT}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...block, height: Number(e.target.value) })}
-          min={150}
-          max={600}
+          min={CHART_HEIGHT.MIN}
+          max={CHART_HEIGHT.MAX}
           className="text-sm h-8 mt-1"
         />
       </div>

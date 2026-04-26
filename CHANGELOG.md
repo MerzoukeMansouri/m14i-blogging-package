@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.1...v2.2.2) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* update BlogEditor story to use full BlogAdmin component with title, taxonomy, and keyboard shortcuts ([6b537da](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/6b537da217cc3f28ae7f70c5ac86b14d51d04f90))
+
 ## [2.2.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.0...v2.2.1) (2026-04-26)
 
 ### 🐛 Bug Fixes

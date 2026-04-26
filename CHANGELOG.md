@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.2...v2.2.3) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* use EditorView directly in story to show editor, not list view ([22b5fa3](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/22b5fa3418f3c6c6508f5b54b6b30c5e4a3359ba))
+
 ## [2.2.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.1...v2.2.2) (2026-04-26)
 
 ### 🐛 Bug Fixes

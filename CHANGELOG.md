@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.0...v2.1.1) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* convert BlogAdmin story to docs-only (requires live backend) ([d774e47](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/d774e47e918ba7ea18b4c339519c231dec9523d2))
+
 ## [2.1.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.12...v2.1.0) (2026-04-26)
 
 ### ✨ Features

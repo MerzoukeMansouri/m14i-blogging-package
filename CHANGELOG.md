@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.12...v2.1.0) (2026-04-26)
+
+### ✨ Features
+
+* add themeable BlogPostList & BlogPreview, refresh storybook ([9951d5d](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9951d5d4648d8e0209eb19dea0614a1ae0deef21))
+
+### 🐛 Bug Fixes
+
+* handle both {post} and raw post API responses ([15326de](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/15326de5d5e6bf36bd838ee128b7d11d016b4a09))
+* migrate from blog schema to public schema with blog_ prefix ([bd1f3b9](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/bd1f3b98c192e184b70a161c38c7fc710cfa7963))
+* streamline supabase migrations and enable demo mode RLS bypass ([6b8e149](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/6b8e149f6b7da17eb8295c83d57dfdfe30984472))
+* update lockfile after removing @hello-pangea/dnd from admin ([6ce3aad](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/6ce3aada6372be79c6526f8096d571b8f22e9cd1))
+* use valid UUID for demo user ID ([9bf1373](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9bf1373046e4e8a71d381992de1192b8774a68d2))
+
 ## [2.0.12](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.0.11...v2.0.12) (2026-04-25)
 
 ### 🐛 Bug Fixes

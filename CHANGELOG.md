@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.4...v2.2.0) (2026-04-26)
+
+### ✨ Features
+
+* add BlogEditor story for interactive blog editing ([0f8957e](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/0f8957e4fab0af5ecc823c86a66cb432501368b8))
+
 ## [2.1.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.3...v2.1.4) (2026-04-26)
 
 ### 🐛 Bug Fixes

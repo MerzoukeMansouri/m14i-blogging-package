@@ -353,7 +353,7 @@ module.exports = {
 
 **Components**
 - `BlogAdmin` - Full admin interface
-- `BlogBuilder` - Drag & drop layout builder
+- `BlogEditorContainer` - Modern editor with drag & drop sidebar panels
 - `WYSIWYGEditor` - Rich text editor
 - `ContentBlockRenderer` - Renders all blocks (text, images, videos, code, charts, carousels, PDFs)
 - `AIAssistantPanel`, `ContentBuilderPanel`, `DraggableLayerPanel`

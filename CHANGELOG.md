@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.1...v2.1.2) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* force 2 columns in TwoColumns story (remove breakpoint) ([4da4e28](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/4da4e28272c29074831526006fe64726ba944f65))
+
 ## [2.1.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.0...v2.1.1) (2026-04-26)
 
 ### 🐛 Bug Fixes

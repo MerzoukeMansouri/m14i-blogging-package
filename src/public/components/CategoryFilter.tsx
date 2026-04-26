@@ -88,7 +88,7 @@ export function CategoryFilter({
           className="w-full justify-between"
         >
           <span>{category.name}</span>
-          <span className="text-xs text-muted-foreground">({category.count})</span>
+          <span className="text-xs text-muted-foreground">({category.postCount})</span>
         </Button>
       ))}
     </div>

@@ -8,10 +8,8 @@ import type {
   BlogPostUpdate,
   BlogFilterParams,
   BlogPostListResponse,
-  CategoryRow,
-  CategoryInsert,
-  TagRow,
-  TagInsert,
+  BlogCategory,
+  BlogTag,
 } from "../../src/types/database";
 
 // Mock data
@@ -98,78 +96,54 @@ const mockPosts: BlogPostRow[] = [
   },
 ];
 
-const mockCategories: CategoryRow[] = [
+const mockCategories: BlogCategory[] = [
   {
-    id: "cat-1",
     name: "Tutorials",
     slug: "tutorials",
-    icon: "📚",
-    description: "Step-by-step guides and tutorials",
-    color: "#3b82f6",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 2,
   },
   {
-    id: "cat-2",
     name: "Advanced",
     slug: "advanced",
-    icon: "🚀",
-    description: "Advanced topics and techniques",
-    color: "#8b5cf6",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 1,
   },
   {
-    id: "cat-3",
     name: "News",
     slug: "news",
-    icon: "📰",
-    description: "Latest news and updates",
-    color: "#10b981",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 0,
   },
 ];
 
-const mockTags: TagRow[] = [
+const mockTags: BlogTag[] = [
   {
-    id: "tag-1",
     name: "react",
     slug: "react",
-    color: "#61dafb",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 2,
   },
   {
-    id: "tag-2",
     name: "typescript",
     slug: "typescript",
-    color: "#3178c6",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 1,
   },
   {
-    id: "tag-3",
     name: "javascript",
     slug: "javascript",
-    color: "#f7df1e",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 2,
   },
   {
-    id: "tag-4",
     name: "web development",
     slug: "web-development",
-    color: "#06b6d4",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 2,
   },
   {
-    id: "tag-5",
     name: "patterns",
     slug: "patterns",
-    color: "#ec4899",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 1,
   },
   {
-    id: "tag-6",
     name: "architecture",
     slug: "architecture",
-    color: "#f59e0b",
-    created_at: new Date("2024-01-01").toISOString(),
+    postCount: 1,
   },
 ];
 
@@ -344,37 +318,26 @@ export class MockBlogAdminAPIClient {
     return posts[index];
   }
 
-  // Categories
-  async listCategories(): Promise<CategoryRow[]> {
+  // Categories & Tags (derived from posts)
+  async listCategories(): Promise<BlogCategory[]> {
     await this.delay();
     return [...categories];
   }
 
-  async createCategory(category: CategoryInsert): Promise<CategoryRow> {
-    await this.delay();
-    const newCategory: CategoryRow = {
-      id: `cat-${Date.now()}`,
-      ...category,
-      created_at: new Date().toISOString(),
-    };
-    categories.push(newCategory);
-    return newCategory;
-  }
-
-  // Tags
-  async listTags(): Promise<TagRow[]> {
+  async listTags(): Promise<BlogTag[]> {
     await this.delay();
     return [...tags];
   }
 
-  async createTag(tag: TagInsert): Promise<TagRow> {
+  async getStats() {
     await this.delay();
-    const newTag: TagRow = {
-      id: `tag-${Date.now()}`,
-      ...tag,
-      created_at: new Date().toISOString(),
+    return {
+      totalPosts: posts.length,
+      publishedPosts: posts.filter((p) => p.status === "published").length,
+      draftPosts: posts.filter((p) => p.status === "draft").length,
+      archivedPosts: posts.filter((p) => p.status === "archived").length,
+      categoryCounts: categories.reduce((acc, c) => ({ ...acc, [c.name]: c.postCount }), {}),
+      tagCounts: tags.reduce((acc, t) => ({ ...acc, [t.name]: t.postCount }), {}),
     };
-    tags.push(newTag);
-    return newTag;
   }
 }

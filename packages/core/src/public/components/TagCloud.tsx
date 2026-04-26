@@ -73,7 +73,7 @@ export function TagCloud({
             className="cursor-pointer hover:bg-accent"
             onClick={() => handleTagClick(tag.name)}
           >
-            {tag.name} ({tag.count})
+            {tag.name} ({tag.postCount})
           </Badge>
         ))}
       </div>

@@ -2,8 +2,7 @@
  * Mock data for Storybook stories
  */
 
-import type { BlogPostRow, LayoutSection } from "../src/types";
-import type { CategoryWithCount, TagWithCount } from "../src/public/types";
+import type { BlogPostRow, LayoutSection, BlogCategory, BlogTag } from "../src/types";
 
 // Sample layout sections
 const sampleSections: LayoutSection[] = [
@@ -248,40 +247,40 @@ export const mockPosts: BlogPostRow[] = [
 ];
 
 // Sample categories
-export const mockCategories: CategoryWithCount[] = [
-  { name: "React", count: 5 },
-  { name: "TypeScript", count: 3 },
-  { name: "Next.js", count: 4 },
-  { name: "CSS", count: 2 },
-  { name: "Node.js", count: 3 },
-  { name: "Accessibility", count: 1 },
-  { name: "Testing", count: 2 },
-  { name: "APIs", count: 2 },
-  { name: "DevOps", count: 1 },
+export const mockCategories: BlogCategory[] = [
+  { name: "React", slug: "react", postCount: 5 },
+  { name: "TypeScript", slug: "typescript", postCount: 3 },
+  { name: "Next.js", slug: "nextjs", postCount: 4 },
+  { name: "CSS", slug: "css", postCount: 2 },
+  { name: "Node.js", slug: "nodejs", postCount: 3 },
+  { name: "Accessibility", slug: "accessibility", postCount: 1 },
+  { name: "Testing", slug: "testing", postCount: 2 },
+  { name: "APIs", slug: "apis", postCount: 2 },
+  { name: "DevOps", slug: "devops", postCount: 1 },
 ];
 
 // Sample tags
-export const mockTags: TagWithCount[] = [
-  { name: "react", count: 8 },
-  { name: "javascript", count: 6 },
-  { name: "typescript", count: 5 },
-  { name: "frontend", count: 7 },
-  { name: "backend", count: 3 },
-  { name: "performance", count: 4 },
-  { name: "best-practices", count: 3 },
-  { name: "nextjs", count: 4 },
-  { name: "testing", count: 3 },
-  { name: "css", count: 2 },
-  { name: "layout", count: 2 },
-  { name: "design", count: 2 },
-  { name: "a11y", count: 1 },
-  { name: "wcag", count: 1 },
-  { name: "ux", count: 2 },
-  { name: "graphql", count: 1 },
-  { name: "rest", count: 1 },
-  { name: "api", count: 2 },
-  { name: "docker", count: 1 },
-  { name: "devops", count: 1 },
+export const mockTags: BlogTag[] = [
+  { name: "react", slug: "react", postCount: 8 },
+  { name: "javascript", slug: "javascript", postCount: 6 },
+  { name: "typescript", slug: "typescript", postCount: 5 },
+  { name: "frontend", slug: "frontend", postCount: 7 },
+  { name: "backend", slug: "backend", postCount: 3 },
+  { name: "performance", slug: "performance", postCount: 4 },
+  { name: "best-practices", slug: "best-practices", postCount: 3 },
+  { name: "nextjs", slug: "nextjs", postCount: 4 },
+  { name: "testing", slug: "testing", postCount: 3 },
+  { name: "css", slug: "css", postCount: 2 },
+  { name: "layout", slug: "layout", postCount: 2 },
+  { name: "design", slug: "design", postCount: 2 },
+  { name: "a11y", slug: "a11y", postCount: 1 },
+  { name: "wcag", slug: "wcag", postCount: 1 },
+  { name: "ux", slug: "ux", postCount: 2 },
+  { name: "graphql", slug: "graphql", postCount: 1 },
+  { name: "rest", slug: "rest", postCount: 1 },
+  { name: "api", slug: "api", postCount: 2 },
+  { name: "docker", slug: "docker", postCount: 1 },
+  { name: "devops", slug: "devops", postCount: 1 },
 ];
 
 // Mock API client for Storybook
@@ -336,10 +335,16 @@ export const mockApiClient = {
         .slice(0, limit);
     },
   },
-  categories: {
-    listWithCounts: async () => mockCategories,
-  },
-  tags: {
-    listWithCounts: async () => mockTags,
+  stats: {
+    getCategories: async () => mockCategories,
+    getTags: async () => mockTags,
+    getStats: async () => ({
+      totalPosts: mockPosts.length,
+      publishedPosts: mockPosts.filter((p) => p.status === "published").length,
+      draftPosts: mockPosts.filter((p) => p.status === "draft").length,
+      archivedPosts: mockPosts.filter((p) => p.status === "archived").length,
+      categoryCounts: mockCategories.reduce((acc, c) => ({ ...acc, [c.name]: c.postCount }), {}),
+      tagCounts: mockTags.reduce((acc, t) => ({ ...acc, [t.name]: t.postCount }), {}),
+    }),
   },
 };

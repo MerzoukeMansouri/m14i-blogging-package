@@ -26,7 +26,7 @@ export type {
 export { BlogAdminAPIClient } from "./api/client";
 
 // Context
-export { useBlogAdminContext } from "./context/BlogAdminContext";
+export { BlogAdminProvider, useBlogAdminContext } from "./context/BlogAdminContext";
 
 // Hooks
 export { usePosts } from "./hooks/usePosts";

@@ -1,27 +1,39 @@
-"use client";
+import { Suspense } from "react";
+import { getBlogClient } from "@/lib/blog-client";
+import { BlogPostDetail } from "./BlogPostDetail";
+import { BlogPostList } from "./BlogPostList";
 
-import dynamic from "next/dynamic";
+interface PageProps {
+  params: Promise<{
+    path?: string[];
+  }>;
+}
 
-const Blog = dynamic(
-  () => import("@m14i/blogging-core").then((m) => m.Blog),
-  { ssr: false },
-);
+export default async function BlogPage({ params }: PageProps) {
+  const { path } = await params;
+  const slug = path?.[0];
 
-export default function BlogPage() {
+  const blogClient = await getBlogClient();
+
+  if (!slug) {
+    const result = await blogClient.posts.list({ status: "published" });
+    const posts = result?.posts || [];
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <BlogPostList posts={posts} />
+      </Suspense>
+    );
+  }
+
+  const post = await blogClient.posts.getBySlug(slug);
+
+  if (!post) {
+    return <div>Post not found</div>;
+  }
+
   return (
-    <Blog
-      basePath="/blog"
-      apiBasePath="/api/blog"
-      display={{
-        layout: "grid",
-        postsPerPage: 9,
-      }}
-      features={{
-        search: true,
-        categoryFilter: true,
-        tagFilter: true,
-        relatedPosts: true,
-      }}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <BlogPostDetail post={post} />
+    </Suspense>
   );
 }

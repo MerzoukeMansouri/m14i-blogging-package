@@ -5,6 +5,9 @@ import "./styles.css";
 export { BlogSEO, generateBlogMetadata, generateBlogJSONLD } from "./components/BlogSEO";
 export { BlogHead, BlogMetaTags, BlogStructuredData } from "./components/BlogHead";
 export { BlogPreview } from "./components/BlogPreview";
+export type { BlogPreviewTheme, BlogPreviewProps } from "./components/BlogPreview";
+export { BlogPostList } from "./components/BlogPostList";
+export type { BlogPostListTheme, BlogPostListProps } from "./components/BlogPostList";
 export { ContentBlockRenderer } from "./components/ContentBlockRenderer";
 
 // Types

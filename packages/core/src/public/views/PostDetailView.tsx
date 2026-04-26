@@ -68,6 +68,9 @@ export function PostDetailView({ slug, className = "" }: PostDetailViewProps) {
       <div className={`container mx-auto px-4 py-8 ${className}`}>
         <div className="text-center py-12">
           <p className="text-muted-foreground">{labels.loading}</p>
+          <pre className="text-left text-xs mt-4 max-w-2xl mx-auto overflow-auto">
+            {JSON.stringify({ isLoading, post, error, slug }, null, 2)}
+          </pre>
         </div>
       </div>
     );

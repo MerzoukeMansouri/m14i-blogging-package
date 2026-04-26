@@ -41,8 +41,11 @@ export function usePost(slug: string | undefined): UsePostReturn {
     }
 
     const data = await response.json();
+    console.log('RAW API RESPONSE:', JSON.stringify(data, null, 2));
     // Server returns {post: {...}} or raw post object
-    return data.post || data;
+    const post = data.post || data;
+    console.log('EXTRACTED POST:', JSON.stringify(post, null, 2));
+    return post;
   }, [apiBasePath, apiClient, slug]);
 
   const { data, isLoading, error, execute } = useAsyncData(fetchPost, {
@@ -51,7 +54,8 @@ export function usePost(slug: string | undefined): UsePostReturn {
 
   useEffect(() => {
     execute();
-  }, [execute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   return {
     post: data ?? null,

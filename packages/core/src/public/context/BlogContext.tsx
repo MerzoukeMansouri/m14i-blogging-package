@@ -171,14 +171,29 @@ export function BlogProvider(props: BlogProviderProps) {
     navigate,
   } = props;
 
+  const mergedDisplay = useMemo(
+    () => ({ ...DEFAULT_DISPLAY, ...display }),
+    [display]
+  );
+
+  const mergedFeatures = useMemo(
+    () => ({ ...DEFAULT_FEATURES, ...features }),
+    [features]
+  );
+
+  const mergedLabels = useMemo(
+    () => ({ ...DEFAULT_LABELS, ...labels }),
+    [labels]
+  );
+
   const value = useMemo<BlogContextValue>(
     () => ({
       apiBasePath,
       apiClient,
       basePath,
-      display: { ...DEFAULT_DISPLAY, ...display },
-      features: { ...DEFAULT_FEATURES, ...features },
-      labels: { ...DEFAULT_LABELS, ...labels },
+      display: mergedDisplay,
+      features: mergedFeatures,
+      labels: mergedLabels,
       classNames,
       components,
       defaultCategory,
@@ -194,9 +209,9 @@ export function BlogProvider(props: BlogProviderProps) {
       apiBasePath,
       apiClient,
       basePath,
-      display,
-      features,
-      labels,
+      mergedDisplay,
+      mergedFeatures,
+      mergedLabels,
       classNames,
       components,
       defaultCategory,

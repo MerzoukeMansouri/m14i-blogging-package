@@ -84,15 +84,6 @@ export function useAsyncData<T>(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Track if component is mounted to prevent state updates after unmount
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   const execute = useCallback(
     async (...args: any[]): Promise<T | undefined> => {
       setIsLoading(true);
@@ -100,23 +91,21 @@ export function useAsyncData<T>(
 
       try {
         const result = await asyncFn(...args);
+        console.log('[useAsyncData] Got result');
 
-        if (isMountedRef.current) {
-          setData(result);
-          setIsLoading(false);
-          onSuccess?.(result);
-        }
+        setData(result);
+        setIsLoading(false);
+        onSuccess?.(result);
 
         return result;
       } catch (err) {
         const errorMessage = formatError(err);
+        console.error('[useAsyncData] Error:', errorMessage);
 
-        if (isMountedRef.current) {
-          setError(errorMessage);
-          setData(undefined);
-          setIsLoading(false);
-          onError?.(err instanceof Error ? err : new Error(errorMessage));
-        }
+        setError(errorMessage);
+        setData(undefined);
+        setIsLoading(false);
+        onError?.(err instanceof Error ? err : new Error(errorMessage));
 
         return undefined;
       }

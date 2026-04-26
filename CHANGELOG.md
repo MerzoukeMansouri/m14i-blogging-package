@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.3...v2.1.4) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* import core styles in Storybook to enable grid display ([579afb6](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/579afb6b3d1fcfca2804fc38f23e539db39fe5b8))
+
 ## [2.1.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.2...v2.1.3) (2026-04-26)
 
 ### 🐛 Bug Fixes

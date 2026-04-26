@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.4...v2.2.5) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* remove taxonomy table migrations and update code to use stats API ([5ec4ee3](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/5ec4ee34f3edb05ed1b6db1da13f52319c289eb2))
+
 ## [2.2.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.3...v2.2.4) (2026-04-26)
 
 ### 🐛 Bug Fixes

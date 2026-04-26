@@ -40,7 +40,9 @@ export function usePost(slug: string | undefined): UsePostReturn {
       throw new Error(`Failed to fetch post: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    // Server returns {post: {...}} or raw post object
+    return data.post || data;
   }, [apiBasePath, apiClient, slug]);
 
   const { data, isLoading, error, execute } = useAsyncData(fetchPost, {

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.0...v2.2.1) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* update BlogEditor story to use BlogEditorContainer with sidebar panels ([7f14f10](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/7f14f107f90b0a3d191fa93d927c0c42496fa43b))
+
 ## [2.2.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.4...v2.2.0) (2026-04-26)
 
 ### ✨ Features

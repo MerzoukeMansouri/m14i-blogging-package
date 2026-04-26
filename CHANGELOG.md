@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.2...v2.1.3) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* add isAllowed=true to BlogAdmin story to prevent access denied ([d59c4da](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/d59c4da09f094b510fe8f3f32547172de3fe788e))
+
 ## [2.1.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.1.1...v2.1.2) (2026-04-26)
 
 ### 🐛 Bug Fixes

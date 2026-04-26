@@ -33,7 +33,11 @@ export default function BlogAdminPage() {
   return (
     <BlogAdmin
       isAllowed={true}
-      currentUser={{ id: "demo-user", name: "Admin", email: "admin@example.com" }}
+      currentUser={{
+        id: "00000000-0000-0000-0000-000000000000",  // Valid UUID for demo
+        name: "Admin",
+        email: "admin@example.com"
+      }}
       basePath="/admin/blog"
       apiBasePath="/api/blog"
       components={{

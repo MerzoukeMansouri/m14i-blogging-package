@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.3...v2.2.4) (2026-04-26)
+
+### 🐛 Bug Fixes
+
+* export BlogAdminProvider from admin package ([dbc4573](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/dbc4573dc46e804b3cd9fa2f49c948c8b5afd036))
+
 ## [2.2.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.2...v2.2.3) (2026-04-26)
 
 ### 🐛 Bug Fixes

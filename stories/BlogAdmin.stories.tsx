@@ -19,6 +19,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Documentation: Story = {
+  args: {
+    isAllowed: true,
+    currentUser: {
+      id: "demo-user",
+      name: "Demo User",
+      email: "demo@example.com",
+    },
+  },
   parameters: {
     docs: {
       description: {
@@ -31,16 +39,14 @@ To use BlogAdmin in your application:
 import { BlogAdmin } from "@m14i/blogging-admin";
 
 <BlogAdmin
-  basePath="/admin/blog"
-  apiBasePath="/api/blog"
-  supabaseUrl={process.env.NEXT_PUBLIC_SUPABASE_URL}
-  supabaseAnonKey={process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}
+  isAllowed={user?.role === "admin"}
   currentUser={{
     id: user.id,
     name: user.name,
     email: user.email,
-    role: "admin"
   }}
+  basePath="/admin/blog"
+  apiBasePath="/api/blog"
 />
 \`\`\`
 
@@ -53,12 +59,23 @@ import { BlogAdmin } from "@m14i/blogging-admin";
 - Media management
 - SEO optimization tools
 
+## Access Control
+
+Pass \`isAllowed={true}\` to grant access. Typically you'd check user permissions:
+
+\`\`\`tsx
+<BlogAdmin
+  isAllowed={user?.role === "admin" || user?.role === "editor"}
+  currentUser={user}
+/>
+\`\`\`
+
 ## Note
 
 This component requires:
-- Supabase instance configured
-- API routes set up
-- User authentication
+- API routes set up for blog operations
+- User authentication system
+- Optional: Supabase for backend storage
 
 See the [installation guide](./?path=/docs/getting-started-installation--docs) for complete setup instructions.
         `,

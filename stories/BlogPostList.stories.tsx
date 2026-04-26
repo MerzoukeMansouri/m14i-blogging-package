@@ -208,7 +208,12 @@ export const TwoColumns: Story = {
     posts: samplePosts.slice(0, 4),
     pageTitle: "Featured",
     theme: {
-      grid: "grid grid-cols-1 md:grid-cols-2 gap-6",
+      grid: "grid grid-cols-2 gap-6",
+    },
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: "tablet",
     },
   },
 };

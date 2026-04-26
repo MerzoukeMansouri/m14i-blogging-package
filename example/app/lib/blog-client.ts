@@ -16,18 +16,16 @@ export async function getBlogClient() {
       }
     );
     return createBlogClient(supabase, {
-      schema: "blog",
-      postsTable: "posts",
-      mediaTable: "media",
+      postsTable: "blog_posts",
+      mediaTable: "blog_media",
       includeAuthor: false,
     });
   }
 
   const supabase = await createClient();
   return createBlogClient(supabase, {
-    schema: "blog",
-    postsTable: "posts",
-    mediaTable: "media",
+    postsTable: "blog_posts",
+    mediaTable: "blog_media",
     includeAuthor: false,
   });
 }

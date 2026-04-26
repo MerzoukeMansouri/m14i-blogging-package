@@ -57,7 +57,7 @@ export function getLayoutLabel(layoutType: LayoutType): string {
 
 // Helper to create a default block with unique ID
 export function createDefaultBlock(type: ContentBlockType): ContentBlock {
-  const id = `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const id = crypto.randomUUID();
 
   switch (type) {
     case "text":

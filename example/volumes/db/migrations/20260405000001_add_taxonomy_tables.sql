@@ -90,14 +90,7 @@ CREATE INDEX idx_tags_created_by ON public.blog_tags(created_by);
 -- TRIGGERS
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION public.update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
+-- Update timestamp triggers
 CREATE TRIGGER categories_update_updated_at
   BEFORE UPDATE ON public.blog_categories
   FOR EACH ROW
@@ -120,37 +113,47 @@ ALTER TABLE public.blog_tags ENABLE ROW LEVEL SECURITY;
 -- Categories RLS Policies
 -- ----------------------------------------------------------------------------
 
+-- Public read: Everyone can read categories
 CREATE POLICY "Public can read categories"
   ON public.blog_categories
   FOR SELECT
-  TO anon, authenticated
   USING (true);
 
+-- Admin manage: Only admin users can create/update/delete categories
 CREATE POLICY "Admin can manage categories"
   ON public.blog_categories
   FOR ALL
-  TO authenticated
   USING (
-    auth.jwt() -> 'user_metadata' ->> 'role' = 'admin' OR
-    auth.uid() IN (
-      SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+    auth.role() = 'authenticated' AND
+    (
+      auth.jwt() -> 'user_metadata' ->> 'role' = 'admin' OR
+      auth.uid() IN (
+        SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+      )
     )
   );
 
+-- ----------------------------------------------------------------------------
+-- Tags RLS Policies
+-- ----------------------------------------------------------------------------
+
+-- Public read: Everyone can read tags
 CREATE POLICY "Public can read tags"
   ON public.blog_tags
   FOR SELECT
-  TO anon, authenticated
   USING (true);
 
+-- Admin manage: Only admin users can create/update/delete tags
 CREATE POLICY "Admin can manage tags"
   ON public.blog_tags
   FOR ALL
-  TO authenticated
   USING (
-    auth.jwt() -> 'user_metadata' ->> 'role' = 'admin' OR
-    auth.uid() IN (
-      SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+    auth.role() = 'authenticated' AND
+    (
+      auth.jwt() -> 'user_metadata' ->> 'role' = 'admin' OR
+      auth.uid() IN (
+        SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+      )
     )
   );
 

@@ -2,9 +2,10 @@
 -- M14I Blogging Package - Brand Settings
 -- ============================================================================
 -- Single-row table for brand context used by AI generation
+-- Uses public schema with blog_ prefix
 -- ============================================================================
 
-CREATE TABLE blog.brand_settings (
+CREATE TABLE blog_brand_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   site_name TEXT NOT NULL DEFAULT 'My Blog',
   description TEXT,
@@ -18,7 +19,7 @@ CREATE TABLE blog.brand_settings (
 );
 
 -- Insert default row
-INSERT INTO blog.brand_settings (
+INSERT INTO blog_brand_settings (
   site_name,
   description,
   industry,
@@ -35,7 +36,7 @@ INSERT INTO blog.brand_settings (
 ) ON CONFLICT DO NOTHING;
 
 -- Trigger for updated_at
-CREATE OR REPLACE FUNCTION blog.update_brand_settings_timestamp()
+CREATE OR REPLACE FUNCTION blog_update_brand_settings_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -44,44 +45,29 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER brand_settings_update_timestamp
-  BEFORE UPDATE ON blog.brand_settings
+  BEFORE UPDATE ON blog_brand_settings
   FOR EACH ROW
-  EXECUTE FUNCTION blog.update_brand_settings_timestamp();
+  EXECUTE FUNCTION blog_update_brand_settings_timestamp();
 
 -- ============================================================================
 -- RLS POLICIES
 -- ============================================================================
 
-ALTER TABLE blog.brand_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_brand_settings ENABLE ROW LEVEL SECURITY;
 
--- Public read (AI needs brand context for generation)
+-- Public read (AI needs brand context)
 CREATE POLICY "Anyone can read brand settings"
-  ON blog.brand_settings FOR SELECT
+  ON blog_brand_settings FOR SELECT
   USING (true);
 
--- Admin only update
-CREATE POLICY "Admin can update brand settings"
-  ON blog.brand_settings FOR UPDATE
-  USING (
-    auth.role() = 'authenticated' AND
-    (
-      auth.jwt() -> 'user_metadata' ->> 'role' = 'admin' OR
-      EXISTS (
-        SELECT 1 FROM auth.users
-        WHERE id = auth.uid()
-        AND raw_user_meta_data->>'role' = 'admin'
-      )
-    )
-  );
-
--- Prevent deletion
-CREATE POLICY "Prevent deletion of brand settings"
-  ON blog.brand_settings FOR DELETE
-  USING (false);
+-- Service role can update
+CREATE POLICY "Service role can update brand settings"
+  ON blog_brand_settings FOR UPDATE
+  USING (auth.role() = 'service_role');
 
 -- ============================================================================
 -- PERMISSIONS
 -- ============================================================================
 
-GRANT SELECT ON blog.brand_settings TO anon, authenticated;
-GRANT UPDATE ON blog.brand_settings TO authenticated;
+GRANT SELECT ON blog_brand_settings TO anon, authenticated;
+GRANT UPDATE ON blog_brand_settings TO authenticated;

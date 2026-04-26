@@ -41,7 +41,6 @@
     "directory": "packages/admin"
   },
   "peerDependencies": {
-    "@hello-pangea/dnd": "^16.0.0",
     "@tiptap/extension-image": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",
@@ -65,7 +64,6 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
-    "@hello-pangea/dnd": "^18.0.1",
     "@tiptap/extension-image": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",

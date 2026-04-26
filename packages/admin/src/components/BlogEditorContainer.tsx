@@ -169,8 +169,6 @@ export function BlogEditorContainer({
           generatingSections={generatingSections}
           hideLayoutPicker={true}
           components={components}
-          hoveredColumnIndex={hoveredColumnIndex}
-          hoveredSectionIndex={hoveredSectionIndex}
         />
       </BlogEditorWithSidebar>
 

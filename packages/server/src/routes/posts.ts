@@ -16,7 +16,7 @@ import {
   successResponse,
   checkAuth,
 } from '../utils';
-import { generateSlug } from '@m14i/blogging-core';
+import { generateSlug } from '@m14i/blogging-core/client';
 
 // Re-export blog API functions from examples (will be moved to src/server/api)
 // For now, users need to provide these or we include them in the package

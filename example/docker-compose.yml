@@ -41,6 +41,8 @@ services:
       - ./volumes/db/migrations/20260405000000_create_blog_schema.sql:/docker-entrypoint-initdb.d/migrations/20260405000000_create_blog_schema.sql:Z
       - ./volumes/db/migrations/20260405000001_add_taxonomy_tables.sql:/docker-entrypoint-initdb.d/migrations/20260405000001_add_taxonomy_tables.sql:Z
       - ./volumes/db/migrations/20260405000002_seed_data.sql:/docker-entrypoint-initdb.d/migrations/20260405000002_seed_data.sql:Z
+      - ./volumes/db/migrations/20260423000000_remove_taxonomy_tables.sql:/docker-entrypoint-initdb.d/migrations/20260423000000_remove_taxonomy_tables.sql:Z
+      - ./volumes/db/migrations/20260425000000_add_brand_settings.sql:/docker-entrypoint-initdb.d/migrations/20260425000000_add_brand_settings.sql:Z
       - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB}"]

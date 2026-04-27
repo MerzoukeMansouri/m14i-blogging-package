@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.6...v3.0.0) (2026-04-27)
+
+### ⚠ BREAKING CHANGES
+
+* Requires Next.js 16.2.5+ for compatibility
+
+### 🐛 Bug Fixes
+
+* update Next.js to 16.2.5 to fix security vulnerabilities ([ffbb062](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/ffbb062aa45e906d692c8e5dab6a7266830a4cc3))
+* update Next.js to v16.0.10 for compatibility ([9aea550](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/9aea550417de6b975e540a87f79ecbea299c3e99))
+
 ## [2.2.6](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.5...v2.2.6) (2026-04-27)
 
 ### 📚 Documentation

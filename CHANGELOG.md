@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v3.0.0...v3.0.1) (2026-04-27)
+
+### 🐛 Bug Fixes
+
+* add prepublishOnly hook to ensure dist is built before npm publish ([f524c88](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/f524c88803856a1b70af7b9fa4ab139784d25f5c))
+
 ## [3.0.0](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.6...v3.0.0) (2026-04-27)
 
 ### ⚠ BREAKING CHANGES

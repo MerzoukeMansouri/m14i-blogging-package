@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.6](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.5...v2.2.6) (2026-04-27)
+
+### 📚 Documentation
+
+* add media library setup guide and update feature lists ([275f0b1](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/275f0b1cb004ae419dbf73ed52b2286131be976c))
+
 ## [2.2.5](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v2.2.4...v2.2.5) (2026-04-26)
 
 ### 🐛 Bug Fixes

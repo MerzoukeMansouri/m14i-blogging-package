@@ -256,6 +256,12 @@ export interface BlogAdminProps {
   apiClient?: any;
 
   /**
+   * Optional Supabase client for media uploads
+   * Enables image upload/gallery features in the admin
+   */
+  supabaseClient?: any;
+
+  /**
    * Security: Controls UI access
    * Developer passes their own logic (e.g., user.role === 'admin')
    * When false, displays access denied screen

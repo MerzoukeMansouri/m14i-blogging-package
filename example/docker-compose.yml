@@ -1,14 +1,17 @@
 # =============================================================================
 # m14i-blogging Example — Docker Compose
 # =============================================================================
-# Minimal self-hosted Supabase stack for local blog development.
+# Complete self-hosted Supabase stack for local blog development.
 #
 # Services:
-#   - db:      PostgreSQL 15 (Supabase fork with extensions)
-#   - auth:    GoTrue (authentication & JWT)
-#   - rest:    PostgREST (auto-generated REST API)
-#   - kong:    API gateway (routes /auth, /rest to services)
-#   - studio:  Supabase Dashboard (optional, http://localhost:3001)
+#   - db:       PostgreSQL 15 (Supabase fork with extensions)
+#   - auth:     GoTrue (authentication & JWT)
+#   - rest:     PostgREST (auto-generated REST API)
+#   - storage:  Supabase Storage API (file uploads & management)
+#   - imgproxy: Image transformations (resize, optimize, convert)
+#   - kong:     API gateway (routes /auth, /rest, /storage to services)
+#   - meta:     Postgres metadata service (required by Studio)
+#   - studio:   Supabase Dashboard (http://localhost:3001)
 #
 # Usage:
 #   cp .env.example .env
@@ -40,6 +43,7 @@ services:
       - ./volumes/db/migrations/20260404000000_set_role_passwords.sql:/docker-entrypoint-initdb.d/migrations/20260404000000_set_role_passwords.sql:Z
       - ./volumes/db/migrations/20260405000000_create_blog_schema.sql:/docker-entrypoint-initdb.d/migrations/20260405000000_create_blog_schema.sql:Z
       - ./volumes/db/migrations/20260425000000_add_brand_settings.sql:/docker-entrypoint-initdb.d/migrations/20260425000000_add_brand_settings.sql:Z
+      - ./volumes/db/migrations/20260427000000_create_blog_storage.sql:/docker-entrypoint-initdb.d/migrations/20260427000000_create_blog_storage.sql:Z
       - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB}"]
@@ -98,6 +102,57 @@ services:
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
   # ---------------------------------------------------------------------------
+  # Storage — File uploads and management
+  # ---------------------------------------------------------------------------
+  storage:
+    image: supabase/storage-api:v1.11.14
+    container_name: m14i-blog-storage
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+      imgproxy:
+        condition: service_started
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
+    volumes:
+      - storage-data:/var/lib/storage:z
+
+  # ---------------------------------------------------------------------------
+  # imgproxy — Image transformations
+  # ---------------------------------------------------------------------------
+  imgproxy:
+    image: darthsim/imgproxy:v3.25.0
+    container_name: m14i-blog-imgproxy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "imgproxy", "health"]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION:-true}
+    volumes:
+      - storage-data:/var/lib/storage:z
+
+  # ---------------------------------------------------------------------------
   # Kong — API Gateway
   # ---------------------------------------------------------------------------
   kong:
@@ -112,6 +167,8 @@ services:
         condition: service_started
       rest:
         condition: service_started
+      storage:
+        condition: service_started
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
@@ -119,6 +176,8 @@ services:
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+      KONG_NGINX_HTTP_CLIENT_HEADER_BUFFER_SIZE: 64k
+      KONG_NGINX_HTTP_LARGE_CLIENT_HEADER_BUFFERS: 16 128k
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
     volumes:
@@ -171,4 +230,6 @@ services:
 
 volumes:
   db-data:
+    driver: local
+  storage-data:
     driver: local

@@ -56,8 +56,8 @@ See **[INSTALL.md](./INSTALL.md)** for complete integration guide.
 - ✅ Drag & drop layout builder
 - ✅ WYSIWYG editor (TipTap)
 - ✅ Rich content blocks (code, charts, PDFs, carousels)
+- ✅ Media library (upload, gallery, stock photos)
 - ✅ AI content generation
-- ✅ Media upload
 
 ### @m14i/blogging-server
 - ✅ Next.js API route handlers

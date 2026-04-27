@@ -497,7 +497,6 @@ export function createBlogClient(
         const { data, error } = await db
                   .from(cfg.postsTable)
           .select("category")
-          .eq("status", "published")
           .not("category", "is", null);
 
         if (error) {
@@ -524,8 +523,7 @@ export function createBlogClient(
       async getTags(): Promise<BlogTag[]> {
         const { data, error } = await db
                   .from(cfg.postsTable)
-          .select("tags")
-          .eq("status", "published");
+          .select("tags");
 
         if (error) {
           throw new Error(`Failed to fetch tags: ${error.message}`);

@@ -17,6 +17,11 @@ import { CollapsibleFormSection } from "../components/CollapsibleFormSection";
 import { BlogEditorContainer } from "../components/BlogEditorContainer";
 import { buildPath } from "../utils/router";
 import { BlogAdminAPIClient } from "../api/client";
+import { generateImageSearchQuery, searchImages } from "../utils/images";
+import { MediaUploader } from "../components/MediaUploader";
+import { MediaGallery } from "../components/MediaGallery";
+import { MediaLibraryModal } from "../components/MediaLibraryModal";
+import { ImageWithBlobUrl } from "../components/ImageWithBlobUrl";
 import type { BlogPostRow, BlogPostInsert, LayoutType, LayoutSection, ContentBlockType } from "@m14i/blogging-core";
 
 export interface EditorViewProps {
@@ -38,6 +43,7 @@ function CardWrapper({
   }
   return <div className={fallbackClassName}>{children}</div>;
 }
+
 
 // Helper component for conditional Button
 function ActionButton({
@@ -168,6 +174,7 @@ export function EditorView({ postId }: EditorViewProps) {
   const [showTagDialog, setShowTagDialog] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showLayerPanel, setShowLayerPanel] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
 
   // AI Generation state
   const [isGenerating, setIsGenerating] = useState(false);
@@ -177,6 +184,10 @@ export function EditorView({ postId }: EditorViewProps) {
   const [generationPhase, setGenerationPhase] = useState<"idle" | "layout" | "sections">("idle");
   const [generatingSections, setGeneratingSections] = useState<Set<string>>(new Set());
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
+
+  // Image finding state
+  const [isFindingImage, setIsFindingImage] = useState(false);
+  const [imageTab, setImageTab] = useState<"url" | "upload" | "gallery">("url");
 
   const {
     state,
@@ -492,6 +503,37 @@ export function EditorView({ postId }: EditorViewProps) {
     return result.content;
   };
 
+  /**
+   * Find and set a relevant image from free image service
+   */
+  const handleFindImage = async (): Promise<void> => {
+    const searchQuery = generateImageSearchQuery(
+      state.title,
+      state.category,
+      state.tags
+    );
+
+    if (!searchQuery) {
+      alert("Please add a title, category, or tag first to help find a relevant image.");
+      return;
+    }
+
+    setIsFindingImage(true);
+
+    try {
+      const images = await searchImages(searchQuery, 1);
+
+      if (images.length > 0) {
+        updateField("featured_image", images[0].urls.regular);
+      }
+    } catch (error) {
+      console.error("Error finding image:", error);
+      alert("Failed to find image. Please try again.");
+    } finally {
+      setIsFindingImage(false);
+    }
+  };
+
   if (loadingPost) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -536,6 +578,16 @@ export function EditorView({ postId }: EditorViewProps) {
             <span className="text-lg">📐</span>
             <span className="hidden sm:inline">Layers</span>
             <kbd className="hidden lg:inline text-xs ml-1 px-1 py-0.5 bg-gray-100 border border-gray-300 rounded opacity-60">⌘L</kbd>
+          </ActionButton>
+
+          <ActionButton
+            Button={Button}
+            variant="outline"
+            onClick={() => setShowMediaLibrary(!showMediaLibrary)}
+            fallbackClassName="px-3 py-2 border border-gray-300 rounded-md flex items-center gap-2 transition-colors hover:bg-gray-50 text-gray-700"
+          >
+            <span className="text-lg">🖼️</span>
+            <span className="hidden sm:inline">Media</span>
           </ActionButton>
 
           <ActionButton
@@ -645,19 +697,112 @@ export function EditorView({ postId }: EditorViewProps) {
               isComplete={!!state.featured_image}
               modalContent={
                 <div className="space-y-4">
-                  <InputField
-                    Input={Input}
-                    id="featured_image"
-                    value={state.featured_image}
-                    onChange={(value) => updateField("featured_image", value)}
-                    placeholder="https://..."
-                  />
-                  {state.featured_image && (
-                    <img
-                      src={state.featured_image}
-                      alt="Featured"
-                      className="w-full h-48 object-cover rounded-md"
+                  {/* Tabs */}
+                  <div className="flex gap-2 border-b">
+                    <button
+                      type="button"
+                      onClick={() => setImageTab("url")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        imageTab === "url"
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      URL / Find Image
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageTab("upload")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        imageTab === "upload"
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageTab("gallery")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        imageTab === "gallery"
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      Media Library
+                    </button>
+                  </div>
+
+                  {/* Tab Content */}
+                  {imageTab === "url" && (
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <InputField
+                            Input={Input}
+                            id="featured_image"
+                            value={state.featured_image}
+                            onChange={(value) => updateField("featured_image", value)}
+                            placeholder="https://..."
+                          />
+                        </div>
+                        {Button ? (
+                          <Button
+                            onClick={handleFindImage}
+                            disabled={isFindingImage}
+                            variant="outline"
+                          >
+                            {isFindingImage ? "Finding..." : "🔍 Find"}
+                          </Button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleFindImage}
+                            disabled={isFindingImage}
+                            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                          >
+                            {isFindingImage ? "..." : "🔍 Find"}
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Enter URL or click "Find" to get a free stock photo based on your post content.
+                      </p>
+                    </div>
+                  )}
+
+                  {imageTab === "upload" && (
+                    <MediaUploader
+                      onImageSelected={(url) => {
+                        updateField("featured_image", url);
+                        // Switch to gallery tab to show uploaded image
+                        setImageTab("gallery");
+                      }}
+                      currentValue={state.featured_image}
                     />
+                  )}
+
+                  {imageTab === "gallery" && (
+                    <MediaGallery
+                      key={state.featured_image} // Force refresh when image changes
+                      onImageSelected={(url) => updateField("featured_image", url)}
+                      selectedUrl={state.featured_image}
+                    />
+                  )}
+
+                  {/* Preview */}
+                  {state.featured_image && (
+                    <div className="pt-4 border-t">
+                      <p className="text-xs text-gray-500 mb-2">Preview:</p>
+                      <ImageWithBlobUrl
+                        url={state.featured_image}
+                        alt="Featured"
+                        className="w-full h-48 object-cover rounded-md bg-gray-100"
+                        loadingText="Loading preview..."
+                        errorText="Failed to load preview"
+                      />
+                    </div>
                   )}
                 </div>
               }
@@ -745,6 +890,14 @@ export function EditorView({ postId }: EditorViewProps) {
             updateField("tags", [...state.tags, tag.name]);
             setShowTagDialog(false);
           }}
+        />
+
+        {/* Media Library Modal */}
+        <MediaLibraryModal
+          isOpen={showMediaLibrary}
+          onClose={() => setShowMediaLibrary(false)}
+          onImageSelected={(url) => updateField("featured_image", url)}
+          currentValue={state.featured_image}
         />
       </div>
   );

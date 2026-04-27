@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { BlogBuilderWithDefaults } from "@m14i/blogging-admin";
 import type { LayoutSection } from "@m14i/blogging-core";
+import { createClient } from "@/lib/supabase-browser";
 
 const BlogAdmin = dynamic(
   () => import("@m14i/blogging-admin").then((m) => m.BlogAdmin),
@@ -30,6 +31,8 @@ function BlogBuilderWrapper({
 }
 
 export default function BlogAdminPage() {
+  const supabase = createClient();
+
   return (
     <BlogAdmin
       isAllowed={true}
@@ -40,6 +43,7 @@ export default function BlogAdminPage() {
       }}
       basePath="/admin/blog"
       apiBasePath="/api/blog"
+      supabaseClient={supabase as any}
       components={{
         BlogBuilder: BlogBuilderWrapper,
       }}

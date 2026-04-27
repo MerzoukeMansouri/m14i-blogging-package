@@ -2,6 +2,8 @@
 
 import React from "react";
 import { WYSIWYGEditor } from "./WYSIWYGEditor";
+import { searchImages } from "../utils/images";
+import { MediaLibraryModal } from "./MediaLibraryModal";
 import type {
   TextBlock,
   ImageBlock,
@@ -103,22 +105,100 @@ interface ImageEditorProps {
 }
 
 export function ImageEditor({ block, onChange, components }: ImageEditorProps): React.ReactElement {
-  const { Label, Input } = components;
+  const { Label, Input, Button } = components;
+  const [isFindingImage, setIsFindingImage] = React.useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
+
+  const handleFindImage = async (): Promise<void> => {
+    const searchQuery = block.alt || block.caption;
+
+    if (!searchQuery?.trim()) {
+      alert("Veuillez d'abord entrer un texte alternatif ou une légende pour chercher une image pertinente.");
+      return;
+    }
+
+    setIsFindingImage(true);
+
+    try {
+      const images = await searchImages(searchQuery.trim(), 1);
+      if (images.length > 0) {
+        onChange({ ...block, src: images[0].urls.regular });
+      }
+    } catch (error) {
+      console.error("Error finding image:", error);
+      alert("Échec de la recherche d'image. Veuillez réessayer.");
+    } finally {
+      setIsFindingImage(false);
+    }
+  };
+
+  const renderButtons = (): React.ReactElement => {
+    if (Button) {
+      return (
+        <>
+          <Button
+            type="button"
+            onClick={handleFindImage}
+            disabled={isFindingImage}
+            variant="outline"
+            size="sm"
+          >
+            {isFindingImage ? "..." : "🔍"}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setShowMediaLibrary(true)}
+            variant="outline"
+            size="sm"
+          >
+            🖼️
+          </Button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <button
+          type="button"
+          onClick={handleFindImage}
+          disabled={isFindingImage}
+          className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        >
+          {isFindingImage ? "..." : "🔍"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowMediaLibrary(true)}
+          className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+        >
+          🖼️
+        </button>
+      </>
+    );
+  };
 
   return (
-    <div className="space-y-3">
-      <div>
-        <Label className="text-xs text-muted-foreground">URL de l'image</Label>
-        <Input
-          type="url"
-          value={block.src}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            onChange({ ...block, src: e.target.value })
-          }
-          placeholder="https://example.com/image.jpg"
-          className="text-sm"
-        />
-      </div>
+    <>
+      <div className="space-y-3">
+        <div>
+          <Label className="text-xs text-muted-foreground">URL de l'image</Label>
+          <div className="flex gap-2">
+            <Input
+              type="url"
+              value={block.src}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange({ ...block, src: e.target.value })
+              }
+              placeholder="https://example.com/image.jpg"
+              className="text-sm flex-1"
+            />
+            {renderButtons()}
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Entrez d'abord un texte alternatif ou légende, puis cliquez 🔍 pour trouver une image gratuite ou 🖼️ pour la bibliothèque
+          </p>
+        </div>
       <div>
         <Label className="text-xs text-muted-foreground">Texte alternatif</Label>
         <Input
@@ -141,7 +221,25 @@ export function ImageEditor({ block, onChange, components }: ImageEditorProps): 
           className="text-sm"
         />
       </div>
+      {block.src && (
+        <div>
+          <Label className="text-xs text-muted-foreground">Aperçu</Label>
+          <img
+            src={block.src}
+            alt={block.alt || "Preview"}
+            className="w-full h-32 object-cover rounded-md border mt-1"
+          />
+        </div>
+      )}
     </div>
+
+    <MediaLibraryModal
+      isOpen={showMediaLibrary}
+      onClose={() => setShowMediaLibrary(false)}
+      onImageSelected={(url) => onChange({ ...block, src: url })}
+      currentValue={block.src}
+    />
+  </>
   );
 }
 
@@ -321,55 +419,107 @@ interface CarouselSlideEditorProps {
 
 function CarouselSlideEditor({ slide, index, onUpdate, onRemove, components }: CarouselSlideEditorProps): React.ReactElement {
   const { Input, Button, XIcon } = components;
+  const [isFindingImage, setIsFindingImage] = React.useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
+
+  const handleFindImage = async (): Promise<void> => {
+    const searchQuery = slide.alt || slide.title || slide.caption;
+
+    if (!searchQuery?.trim()) {
+      alert("Entrez d'abord un titre, texte alternatif ou légende.");
+      return;
+    }
+
+    setIsFindingImage(true);
+
+    try {
+      const images = await searchImages(searchQuery.trim(), 1);
+      if (images.length > 0) {
+        onUpdate(index, { ...slide, src: images[0].urls.regular });
+      }
+    } catch (error) {
+      console.error("Error finding image:", error);
+    } finally {
+      setIsFindingImage(false);
+    }
+  };
 
   return (
-    <div className="border rounded p-2 space-y-2 bg-muted/30">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium">Slide {index + 1}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => onRemove(index)}
-        >
-          <XIcon className="w-3 h-3" />
-        </Button>
+    <>
+      <div className="border rounded p-2 space-y-2 bg-muted/30">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium">Slide {index + 1}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={() => onRemove(index)}
+          >
+            <XIcon className="w-3 h-3" />
+          </Button>
+        </div>
+        <div className="flex gap-1">
+          <Input
+            type="url"
+            value={slide.src}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onUpdate(index, { ...slide, src: e.target.value })
+            }
+            placeholder="URL de l'image"
+            className="text-xs h-8 flex-1"
+          />
+          <button
+            type="button"
+            onClick={handleFindImage}
+            disabled={isFindingImage}
+            className="px-2 h-8 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 text-xs"
+            title="Trouver une image"
+          >
+            {isFindingImage ? "..." : "🔍"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowMediaLibrary(true)}
+            className="px-2 h-8 border border-gray-300 rounded-md hover:bg-gray-50 text-xs"
+            title="Bibliothèque média"
+          >
+            🖼️
+          </button>
+        </div>
+        <Input
+          value={slide.alt}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onUpdate(index, { ...slide, alt: e.target.value })
+          }
+          placeholder="Texte alternatif"
+          className="text-xs h-8"
+        />
+        <Input
+          value={slide.title || ""}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onUpdate(index, { ...slide, title: e.target.value })
+          }
+          placeholder="Titre (optionnel)"
+          className="text-xs h-8"
+        />
+        <Input
+          value={slide.caption || ""}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onUpdate(index, { ...slide, caption: e.target.value })
+          }
+          placeholder="Caption (optionnel)"
+          className="text-xs h-8"
+        />
       </div>
-      <Input
-        type="url"
-        value={slide.src}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onUpdate(index, { ...slide, src: e.target.value })
-        }
-        placeholder="URL de l'image"
-        className="text-xs h-8"
+
+      <MediaLibraryModal
+        isOpen={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onImageSelected={(url) => onUpdate(index, { ...slide, src: url })}
+        currentValue={slide.src}
       />
-      <Input
-        value={slide.alt}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onUpdate(index, { ...slide, alt: e.target.value })
-        }
-        placeholder="Texte alternatif"
-        className="text-xs h-8"
-      />
-      <Input
-        value={slide.title || ""}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onUpdate(index, { ...slide, title: e.target.value })
-        }
-        placeholder="Titre (optionnel)"
-        className="text-xs h-8"
-      />
-      <Input
-        value={slide.caption || ""}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onUpdate(index, { ...slide, caption: e.target.value })
-        }
-        placeholder="Caption (optionnel)"
-        className="text-xs h-8"
-      />
-    </div>
+    </>
   );
 }
 

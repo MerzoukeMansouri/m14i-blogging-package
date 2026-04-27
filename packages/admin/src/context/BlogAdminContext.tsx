@@ -7,6 +7,7 @@
 
 import { createContext, useContext, ReactNode, useMemo } from "react";
 import { BlogAdminAPIClient } from "../api/client";
+import type { SupabaseStorageClient } from "../utils/supabase-storage";
 import type {
   CurrentUser,
   BlogAdminTheme,
@@ -25,6 +26,9 @@ import type {
 export interface BlogAdminContextValue {
   // API Client
   apiClient: BlogAdminAPIClient;
+
+  // Supabase Client (optional, for media upload)
+  supabaseClient?: SupabaseStorageClient;
 
   // User
   currentUser?: CurrentUser;
@@ -148,6 +152,7 @@ const DEFAULT_LABELS: Required<BlogAdminLabels> = {
 export interface BlogAdminProviderProps {
   children: ReactNode;
   apiClient: BlogAdminAPIClient;
+  supabaseClient?: SupabaseStorageClient;
   currentUser?: CurrentUser;
   basePath?: string;
   theme?: BlogAdminTheme;
@@ -171,6 +176,7 @@ export interface BlogAdminProviderProps {
 export function BlogAdminProvider({
   children,
   apiClient,
+  supabaseClient,
   currentUser,
   basePath = "/admin/blog",
   theme,
@@ -189,6 +195,7 @@ export function BlogAdminProvider({
   const value = useMemo<BlogAdminContextValue>(
     () => ({
       apiClient,
+      supabaseClient,
       currentUser,
       basePath,
       theme,

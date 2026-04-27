@@ -44,6 +44,12 @@ export { DraggableLayerPanel } from "./components/DraggableLayerPanel";
 export { BlogEditorContainer } from "./components/BlogEditorContainer";
 export { AccessDenied } from "./components/AccessDenied";
 
+// Media Components
+export { MediaUploader } from "./components/MediaUploader";
+export { MediaGallery } from "./components/MediaGallery";
+export { MediaLibraryModal } from "./components/MediaLibraryModal";
+export { ImageWithBlobUrl } from "./components/ImageWithBlobUrl";
+
 // Editor Components
 export { BlogBuilder } from "./components/BlogBuilder";
 export { BlogBuilderWithDefaults } from "./components/BlogBuilderWithDefaults";
@@ -64,6 +70,8 @@ export { EditorView } from "./views/EditorView";
 
 // Utilities
 export { parseRoute, buildPath, navigateTo } from "./utils/router";
+export { uploadImage, listImages, deleteImage, validateImageFile } from "./utils/supabase-storage";
+export type { SupabaseStorageClient, UploadedImage } from "./utils/supabase-storage";
 
 // Re-export core for convenience
 export * from "@m14i/blogging-core";

@@ -4,9 +4,10 @@ A complete blog application using [m14i-blogging](https://www.npmjs.com/package/
 
 ## What's Included
 
-- **Self-hosted Supabase** — PostgreSQL, GoTrue (auth), PostgREST (REST API), Kong (API gateway), Studio (dashboard)
+- **Self-hosted Supabase** — PostgreSQL, GoTrue (auth), PostgREST (REST API), Kong (API gateway), Studio (dashboard), Storage (image upload)
 - **Next.js 15 app** — Blog admin panel + public blog, pre-wired API routes
-- **Auto-provisioned database** — Blog schema, categories, tags, and seed data applied on first boot
+- **Auto-provisioned database** — Blog schema, categories, tags, seed data, and storage bucket applied on first boot
+- **Media library** — Upload images, browse gallery, and search free stock photos
 - **Zero config** — Pre-generated JWT keys for local development
 
 ## Prerequisites
@@ -91,6 +92,7 @@ Docker Compose starts a Supabase-flavored PostgreSQL. On first boot, it auto-run
 2. `20260405000000_create_blog_schema.sql` — Creates `blog` schema with `posts` and `media` tables, RLS policies, full-text search, and public views
 3. `20260405000001_add_taxonomy_tables.sql` — Creates `blog_categories` and `blog_tags` tables in `public` schema
 4. `20260405000002_seed_data.sql` — Inserts sample categories, tags, and a welcome post
+5. `20260427000000_create_blog_storage.sql` — Creates `blog-images` storage bucket with public access and RLS policies for image uploads
 
 ### API Routes
 
@@ -115,6 +117,14 @@ POST   /api/blog/media        → createMedia (auth required)
 ### Admin Panel
 
 Uses `BlogAdmin` with `BlogBuilderWithDefaults` (no shadcn/ui required). Set `isAllowed={true}` for demo purposes — in production, wire this to your auth logic.
+
+**Media Library**: The admin includes a built-in media library with:
+- Image upload (JPG, PNG, GIF, WebP, max 5MB)
+- Gallery view of uploaded images
+- Free stock photo search via Picsum Photos
+- Media library button in toolbar for quick access
+
+For more details, see [Media Library Setup Guide](../docs/MEDIA_LIBRARY_SETUP.md).
 
 ### Public Blog
 
@@ -172,6 +182,12 @@ import { PlusIcon, XIcon } from "lucide-react";
 3. **Enable HTTPS** — configure Kong or use a reverse proxy
 4. **Restrict CORS** — update Kong plugins
 5. **Disable Studio** — or put it behind authentication
+
+## Documentation
+
+- **[Media Library Setup](../docs/MEDIA_LIBRARY_SETUP.md)** — Configure image upload and storage
+- **[Blog Admin Guide](../docs/BLOG_ADMIN_GUIDE.md)** — Complete BlogAdmin component reference
+- **[Installation Guide](../docs/INSTALLATION.md)** — Package installation instructions
 
 ## Troubleshooting
 

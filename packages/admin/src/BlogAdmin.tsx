@@ -44,6 +44,7 @@ export function BlogAdmin(props: BlogAdminProps) {
   const {
     apiBasePath = "/api/blog",
     apiClient: customApiClient,
+    supabaseClient,
     isAllowed,
     currentUser,
     basePath = "/admin/blog",
@@ -93,6 +94,7 @@ export function BlogAdmin(props: BlogAdminProps) {
     return (
       <BlogAdminProvider
         apiClient={apiClient}
+        supabaseClient={supabaseClient}
         currentUser={currentUser}
         basePath={basePath}
         theme={theme}
@@ -132,6 +134,7 @@ export function BlogAdmin(props: BlogAdminProps) {
   return (
     <BlogAdminProvider
       apiClient={apiClient}
+      supabaseClient={supabaseClient}
       currentUser={currentUser}
       basePath={basePath}
       theme={theme}

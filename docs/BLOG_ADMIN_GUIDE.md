@@ -22,6 +22,7 @@ The `BlogAdmin` component provides a complete, drop-in blog administration inter
 
 - ✅ **Complete CRUD operations** for posts, categories, and tags
 - ✅ **Rich text editor** with drag-and-drop content blocks (BlogBuilder)
+- ✅ **Media library** with upload, gallery, and stock photo search
 - ✅ **Live preview** in new tab with sessionStorage for drafts
 - ✅ **Auto-save** (3-second debounce) to sessionStorage
 - ✅ **Inline taxonomy creation** (categories and tags)
@@ -674,8 +675,15 @@ For issues, questions, or feature requests:
 
 ---
 
+## Additional Guides
+
+- **[Media Library Setup](./MEDIA_LIBRARY_SETUP.md)** - Configure image upload and media library with Supabase Storage
+
+---
+
 **Next Steps:**
 
+- Set up media library for image uploads (see guide above)
 - Customize the look with your shadcn/ui components
 - Add custom callbacks for notifications
 - Translate labels for your language

@@ -35,8 +35,30 @@ export function TaxonomySelector({
   const Button = components?.Button;
   const Input = components?.Input;
 
+  // Ensure selected category is in the list (for newly created categories)
+  const allCategories = [...categories];
+  if (selectedCategory && !categories.find(c => c.name === selectedCategory)) {
+    allCategories.unshift({
+      name: selectedCategory,
+      slug: selectedCategory.toLowerCase().replace(/\s+/g, "-"),
+      postCount: 0,
+    });
+  }
+
+  // Ensure selected tags are in the list (for newly created tags)
+  const allTags = [...tags];
+  selectedTags.forEach(tagName => {
+    if (!tags.find(t => t.name === tagName)) {
+      allTags.push({
+        name: tagName,
+        slug: tagName.toLowerCase().replace(/\s+/g, "-"),
+        postCount: 0,
+      });
+    }
+  });
+
   // Filter tags based on search
-  const filteredTags = tags.filter((tag) =>
+  const filteredTags = allTags.filter((tag) =>
     tag.name.toLowerCase().includes(tagSearchQuery.toLowerCase())
   );
 
@@ -56,15 +78,25 @@ export function TaxonomySelector({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{labels.category}</label>
-            {onCreateCategory && Button && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onCreateCategory}
-                className="h-8 text-xs"
-              >
-                + {labels.newCategory}
-              </Button>
+            {onCreateCategory && (
+              Button ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onCreateCategory}
+                  className="h-8 text-xs"
+                >
+                  + {labels.newCategory}
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onCreateCategory}
+                  className="h-8 px-3 text-xs text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                >
+                  + {labels.newCategory}
+                </button>
+              )
             )}
           </div>
 
@@ -75,7 +107,7 @@ export function TaxonomySelector({
               disabled={loading}
             >
               <option value="">{labels.selectCategory}</option>
-              {categories.map((category) => (
+              {allCategories.map((category) => (
                 <option key={category.slug} value={category.name}>
                   {category.name}
                 </option>
@@ -89,7 +121,7 @@ export function TaxonomySelector({
               className="w-full px-3 py-2 border rounded-md"
             >
               <option value="">{labels.selectCategory}</option>
-              {categories.map((category) => (
+              {allCategories.map((category) => (
                 <option key={category.slug} value={category.name}>
                   {category.name}
                 </option>
@@ -104,15 +136,25 @@ export function TaxonomySelector({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{labels.tags}</label>
-            {onCreateTag && Button && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onCreateTag}
-                className="h-8 text-xs"
-              >
-                + {labels.newTag}
-              </Button>
+            {onCreateTag && (
+              Button ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onCreateTag}
+                  className="h-8 text-xs"
+                >
+                  + {labels.newTag}
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onCreateTag}
+                  className="h-8 px-3 text-xs text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                >
+                  + {labels.newTag}
+                </button>
+              )
             )}
           </div>
 
@@ -139,7 +181,7 @@ export function TaxonomySelector({
           {selectedTags.length > 0 && (
             <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-md">
               {selectedTags.map((tagName) => {
-                const tag = tags.find((t) => t.name === tagName);
+                const tag = allTags.find((t) => t.name === tagName);
                 return Badge ? (
                   <Badge
                     key={tagName}

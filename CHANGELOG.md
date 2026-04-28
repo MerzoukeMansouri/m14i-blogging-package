@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.4](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v3.0.3...v3.0.4) (2026-04-28)
+
+### 🐛 Bug Fixes
+
+* exclude .tgz files from npm package ([3bfe9d5](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/3bfe9d5364c5e2ed806c6b72eecf7a3378146388))
+
 ## [3.0.3](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v3.0.2...v3.0.3) (2026-04-28)
 
 ### 🐛 Bug Fixes

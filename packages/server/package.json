@@ -38,6 +38,9 @@
     "url": "git+https://github.com/MerzoukeMansouri/m14i-blogging-package.git",
     "directory": "packages/server"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@supabase/supabase-js": "^2.0.0"
   },

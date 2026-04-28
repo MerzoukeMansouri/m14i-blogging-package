@@ -40,6 +40,9 @@
     "url": "git+https://github.com/MerzoukeMansouri/m14i-blogging-package.git",
     "directory": "packages/admin"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@tiptap/extension-image": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",

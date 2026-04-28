@@ -1,50 +1,11 @@
 {
   "name": "m14i-blogging",
-  "version": "3.0.4",
+  "version": "4.0.0",
+  "private": true,
   "type": "module",
-  "description": "Drag & drop blog builder with customizable layouts and content blocks for React and Next.js",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./client": {
-      "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.mjs",
-      "require": "./dist/client/index.cjs"
-    },
-    "./server": {
-      "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.mjs",
-      "require": "./dist/server/index.cjs"
-    },
-    "./admin": {
-      "types": "./dist/admin/index.d.ts",
-      "import": "./dist/admin/index.mjs",
-      "require": "./dist/admin/index.cjs"
-    },
-    "./public": {
-      "types": "./dist/public/index.d.ts",
-      "import": "./dist/public/index.mjs",
-      "require": "./dist/public/index.cjs"
-    },
-    "./styles": "./dist/index.css",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "docs",
-    "supabase",
-    ".claude",
-    "README.md",
-    "LICENSE"
-  ],
+  "description": "Monorepo for @m14i/blogging-* packages - Drag & drop blog builder with customizable layouts and content blocks for React and Next.js",
   "scripts": {
-    "build": "pnpm --filter @m14i/blogging-core build && pnpm --filter @m14i/blogging-server build && pnpm --filter @m14i/blogging-admin build && node aggregate-dist.cjs",
+    "build": "pnpm --filter @m14i/blogging-core build && pnpm --filter @m14i/blogging-server build && pnpm --filter @m14i/blogging-admin build",
     "build:core": "pnpm --filter @m14i/blogging-core build",
     "build:admin": "pnpm --filter @m14i/blogging-admin build",
     "build:server": "pnpm --filter @m14i/blogging-server build",
@@ -53,7 +14,7 @@
     "clean": "rm -rf packages/*/dist example/app/.next",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "semantic-release": "semantic-release"
+    "release": "pnpm build && pnpm -r --workspace-concurrency=1 exec -- npx --no-install semantic-release -e semantic-release-monorepo"
   },
   "keywords": [
     "blog",
@@ -77,48 +38,11 @@
     "url": "https://github.com/MerzoukeMansouri/m14i-blogging-package/issues"
   },
   "homepage": "https://github.com/MerzoukeMansouri/m14i-blogging-package#readme",
-  "publishConfig": {
-    "access": "public"
-  },
   "packageManager": "pnpm@10.25.0",
   "pnpm": {
     "overrides": {
       "postcss@<8.5.10": ">=8.5.10"
     }
-  },
-  "peerDependencies": {
-    "@hello-pangea/dnd": "^16.0.0",
-    "@tiptap/extension-image": "^2.10.0",
-    "@tiptap/extension-link": "^2.10.0",
-    "@tiptap/extension-placeholder": "^2.10.0",
-    "@tiptap/react": "^2.10.0",
-    "@tiptap/starter-kit": "^2.10.0",
-    "lucide-react": "^0.0.0",
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "react-markdown": "^9.0.0",
-    "rehype-stringify": "^10.0.0",
-    "remark-gfm": "^4.0.0",
-    "remark-parse": "^11.0.0",
-    "remark-rehype": "^11.0.0",
-    "unified": "^11.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@supabase/supabase-js": {
-      "optional": true
-    },
-    "@supabase/ssr": {
-      "optional": true
-    },
-    "next": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0",
-    "@types/react-syntax-highlighter": "^15.5.13",
-    "react-syntax-highlighter": "^16.1.1",
-    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -156,6 +80,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "semantic-release": "^25.0.3",
+    "semantic-release-monorepo": "^8.0.2",
     "storybook": "^10.3.4",
     "tailwindcss": "^4.2.2",
     "tsup": "^8.5.1",

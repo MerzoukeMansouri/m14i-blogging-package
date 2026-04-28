@@ -20,11 +20,8 @@ concurrency:
 
 jobs:
   release:
-    name: Release Package
+    name: Release Packages
     runs-on: ubuntu-latest
-    outputs:
-      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
-      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
 
     steps:
       - name: Checkout
@@ -32,6 +29,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -43,6 +41,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@11.5.1
@@ -50,17 +49,60 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build package
+      - name: Build packages
         run: pnpm run build
 
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: pnpm audit signatures
 
-      - name: Release
-        id: semantic
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          # Publish all packages with provenance
+          pnpm publish -r --no-git-checks --access public
+
+          # Create git tags for each published package
+          for package in packages/*/package.json; do
+            dir=$(dirname "$package")
+            name=$(node -p "require('./$package').name")
+            version=$(node -p "require('./$package').version")
+            tag="${name}@${version}"
+
+            echo "Creating tag: $tag"
+            git tag "$tag" || echo "Tag $tag already exists"
+          done
+
+          # Push tags
+          git push --tags origin main || echo "Some tags may already exist"
+
+      - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: |
+          for package in packages/*/package.json; do
+            dir=$(dirname "$package")
+            name=$(node -p "require('./$package').name")
+            version=$(node -p "require('./$package').version")
+            tag="${name}@${version}"
+
+            # Check if release already exists
+            if ! gh release view "$tag" &>/dev/null; then
+              echo "Creating release for $tag"
+              gh release create "$tag" \
+                --title "$name v$version" \
+                --notes "See CHANGELOG.md for details" \
+                --latest=false
+            else
+              echo "Release $tag already exists"
+            fi
+          done
 
   deploy-storybook:
     name: Deploy Storybook

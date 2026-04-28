@@ -44,7 +44,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "pnpm --filter @m14i/blogging-core build && pnpm --filter @m14i/blogging-server build && pnpm --filter @m14i/blogging-admin build",
+    "build": "pnpm --filter @m14i/blogging-core build && pnpm --filter @m14i/blogging-server build && pnpm --filter @m14i/blogging-admin build && node aggregate-dist.cjs",
     "build:core": "pnpm --filter @m14i/blogging-core build",
     "build:admin": "pnpm --filter @m14i/blogging-admin build",
     "build:server": "pnpm --filter @m14i/blogging-server build",

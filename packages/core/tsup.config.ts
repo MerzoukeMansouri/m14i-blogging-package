@@ -53,6 +53,32 @@ export default defineConfig([
     ],
     injectStyle: false,
   },
+  // Public-facing components
+  {
+    entry: {
+      'public/index': 'src/public/index.ts',
+    },
+    format: ['cjs', 'esm'],
+    dts: true,
+    sourcemap: true,
+    treeshake: true,
+    splitting: false,
+    minify: false,
+    outExtension: getOutputExtension,
+    external: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'lucide-react',
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+      'next',
+      'next/navigation',
+      'react-markdown',
+      'remark-gfm',
+    ],
+    injectStyle: false,
+  },
   // CSS bundle
   {
     entry: {

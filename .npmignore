@@ -30,6 +30,7 @@ docs
 node_modules
 .DS_Store
 *.log
+*.tgz
 
 # Supabase (include migrations)
 supabase/seed.sql

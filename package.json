@@ -53,8 +53,7 @@
     "clean": "rm -rf packages/*/dist example/app/.next",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "semantic-release": "semantic-release",
-    "prepublishOnly": "pnpm run build"
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "blog",

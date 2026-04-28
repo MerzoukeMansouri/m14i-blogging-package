@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v3.0.1...v3.0.2) (2026-04-28)
+
+### 🐛 Bug Fixes
+
+* remove redundant prepublishOnly hook ([abc55cb](https://github.com/MerzoukeMansouri/m14i-blogging-package/commit/abc55cb06f378c8cb102c471731bee441b76aab1))
+
 ## [3.0.1](https://github.com/MerzoukeMansouri/m14i-blogging-package/compare/v3.0.0...v3.0.1) (2026-04-27)
 
 ### 🐛 Bug Fixes

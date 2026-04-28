@@ -1,6 +1,6 @@
 {
   "name": "m14i-blogging",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "type": "module",
   "description": "Drag & drop blog builder with customizable layouts and content blocks for React and Next.js",
   "main": "./dist/index.cjs",

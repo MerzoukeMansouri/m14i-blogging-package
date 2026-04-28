@@ -53,9 +53,17 @@
     "directory": "packages/core"
   },
   "peerDependencies": {
+    "lucide-react": "^0.0.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "lucide-react": "^0.0.0"
+    "react-markdown": "^9.0.0",
+    "react-syntax-highlighter": "^15.0.0",
+    "recharts": "^2.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
+    "unified": "^11.0.0"
   },
   "peerDependenciesMeta": {
     "@supabase/supabase-js": {
@@ -66,18 +74,50 @@
     },
     "next": {
       "optional": true
+    },
+    "react-markdown": {
+      "optional": true
+    },
+    "remark-gfm": {
+      "optional": true
+    },
+    "unified": {
+      "optional": true
+    },
+    "remark-parse": {
+      "optional": true
+    },
+    "remark-rehype": {
+      "optional": true
+    },
+    "rehype-stringify": {
+      "optional": true
+    },
+    "react-syntax-highlighter": {
+      "optional": true
+    },
+    "recharts": {
+      "optional": true
     }
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "lucide-react": "^1.7.0",
     "next": "^15.5.15",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "recharts": "^3.8.1",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5"
   }
 }
